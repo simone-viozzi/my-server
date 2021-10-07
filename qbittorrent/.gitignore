@@ -1,0 +1,9 @@
+#docker-compose.yml
+docker-qbittorrent
+downloads
+engines
+#.gitignore
+jackett-config
+qbit-config
+#qbittorrent-plugins
+torrents

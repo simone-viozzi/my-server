@@ -1,0 +1,7 @@
+cache
+#docker-compose.yml
+lib
+log
+munin-conf.d
+muninplugins
+plugin-conf.d

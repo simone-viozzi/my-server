@@ -1,0 +1,9 @@
+services:
+    meld:
+      build: .
+      container_name: meld
+      ports:
+        - "2150:22"
+        - "5900:5900"
+      volumes:
+        - /data/hdd/rclone:/root/data

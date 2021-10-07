@@ -1,0 +1,40 @@
+
+services:
+  qbitorrent:
+    build: ./qbittorrent-plugins
+    container_name: qbittorrent
+    user: 1002:1002 
+    ports:
+      - 8080:8080
+      - 6881:6881/tcp
+      - 6881:6881/udp
+    links:
+      - jackett
+    volumes:
+      - ./qbit-config:/config
+      - ./torrents:/torrents
+      - /data/hdd/torrents:/downloads
+      - type: bind
+        source: ./engines/jackett.json
+        target: /engines/jackett.json      
+            # - ./engines:/engines
+    restart: always
+
+
+  jackett:
+    image: ghcr.io/linuxserver/jackett
+    container_name: jackett
+    environment:
+      - PUID=1002
+      - PGID=1002
+      - TZ=Europe/Paris
+      - AUTO_UPDATE=true #optional
+        #- RUN_OPTS=<run options here> #optional
+    volumes:
+      - ./jackett-config:/config
+      - ./downloads:/downloads
+    ports:
+      - 9117:9117
+    restart: always
+
+

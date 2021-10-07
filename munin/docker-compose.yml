@@ -1,0 +1,36 @@
+services:
+  munin-server:
+    image: occitech/munin
+    container_name: munin-server
+    ports: 
+      - 9090:80
+    networks:
+      - server-client
+    environment:
+      - NODES=server:127.0.0.1
+        #- DISABLELOCALNODE=yes
+      - TZ=Europe/Paris
+    volumes:
+      - ./munin-conf.d:/etc/munin/munin-conf.d
+      - ./plugin-conf.d:/etc/munin/plugin-conf.d
+      - ./lib:/var/lib/munin
+      - ./log:/var/log/munin
+      - ./cache:/var/cache/munin
+    restart: always
+
+  minin-client:
+    image: funkypenguin/munin-node
+    container_name: munin-client
+    privileged: true
+    volumes:
+      - ./muninplugins:/var/lib/muninplugins
+      - /:/rootfs:ro
+      - /sys:/sys:ro
+    environment:
+      - ALLOW=cidr_allow 0.0.0.0/0
+    networks:
+      - server-client
+    restart: always
+
+networks:
+    server-client:

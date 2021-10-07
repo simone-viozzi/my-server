@@ -1,0 +1,93 @@
+FROM alpine:3.13
+
+# Install required packages
+RUN apk add --no-cache \
+        boost-system \
+        boost-thread \
+        ca-certificates \
+        curl \
+        dumb-init \
+        libressl \
+        qt5-qtbase
+
+ENV PYTHONUNBUFFERED=1
+
+RUN echo "**** install Python ****" && \
+    apk add --no-cache python3 && \
+    if [ ! -e /usr/bin/python ]; then ln -sf python3 /usr/bin/python ; fi && \
+    \
+    echo "**** install pip ****" && \
+    python3 -m ensurepip && \
+    rm -r /usr/lib/python*/ensurepip && \
+    pip3 install --no-cache --upgrade pip setuptools wheel && \
+    if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi
+
+# Compiling qBitTorrent following instructions on
+# https://github.com/qbittorrent/qBittorrent/wiki/Compiling-qBittorrent-on-Debian-and-Ubuntu#Libtorrent
+RUN set -x \
+    # Install build dependencies
+ && apk add --no-cache -t .build-deps \
+        boost-dev \
+        cmake \
+        g++ \
+        git \
+        libressl-dev \
+        make \
+        qt5-qttools-dev \
+    # Build lib rasterbar from source code (required by qBittorrent)
+ && LIBTORRENT_RASTERBAR_URL=$(curl -sSL https://api.github.com/repos/arvidn/libtorrent/releases/latest | grep -E 'browser_download_url.*libtorrent-rasterbar'  | head -n 1 | cut -d '"' -f 4) \
+ && mkdir /tmp/libtorrent-rasterbar \
+ && curl -sSL $LIBTORRENT_RASTERBAR_URL | tar xzC /tmp/libtorrent-rasterbar \
+ && cd /tmp/libtorrent-rasterbar/* \
+ && mkdir build \
+ && cd build \
+ && cmake .. \
+ && make \
+ && make DESTDIR=/ install \
+ && mv /usr/local/lib64/* /usr/local/lib \
+ && rmdir /usr/local/lib64 \
+    # Build qBittorrent from source code
+ && git clone https://github.com/qbittorrent/qBittorrent.git /tmp/qbittorrent \
+ && cd /tmp/qbittorrent \
+    # Checkout latest release
+ && latesttag=$(git describe --tags `git rev-list --tags --max-count=1`) \
+ && git checkout $latesttag \
+    # Compile
+ && ./configure --disable-gui --disable-stacktrace \
+ && make \
+ && make install \
+    # Clean-up
+ && cd / \
+ && apk del --purge .build-deps \
+ && rm -rf /tmp/*
+
+RUN set -x \
+    # Add non-root user
+ && adduser -S -D -u 520 -g 520 -s /sbin/nologin qbittorrent \
+    # Create symbolic links to simplify mounting
+ && mkdir -p /home/qbittorrent/.config/qBittorrent \
+ && mkdir -p /home/qbittorrent/.local/share/qBittorrent \
+ && mkdir /downloads \
+ && chmod go+rw -R /home/qbittorrent /downloads \
+ && ln -s /home/qbittorrent/.config/qBittorrent /config \
+ && ln -s /home/qbittorrent/.local/share/qBittorrent /torrents \
+ && ln -s /home/qbittorrent/.local/share/qBittorrent/nova3/engines /engines \
+    # Check it works
+ && su qbittorrent -s /bin/sh -c 'qbittorrent-nox -v'
+
+# Default configuration file.
+COPY qBittorrent.conf /default/qBittorrent.conf
+COPY entrypoint.sh /
+
+VOLUME ["/config", "/torrents", "/downloads"]
+
+ENV HOME=/home/qbittorrent
+
+USER qbittorrent
+
+EXPOSE 8080 6881
+
+ENTRYPOINT ["dumb-init", "/entrypoint.sh"]
+CMD ["qbittorrent-nox"]
+
+HEALTHCHECK --interval=5s --timeout=2s --retries=20 CMD curl --connect-timeout 15 --silent --show-error --fail http://localhost:8080/ >/dev/null || exit 1

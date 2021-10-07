@@ -6,8 +6,4 @@ the container i have on my server are:
 - munin
 - nextcloud
 - plex
-- qbittorrent
-
-
-
-sdfasf 
+- qbittorrent 

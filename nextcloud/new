@@ -8,7 +8,7 @@ services:
     volumes:
       - db:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=mysql
+      - MYSQL_ROOT_PASSWORD=
     env_file:
       - db.env
 
@@ -21,11 +21,10 @@ services:
     restart: always
     volumes:
       - nextcloud:/var/www/html
-      - /data/hdd/torrents:/data/torrents
     environment:
-      - VIRTUAL_HOST=simoserver.myddns.me
-      - LETSENCRYPT_HOST=simoserver.myddns.me
-      - LETSENCRYPT_EMAIL=viozzis333@gmail.com
+      - VIRTUAL_HOST=
+      - LETSENCRYPT_HOST=
+      - LETSENCRYPT_EMAIL=
       - MYSQL_HOST=db
       - REDIS_HOST=redis
     env_file:
@@ -77,29 +76,28 @@ services:
     depends_on:
       - proxy
 
+# self signed
+#  omgwtfssl:
+#    image: paulczar/omgwtfssl
+#    restart: "no"
+#    volumes:
+#      - certs:/certs
+#    environment:
+#      - SSL_SUBJECT=servhostname.local
+#      - CA_SUBJECT=my@example.com
+#      - SSL_KEY=/certs/servhostname.local.key
+#      - SSL_CSR=/certs/servhostname.local.csr
+#      - SSL_CERT=/certs/servhostname.local.crt
+#    networks:
+#      - proxy-tier
+
 volumes:
-  nextcloud:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/hdd/nextcloud/nextcloud
   db:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/hdd/nextcloud/db
+  nextcloud:
   certs:
   acme:
   vhost.d:
   html:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/hdd/nextcloud/html
 
 networks:
   proxy-tier:
-

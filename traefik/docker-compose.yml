@@ -13,7 +13,6 @@ services:
     command:
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
-      - --entrypoints.jellyfin-service.address=:9999
       - --providers.docker
       #- --providers.docker.endpoint=unix:///var/run/docker.sock
       - --providers.docker.exposedByDefault=false
@@ -48,8 +47,6 @@ services:
       # middleware redirect
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
-      # jellyfin special config
-      - 'http.services.jellyfin-svc.loadBalancer.servers.url=192.168.178.250:8096'
 
 volumes:
   certs:

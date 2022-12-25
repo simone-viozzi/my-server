@@ -2,57 +2,57 @@
 version: "3.7"
 
 services:
-  traefik:
-    image: traefik:v2.9.1
-    networks:
-      ocis-net:
-        aliases:
-          - ${OCIS_DOMAIN:-ocis.owncloud.test}
-          - ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
-          - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
-          - ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
-    command:
-      - "--log.level=${TRAEFIK_LOG_LEVEL:-ERROR}"
-      # letsencrypt configuration
-      - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
-      - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
-      - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
-      # enable dashboard
-      - "--api.dashboard=true"
-      # define entrypoints
-      - "--entryPoints.http.address=:80"
-      - "--entryPoints.http.http.redirections.entryPoint.to=https"
-      - "--entryPoints.http.http.redirections.entryPoint.scheme=https"
-      - "--entryPoints.https.address=:443"
-      # docker provider (get configuration from container labels)
-      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
-      - "--providers.docker.exposedByDefault=false"
-      # access log
-      - "--accessLog=true"
-      - "--accessLog.format=json"
-      - "--accessLog.fields.headers.names.X-Request-Id=keep"
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "certs:/certs"
-    labels:
-      - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:-admin:$$apr1$$4vqie50r$$YQAmQdtmz5n9rEALhxJ4l.}" # defaults to admin:admin
-      - "traefik.http.routers.traefik.entrypoints=https"
-      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN:-traefik.owncloud.test}`)"
-      - "traefik.http.routers.traefik.middlewares=traefik-auth"
-      - "traefik.http.routers.traefik.tls.certresolver=http"
-      - "traefik.http.routers.traefik.service=api@internal"
-    logging:
-      driver: "local"
-    restart: always
+  #traefik:
+  #  image: traefik:v2.9.1
+  #  networks:
+  #    ocis-net:
+  #      aliases:
+  #        - ${OCIS_DOMAIN:-ocis.owncloud.test}
+  #        - ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+  #        - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
+  #        - ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
+  #  command:
+  #    - "--log.level=${TRAEFIK_LOG_LEVEL:-ERROR}"
+  #    # letsencrypt configuration
+  #    - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
+  #    - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
+  #    - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
+  #    # enable dashboard
+  #    - "--api.dashboard=true"
+  #    # define entrypoints
+  #    - "--entryPoints.http.address=:80"
+  #    - "--entryPoints.http.http.redirections.entryPoint.to=https"
+  #    - "--entryPoints.http.http.redirections.entryPoint.scheme=https"
+  #    - "--entryPoints.https.address=:443"
+  #    # docker provider (get configuration from container labels)
+  #    - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+  #    - "--providers.docker.exposedByDefault=false"
+  #    # access log
+  #    - "--accessLog=true"
+  #    - "--accessLog.format=json"
+  #    - "--accessLog.fields.headers.names.X-Request-Id=keep"
+  #  ports:
+  #    - "80:80"
+  #    - "443:443"
+  #  volumes:
+  #    - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  #    - "certs:/certs"
+  #  labels:
+  #    - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
+  #    - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:-admin:$$apr1$$4vqie50r$$YQAmQdtmz5n9rEALhxJ4l.}" # defaults to admin:admin
+  #    - "traefik.http.routers.traefik.entrypoints=https"
+  #    - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN:-traefik.owncloud.test}`)"
+  #    - "traefik.http.routers.traefik.middlewares=traefik-auth"
+  #    - "traefik.http.routers.traefik.tls.certresolver=http"
+  #    - "traefik.http.routers.traefik.service=api@internal"
+  #  logging:
+  #    driver: "local"
+  #  restart: always
 
   ocis:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
-      ocis-net:
+      proxy:
     entrypoint:
       - /bin/sh
     # run ocis init to initialize a configuration file with random secrets
@@ -80,9 +80,10 @@ services:
       - /data/wd-red/ocis/ocis-data:/var/lib/ocis
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.ocis.entrypoints=https"
       - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`)"
-      - "traefik.http.routers.ocis.tls.certresolver=http"
+      - "traefik.http.routers.ocis.entrypoints=websecure"
+      - "traefik.http.routers.ocis.tls.certresolver=leresolver"
+      - "traefik.http.routers.ocis.tls=true"
       - "traefik.http.routers.ocis.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
     logging:
@@ -92,7 +93,7 @@ services:
   ocis-appprovider-collabora:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
-      ocis-net:
+      proxy:
     entrypoint:
       - "/wait.sh"
     #command: ["sleep 10000"]
@@ -118,7 +119,7 @@ services:
   ocis-appprovider-onlyoffice:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
-      ocis-net:
+      proxy:
     user: "0" # needed for apk add in entrypoint script
     entrypoint:
       - "/wait.sh"
@@ -145,7 +146,7 @@ services:
   wopiserver:
     image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v9.3.1}
     networks:
-      ocis-net:
+      proxy:
     entrypoint:
       - /bin/sh
       - /entrypoint-override.sh
@@ -159,9 +160,10 @@ services:
       - wopi-recovery:/var/spool/wopirecovery
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.wopiserver.entrypoints=https"
       - "traefik.http.routers.wopiserver.rule=Host(`${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}`)"
-      - "traefik.http.routers.wopiserver.tls.certresolver=http"
+      - "traefik.http.routers.wopiserver.entrypoints=websecure"
+      - "traefik.http.routers.wopiserver.tls=true"
+      - "traefik.http.routers.wopiserver.tls.certresolver=leresolver"
       - "traefik.http.routers.wopiserver.service=wopiserver"
       - "traefik.http.services.wopiserver.loadbalancer.server.port=8880"
     logging:
@@ -171,7 +173,7 @@ services:
   collabora:
     image: collabora/code:22.05.6.3.1
     networks:
-      ocis-net:
+      proxy:
     environment:
       aliasgroup1: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}:443
       DONT_GEN_SSL_CERT: "YES"
@@ -182,9 +184,10 @@ services:
       - MKNOD
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.collabora.entrypoints=https"
       - "traefik.http.routers.collabora.rule=Host(`${COLLABORA_DOMAIN:-collabora.owncloud.test}`)"
-      - "traefik.http.routers.collabora.tls.certresolver=http"
+      - "traefik.http.routers.collabora.entrypoints=websecure"
+      - "traefik.http.routers.collabora.tls=true"
+      - "traefik.http.routers.collabora.tls.certresolver=leresolver"
       - "traefik.http.routers.collabora.service=collabora"
       - "traefik.http.services.collabora.loadbalancer.server.port=9980"
     logging:
@@ -194,15 +197,17 @@ services:
   onlyoffice:
     image: onlyoffice/documentserver:7.2
     networks:
-      ocis-net:
+      proxy:
     environment:
       WOPI_ENABLED: "true"
       USE_UNAUTHORIZED_STORAGE: "${INSECURE:-false}" # self signed certificates
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.onlyoffice.entrypoints=https"
       - "traefik.http.routers.onlyoffice.rule=Host(`${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}`)"
-      - "traefik.http.routers.onlyoffice.tls.certresolver=http"
+      - "traefik.http.routers.onlyoffice.entrypoints=websecure"
+      - "traefik.http.routers.onlyoffice.tls=true"
+      - "traefik.http.routers.onlyoffice.tls.certresolver=leresolver"
+
       - "traefik.http.routers.onlyoffice.service=onlyoffice"
       - "traefik.http.services.onlyoffice.loadbalancer.server.port=80"
       # websockets can't be opend when this is ommitted
@@ -213,11 +218,11 @@ services:
     restart: always
 
 volumes:
-  certs:
+  #certs:
   ocis-config:
   wopi-recovery:
 
 networks:
-  ocis-net:
-    #name: traefik-net
-    #external: true
+  #ocis-net:
+  proxy:
+    external: true

@@ -10,7 +10,7 @@ services:
       - jellyfin-config:/config
       - jellyfin-cache:/cache
       - /data/hdd/torrents:/media
-    restart: 'unless-stopped'
+    restart: unless-stopped
     networks:
       proxy:
     labels:
@@ -75,6 +75,7 @@ services:
 
 volumes:
   jellyfin-config:
+    external: true
   jellyfin-cache:
 
 networks:

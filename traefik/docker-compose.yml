@@ -46,7 +46,7 @@ services:
 
       # middleware redirect
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-    restart: always
+    restart: unless-stopped
 
 volumes:
   certs:

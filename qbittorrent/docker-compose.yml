@@ -1,24 +1,5 @@
 
 services:
-  #qbitorrent:
-  #  build: ./qbittorrent-plugins
-  #  container_name: qbittorrent
-  #  user: 1002:1002 
-  #  ports:
-  #    - 8080:8080
-  #    - 6881:6881/tcp
-  #    - 6881:6881/udp
-  #  networks:
-  #    - jackett-net:
-  #  volumes:
-  #    - ./qbit-config:/config
-  #    - ./torrents:/torrents
-  #    - /data/hdd/torrents:/downloads
-  #    - type: bind
-  #      source: ./engines/jackett.json
-  #      target: /engines/jackett.json      
-  #          # - ./engines:/engines
-  #  restart: always
 
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest

@@ -9,10 +9,11 @@ services:
     volumes:
       - jellyfin-config:/config
       - jellyfin-cache:/cache
-      - /data/hdd/torrents:/media
+      - /data/hdd/media-lib/media:/media
     restart: unless-stopped
     networks:
       proxy:
+      media:
     labels:
       - 'traefik.enable=true'
       #### Host or Path where Jellyfin is accessible
@@ -63,7 +64,7 @@ services:
       #- 'traefik.http.routers.jellyfin.service=jellyfin-svc@file'
       #- 'traefik.http.services.jellyfin-svc.loadBalancer.server.port=8096'
       #- 'traefik.http.services.jellyfin-svc.loadBalancer.passHostHeader=true'
-#
+      #
       ### Redirection of HTTP on port 9999 to HTTPS on port 9999 (consistent protocol)
       #- 'traefik.http.routers.jellyfin-insecure.entryPoints=jellyfin-service'
       #- 'traefik.http.routers.jellyfin-insecure.rule=Host(`${DOMAIN}`)' # OPTIONAL: && PathPrefix(`/jellyfin`)
@@ -78,6 +79,9 @@ volumes:
     external: true
   jellyfin-cache:
 
+
 networks:
   proxy:
+    external: true
+  media:
     external: true

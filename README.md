@@ -259,3 +259,47 @@ To create a docker volume mapped to a btrfs sub-volume you need to:
         external: true
     ```
 
+### docker volumes backup
+
+To back up some of the docker volumes to an external cloud storage i wrote [my own backup script](https://github.com/simone-viozzi/btrfs2cloud-backup). To set it up you just need to configure snapper for the docker volume, as described on the arch wiki (with .snapshots mapped to a subvolume outsise the one you are taking a backup of).
+
+## Traekik reverse proxy
+
+As a reverse proxy for every service that need to be exposed to the web i use traefik. Is configured to work on the network `proxy`, created with:
+
+```bash
+docker network create proxy
+```
+
+And referenced in the docker-compose files as:
+
+```yaml
+networks:
+  proxy:
+    external: true
+```
+
+### Services that have the web interface on ports different than 80
+
+To redirect the traffic to the correct port you need to add:
+
+```yaml
+labels:
+  - "traefik.http.routers.<service name>.service=<service name>-svc"
+  - "traefik.http.services.<service name>-svc.loadbalancer.server.port=<port of the service>"
+```
+
+### Containers that are part of more than one network
+
+To tell traefik in which network it should search the service, you need to add the following label:
+
+```yaml
+service:
+  networks:
+    media:
+    proxy:
+  labels:
+    [...]
+    - "traefik.docker.network=proxy"
+```
+

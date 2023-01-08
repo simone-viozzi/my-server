@@ -13,12 +13,11 @@ services:
     restart: unless-stopped
     networks:
       proxy:
-      media:
     labels:
       - 'traefik.enable=true'
       #### Host or Path where Jellyfin is accessible
       #### Remove (or change) this rule if you'd rather have Jellyfin accessible at a PathPrefix URI
-      - 'traefik.http.routers.jellyfin.rule=Host(`${DOMAIN}`)' # OPTIONAL: && PathPrefix(`/jellyfin`)
+      - 'traefik.http.routers.jellyfin.rule=Host(`${JELLYFIN_DOMAIN}`)' # OPTIONAL: && PathPrefix(`/jellyfin`)
       ## HTTP Router
       #### Entry point where Jellyfin is accessible via
       #### Change secure to https in the line below to have accessible without needing to specify a port and change the SSLHost option below
@@ -73,6 +72,11 @@ services:
       ##- 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.port=9999' # remove if you are using a default port
       #- 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.permanent=false'
       #- 'traefik.http.routers.jellyfin-insecure.service=noop@internal'
+      - homepage.group=Media
+      - homepage.name=Jellyfin
+      - homepage.icon=https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/jellyfin.svg
+      - homepage.href=https://${JELLYFIN_DOMAIN}
+      - homepage.description=View media from anywhere
 
 volumes:
   jellyfin-config:
@@ -82,6 +86,4 @@ volumes:
 
 networks:
   proxy:
-    external: true
-  media:
     external: true

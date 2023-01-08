@@ -133,19 +133,33 @@ services:
       - 5055:5055
     networks:
       media:
+      proxy:
     volumes:
       - jellyseerr-config:/app/config
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.jellyseerr.rule=Host(`${DOMAIN}`)"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.jellyseerr.rule=Host(`${JELLYSEERR_DOMAIN}`)"
       - "traefik.http.routers.jellyseerr.entrypoints=websecure"
       - "traefik.http.routers.jellyseerr.tls.certresolver=leresolver"
       - "traefik.http.routers.jellyseerr.tls=true"
-      - "traefik.http.routers.jellyseerr.service=ocis"
+      - "traefik.http.routers.jellyseerr.service=jellyseerr-svc"
+      - "traefik.http.services.jellyseerr-svc.loadbalancer.server.port=5055"
+      
+
+      - homepage.group=Media
+      - homepage.name=Discover
+      - homepage.icon=https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/jellyseerr.svg
+      - homepage.href=https://${JELLYSEERR_DOMAIN}
+      - homepage.description=Discover media and request it
+
+      #- "traefik.http.routers.jellyseerr.service=jellyseerr"
 
 networks:
   media:
+    external: true
+  proxy:
     external: true
 
 volumes:

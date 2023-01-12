@@ -323,6 +323,8 @@ curl -X POST -d '{"tag":"admin", "body":"test message"}' \
     http://localhost:8005/notify/apprise
 ```
 
+To connect it with other containers i created an external network, then added both apprise and the other container to that network.
+
 ### Use outside docker network vs use inside the docker network
 
 Apprise use the port 8000, but in my case it war already used by portainer. To overcome this i set the port mapping of apprise to `- 8005:8000`. This means that a notification from the system must be sent to `http://localhost:8005/notify/apprise`. While a notification from within the docker network must be sent to `http://apprise:8000/notify/apprise`.

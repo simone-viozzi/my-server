@@ -333,9 +333,9 @@ Apprise use the port 8000, but in my case it war already used by portainer. To o
 
 To enable notifications through apprise you need the [Webhook](https://github.com/jellyfin/jellyfin-plugin-webhook) plugin, it can be installed directly from the plugin section of jellyfin.
 
-Then, if for example you what a notification when an item is added, you need to:
+Then, if for example you what a notification when an item is added, you need to create a `generic destination`:
 
-1. set the correct webhook url: `http://apprise:8000/notify/apprise`
+1. set the correct webhook url: `http://apprise:8000/notify/apprise`. You can confirm that the url is correct with `docker exec -it jellyfin bash` than using curl from within the container.
 1. check `Item Added`
 1. use a template like:
 

@@ -343,18 +343,19 @@ Then, if for example you what a notification when an item is added, you need to 
     {
       "tag": "general",
       {{#if_equals ItemType 'Season'}}
-          "body": "{{ItemType}} ora disponibile\n\n{{{SeriesName}}} ({{Year}})\n{{{Name}}}\n{{Overview}}\n\nDurata: {{RunTime}}\n\nStato: Disponibile"
+          "body": "<b>{{ItemType}} ora disponibile</b>\n\n<b>{{{SeriesName}}} ({{Year}})</b>\n<b><em>{{{Name}}}</em></b>\n{{Overview}}\n\n<b>Durata: {{RunTime}}</b>\n\nStato: Disponibile",
       {{else}}
         {{#if_equals ItemType 'Episode'}}
-              "body": "episodio ora disponibile\n\n{{{SeriesName}}} ({{Year}})\nS{{SeasonNumber00}}E{{EpisodeNumber00}} - {{{Name}}}\n{{Overview}}\n\nDurata: {{RunTime}}\n\nStato: disponibile"
+              "body": "<b>episodio ora disponibile</b>\n\n<b>{{{SeriesName}}} ({{Year}})</b>\n<b>S{{SeasonNumber00}}E{{EpisodeNumber00}}</b> - <b><em>{{{Name}}}</em></b>\n{{Overview}}\n\n<b>Durata: {{RunTime}}</b>\n\nStato: disponibile",
           {{else}}
-              "body": "{{ItemType}} ora disponibile\n\n{{{Name}}} ({{Year}})\n{{Overview}}\n\nDurata: {{RunTime}}\n\nStato: disponibile"
+              "body": "<b>{{ItemType}} ora disponibile</b>\n\n<b>{{{Name}}} ({{Year}})</b>\n{{Overview}}\n\n<b>Durata: {{RunTime}}</b>\n\nStato: disponibile",
           {{/if_equals}}
       {{/if_equals}}
+      "format": "html"
     }
     ```
 
-    I took the template from [here](https://github.com/jellyfin/jellyfin-plugin-webhook/blob/master/Jellyfin.Plugin.Webhook/Templates/Telegram.handlebars) and modified it by removing the html tags, and using only `tag` and `body` for the keys.
+    I took the template from [here](https://github.com/jellyfin/jellyfin-plugin-webhook/blob/master/Jellyfin.Plugin.Webhook/Templates/Telegram.handlebars) and modified it following [this](https://github.com/caronc/apprise/wiki/Notify_telegram).
 
     With the `tag` key you can specify to wich topic the notification will be sent.
 

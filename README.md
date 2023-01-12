@@ -303,3 +303,60 @@ service:
     - "traefik.docker.network=proxy"
 ```
 
+## Apprise
+
+To get notification from the servers i did set up [apprise](https://github.com/caronc/apprise-api) and a telegram bot.
+
+In the apprise configuration interface you can set up some topics:
+
+```bash
+general=tgram://<bot token>/<chat id>
+
+admin=tgram://<bot token>/<chat id>
+```
+
+Then you can use the topic with:
+
+```bash
+curl -X POST -d '{"tag":"admin", "body":"test message"}' \
+    -H "Content-Type: application/json" \
+    http://localhost:8005/notify/apprise
+```
+
+### Use outside docker network vs use inside the docker network
+
+Apprise use the port 8000, but in my case it war already used by portainer. To overcome this i set the port mapping of apprise to `- 8005:8000`. This means that a notification from the system must be sent to `http://localhost:8005/notify/apprise`. While a notification from within the docker network must be sent to `http://apprise:8000/notify/apprise`.
+
+### Jellyfin + Apprise = <3
+
+To enable notifications through apprise you need the [Webhook](https://github.com/jellyfin/jellyfin-plugin-webhook) plugin, it can be installed directly from the plugin section of jellyfin.
+
+Then, if for example you what a notification when an item is added, you need to:
+
+1. set the correct webhook url: `http://apprise:8000/notify/apprise`
+1. check `Item Added`
+1. use a template like:
+
+    ```json
+    {
+      "tag": "general",
+      {{#if_equals ItemType 'Season'}}
+          "body": "{{ItemType}} ora disponibile\n\n{{{SeriesName}}} ({{Year}})\n{{{Name}}}\n{{Overview}}\n\nDurata: {{RunTime}}\n\nStato: Disponibile"
+      {{else}}
+        {{#if_equals ItemType 'Episode'}}
+              "body": "episodio ora disponibile\n\n{{{SeriesName}}} ({{Year}})\nS{{SeasonNumber00}}E{{EpisodeNumber00}} - {{{Name}}}\n{{Overview}}\n\nDurata: {{RunTime}}\n\nStato: disponibile"
+          {{else}}
+              "body": "{{ItemType}} ora disponibile\n\n{{{Name}}} ({{Year}})\n{{Overview}}\n\nDurata: {{RunTime}}\n\nStato: disponibile"
+          {{/if_equals}}
+      {{/if_equals}}
+    }
+    ```
+
+    I took the template from [here](https://github.com/jellyfin/jellyfin-plugin-webhook/blob/master/Jellyfin.Plugin.Webhook/Templates/Telegram.handlebars) and modified it by removing the html tags, and using only `tag` and `body` for the keys.
+
+    With the `tag` key you can specify to wich topic the notification will be sent.
+
+1. Add a request header:
+
+    - key: `Content-Type`
+    - value: `application/json`

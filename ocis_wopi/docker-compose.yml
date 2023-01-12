@@ -2,52 +2,6 @@
 version: "3.7"
 
 services:
-  #traefik:
-  #  image: traefik:v2.9.1
-  #  networks:
-  #    ocis-net:
-  #      aliases:
-  #        - ${OCIS_DOMAIN:-ocis.owncloud.test}
-  #        - ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
-  #        - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
-  #        - ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
-  #  command:
-  #    - "--log.level=${TRAEFIK_LOG_LEVEL:-ERROR}"
-  #    # letsencrypt configuration
-  #    - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
-  #    - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
-  #    - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
-  #    # enable dashboard
-  #    - "--api.dashboard=true"
-  #    # define entrypoints
-  #    - "--entryPoints.http.address=:80"
-  #    - "--entryPoints.http.http.redirections.entryPoint.to=https"
-  #    - "--entryPoints.http.http.redirections.entryPoint.scheme=https"
-  #    - "--entryPoints.https.address=:443"
-  #    # docker provider (get configuration from container labels)
-  #    - "--providers.docker.endpoint=unix:///var/run/docker.sock"
-  #    - "--providers.docker.exposedByDefault=false"
-  #    # access log
-  #    - "--accessLog=true"
-  #    - "--accessLog.format=json"
-  #    - "--accessLog.fields.headers.names.X-Request-Id=keep"
-  #  ports:
-  #    - "80:80"
-  #    - "443:443"
-  #  volumes:
-  #    - "/var/run/docker.sock:/var/run/docker.sock:ro"
-  #    - "certs:/certs"
-  #  labels:
-  #    - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
-  #    - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:-admin:$$apr1$$4vqie50r$$YQAmQdtmz5n9rEALhxJ4l.}" # defaults to admin:admin
-  #    - "traefik.http.routers.traefik.entrypoints=https"
-  #    - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN:-traefik.owncloud.test}`)"
-  #    - "traefik.http.routers.traefik.middlewares=traefik-auth"
-  #    - "traefik.http.routers.traefik.tls.certresolver=http"
-  #    - "traefik.http.routers.traefik.service=api@internal"
-  #  logging:
-  #    driver: "local"
-  #  restart: always
 
   ocis:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
@@ -86,11 +40,14 @@ services:
       - "traefik.http.routers.ocis.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
 
-      - homepage.group=Storage
-      - homepage.name=Owncloud
-      - homepage.icon=https://raw.githubusercontent.com/owncloud/core/eebd754771a99bc44820eb67a6d57cea238e6b86/core/img/logo-icon.svg
-      - homepage.href=https://${OCIS_DOMAIN}
-      - homepage.description=Store whatever you want
+      - "homepage.group=Storage"
+      - "homepage.name=Owncloud"
+      - "homepage.icon=https://raw.githubusercontent.com/owncloud/core/eebd754771a99bc44820eb67a6d57cea238e6b86/core/img/logo-icon.svg"
+      - "homepage.href=https://${OCIS_DOMAIN}"
+      - "homepage.description=Store whatever you want"
+
+      # set watchtower to monitor only and do not perform the update
+      - "com.centurylinklabs.watchtower.monitor-only=true"
     logging:
       driver: "local"
     restart: unless-stopped
@@ -101,7 +58,6 @@ services:
       proxy:
     entrypoint:
       - "/wait.sh"
-    #command: ["sleep 10000"]
     command: ["/bin/sh", "-c", "ocis app-provider server"]
     environment:
       REVA_GATEWAY: ${REVA_GATEWAY:-ocis:9142}
@@ -117,6 +73,9 @@ services:
     volumes:
       - ocis-config:/etc/ocis
       - ./config/wait.sh:/wait.sh
+    labels:
+      # set watchtower to monitor only and do not perform the update
+      - "com.centurylinklabs.watchtower.monitor-only=true"
     logging:
       driver: "local"
     restart: unless-stopped
@@ -144,6 +103,9 @@ services:
       - ./config/ocis-appprovider-onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-config:/etc/ocis
       - ./config/wait.sh:/wait.sh
+    labels:
+      # set watchtower to monitor only and do not perform the update
+      - "com.centurylinklabs.watchtower.monitor-only=true"
     logging:
       driver: "local"
     restart: unless-stopped
@@ -171,6 +133,9 @@ services:
       - "traefik.http.routers.wopiserver.tls.certresolver=leresolver"
       - "traefik.http.routers.wopiserver.service=wopiserver"
       - "traefik.http.services.wopiserver.loadbalancer.server.port=8880"
+
+      # set watchtower to monitor only and do not perform the update
+      - "com.centurylinklabs.watchtower.monitor-only=true"
     logging:
       driver: "local"
     restart: unless-stopped
@@ -195,6 +160,9 @@ services:
       - "traefik.http.routers.collabora.tls.certresolver=leresolver"
       - "traefik.http.routers.collabora.service=collabora"
       - "traefik.http.services.collabora.loadbalancer.server.port=9980"
+
+      # set watchtower to monitor only and do not perform the update
+      - "com.centurylinklabs.watchtower.monitor-only=true"
     logging:
       driver: "local"
     restart: unless-stopped
@@ -218,6 +186,9 @@ services:
       # websockets can't be opend when this is ommitted
       - "traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.onlyoffice.middlewares=onlyoffice"
+
+      # set watchtower to monitor only and do not perform the update
+      - "com.centurylinklabs.watchtower.monitor-only=true"
     logging:
       driver: "local"
     restart: unless-stopped

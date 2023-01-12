@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+  apprise:
+    image: caronc/apprise:latest
+    container_name: apprise
+    networks:
+      - apprise
+    ports:
+      - 8005:8000
+    volumes:
+      - ./apprise_config:/config
+    restart: unless-stopped
+
+networks:
+  apprise:
+    external: true

@@ -11,6 +11,7 @@ services:
           - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
           - ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
     command:
+      - "--log.level=ERROR"
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       - --providers.docker

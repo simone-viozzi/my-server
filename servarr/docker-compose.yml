@@ -154,8 +154,6 @@ services:
       - homepage.href=https://${JELLYSEERR_DOMAIN}
       - homepage.description=Discover media and request it
 
-      #- "traefik.http.routers.jellyseerr.service=jellyseerr"
-
 networks:
   media:
     external: true

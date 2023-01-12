@@ -13,8 +13,10 @@ services:
     restart: unless-stopped
     networks:
       proxy:
+      apprise:
     labels:
       - 'traefik.enable=true'
+      - "traefik.docker.network=proxy"
       #### Host or Path where Jellyfin is accessible
       #### Remove (or change) this rule if you'd rather have Jellyfin accessible at a PathPrefix URI
       - 'traefik.http.routers.jellyfin.rule=Host(`${JELLYFIN_DOMAIN}`)' # OPTIONAL: && PathPrefix(`/jellyfin`)
@@ -72,11 +74,11 @@ services:
       ##- 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.port=9999' # remove if you are using a default port
       #- 'traefik.http.middlewares.jellyfin-insecure-mw.redirectscheme.permanent=false'
       #- 'traefik.http.routers.jellyfin-insecure.service=noop@internal'
-      - homepage.group=Media
-      - homepage.name=Jellyfin
-      - homepage.icon=https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/jellyfin.svg
-      - homepage.href=https://${JELLYFIN_DOMAIN}
-      - homepage.description=View media from anywhere
+      - "homepage.group=Media"
+      - "homepage.name=Jellyfin"
+      - "homepage.icon=https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/jellyfin.svg"
+      - "homepage.href=https://${JELLYFIN_DOMAIN}"
+      - "homepage.description=View media from anywhere"
 
 volumes:
   jellyfin-config:
@@ -86,4 +88,6 @@ volumes:
 
 networks:
   proxy:
+    external: true
+  apprise:
     external: true

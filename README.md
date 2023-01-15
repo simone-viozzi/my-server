@@ -363,3 +363,7 @@ Then, if for example you what a notification when an item is added, you need to 
 
     - key: `Content-Type`
     - value: `application/json`
+
+## Jellyserr link inside Jellyfin menu'
+
+Follow [this](https://jellyfin.org/docs/general/clients/web-config/#custom-menu-links) and [this](https://gist.github.com/thornbill/bfdcdb2d79440095b108e8c1f9e38a2f). The secret is to not put the `menuLinks` at the end, but in the middle under `themes`. 

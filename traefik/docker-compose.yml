@@ -10,6 +10,7 @@ services:
           - ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
           - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
           - ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
+          - ${JELLYFIN_DOMAIN}
     command:
       - "--log.level=ERROR"
       - --entrypoints.web.address=:80

@@ -3,16 +3,18 @@ version: "3.3"
 services:
   traefik:
     image: traefik:v2.9.1
+    container_name: traefik
     networks:
       proxy:
         aliases:
-          - ${OCIS_DOMAIN:-ocis.owncloud.test}
-          - ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
-          - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
-          - ${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
+          - ${OCIS_DOMAIN}
+          - ${WOPISERVER_DOMAIN}
+          - ${COLLABORA_DOMAIN}
+          - ${ONLYOFFICE_DOMAIN}
           - ${JELLYFIN_DOMAIN}
+      monitor-net:
     command:
-      - "--log.level=ERROR"
+      - --log.level=ERROR
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
       - --providers.docker
@@ -23,6 +25,10 @@ services:
       - --certificatesresolvers.leresolver.acme.email=${EMAIL}
       - --certificatesresolvers.leresolver.acme.storage=/certs/acme.json
       - --certificatesresolvers.leresolver.acme.tlschallenge=true
+      # enable prometheus
+      - --metrics.prometheus=true
+      - --metrics.prometheus.addEntryPointsLabels=true
+      - --metrics.prometheus.addServicesLabels=true
     ports:
       - "80:80"
       - "443:443"
@@ -32,6 +38,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
       - "traefik.http.routers.traefik.rule=Host(`${DOMAIN}`)"
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.routers.traefik.tls.certresolver=leresolver"
@@ -53,13 +60,11 @@ services:
   homepage:
     image: ghcr.io/benphelps/homepage:latest
     container_name: homepage
-    ports:
-      - 3000:3000
     networks:
       proxy:
     volumes:
-      - /home/simone/containers/traefik/homepage-config:/app/config # Make sure your local config directory exists
-      - /var/run/docker.sock:/var/run/docker.sock # (optional) For docker integrations
+      - /home/simone/containers/traefik/homepage-config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
@@ -72,8 +77,9 @@ services:
 
 volumes:
   certs:
-    #homepage-config:
 
 networks:
   proxy:
+    external: true
+  monitor-net:
     external: true

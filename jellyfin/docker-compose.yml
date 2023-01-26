@@ -15,12 +15,13 @@ services:
     networks:
       proxy:
       apprise:
+      monitor-net:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
       #### Host or Path where Jellyfin is accessible
       #### Remove (or change) this rule if you"d rather have Jellyfin accessible at a PathPrefix URI
-      - "traefik.http.routers.jellyfin.rule=Host(`${JELLYFIN_DOMAIN}`)" # OPTIONAL: && PathPrefix(`/jellyfin`)
+      - "traefik.http.routers.jellyfin.rule=Host(`${JELLYFIN_DOMAIN}`) && !Path(`/metrics`)"
       ## HTTP Router
       #### Entry point where Jellyfin is accessible via
       #### Change secure to https in the line below to have accessible without needing to specify a port and change the SSLHost option below
@@ -29,7 +30,6 @@ services:
       #### Enable TLS with the ACME/LetsEncrypt resolver for HOSTNAME.DOMAIN_NAME
       - "traefik.http.routers.jellyfin.tls=true"
       - "traefik.http.routers.jellyfin.tls.certResolver=leresolver"
-      #- "traefik.http.routers.jellyfin.tls.domains=${DOMAIN}"
 
       ### Middleware
       #- "traefik.http.routers.jellyfin.middlewares=jellyfin-mw"
@@ -91,4 +91,6 @@ networks:
   proxy:
     external: true
   apprise:
+    external: true
+  monitor-net:
     external: true

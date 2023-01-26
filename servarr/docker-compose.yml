@@ -8,14 +8,14 @@ services:
       - PUID=1002
       - PGID=1002
       - TZ=Europe/Rome
-      - WEBUI_PORT=8080
+      - WEBUI_PORT=8078
     volumes:
       - qbit-config:/config
       - qbit-torrents:/torrents
       - /data/hdd/media-lib/torrents:/data/torrents
       - ./engines:/config/qBittorrent/nova3/engines
     ports:
-      - 8080:8080
+      - 8078:8078
       - 6881:6881
       - 6881:6881/udp
     networks:

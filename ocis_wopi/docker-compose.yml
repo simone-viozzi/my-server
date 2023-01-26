@@ -5,6 +5,7 @@ services:
 
   ocis:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    container_name: ocis
     networks:
       proxy:
     entrypoint:
@@ -54,6 +55,7 @@ services:
 
   ocis-appprovider-collabora:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    container_name: ocis-appprovider-collabora
     networks:
       proxy:
     entrypoint:
@@ -82,6 +84,7 @@ services:
 
   ocis-appprovider-onlyoffice:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    container_name: ocis-appprovider-onlyoffice
     networks:
       proxy:
     user: "0" # needed for apk add in entrypoint script
@@ -112,6 +115,7 @@ services:
 
   wopiserver:
     image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v9.3.1}
+    container_name: wopiserver
     networks:
       proxy:
     entrypoint:
@@ -142,6 +146,7 @@ services:
 
   collabora:
     image: collabora/code:22.05.6.3.1
+    container_name: collabora
     networks:
       proxy:
     environment:
@@ -169,6 +174,7 @@ services:
 
   onlyoffice:
     image: onlyoffice/documentserver:7.2
+    container_name: onlyoffice
     networks:
       proxy:
     environment:

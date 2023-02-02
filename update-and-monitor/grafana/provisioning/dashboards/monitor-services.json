@@ -1,0 +1,3227 @@
+{
+  "uid": "IAWTJOT4z",
+  "slug": "",
+  "title": "Monitor Services",
+  "originalTitle": "",
+  "tags": [
+    "prometheus"
+  ],
+  "style": "dark",
+  "timezone": "browser",
+  "editable": true,
+  "hideControls": false,
+  "sharedCrosshair": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": false,
+      "error": false,
+      "gridPos": {},
+      "hideTimeOverride": true,
+      "id": 1,
+      "isNew": false,
+      "span": 0,
+      "title": "Prometheus Uptime",
+      "transparent": false,
+      "type": "stat",
+      "colors": null,
+      "colorValue": false,
+      "colorBackground": false,
+      "decimals": 0,
+      "format": "",
+      "gauge": {
+        "maxValue": 0,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": false
+      },
+      "maxDataPoints": 100,
+      "nullPointMode": "",
+      "sparkline": {},
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "(time() - process_start_time_seconds{instance=\"localhost:9090\",job=\"prometheus\"})",
+          "intervalFactor": 1,
+          "interval": "10s",
+          "step": 10
+        }
+      ],
+      "thresholds": "",
+      "valueFontSize": "",
+      "valueMaps": null,
+      "valueName": "",
+      "options": {
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "displayMode": "",
+        "content": "",
+        "mode": "",
+        "reduceOptions": {
+          "values": false,
+          "fields": "",
+          "calcs": [
+            "mean"
+          ]
+        }
+      }
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": false,
+      "error": false,
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "hideTimeOverride": true,
+      "id": 5,
+      "isNew": false,
+      "span": 0,
+      "title": "Memory Usage",
+      "transparent": false,
+      "type": "stat",
+      "colors": null,
+      "colorValue": false,
+      "colorBackground": false,
+      "decimals": 0,
+      "format": "",
+      "gauge": {
+        "maxValue": 0,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": false
+      },
+      "maxDataPoints": 100,
+      "nullPointMode": "",
+      "sparkline": {},
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum(container_memory_usage_bytes{container_label_org_label_schema_group=\"monitoring\"})",
+          "intervalFactor": 1,
+          "interval": "10s",
+          "step": 10,
+          "format": "time_series"
+        }
+      ],
+      "thresholds": "",
+      "valueFontSize": "",
+      "valueMaps": null,
+      "valueName": "",
+      "options": {
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "displayMode": "",
+        "content": "",
+        "mode": "",
+        "reduceOptions": {
+          "values": false,
+          "fields": "",
+          "calcs": [
+            "mean"
+          ]
+        }
+      }
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": false,
+      "error": false,
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "hideTimeOverride": true,
+      "id": 3,
+      "isNew": false,
+      "span": 0,
+      "title": "In-Memory Chunks",
+      "transparent": false,
+      "type": "stat",
+      "colors": null,
+      "colorValue": false,
+      "colorBackground": false,
+      "decimals": 0,
+      "format": "",
+      "gauge": {
+        "maxValue": 0,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": false
+      },
+      "maxDataPoints": 100,
+      "nullPointMode": "",
+      "sparkline": {},
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "prometheus_tsdb_head_chunks",
+          "intervalFactor": 1,
+          "interval": "10s",
+          "step": 10
+        }
+      ],
+      "thresholds": "",
+      "valueFontSize": "",
+      "valueMaps": null,
+      "valueName": "",
+      "options": {
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "displayMode": "",
+        "content": "",
+        "mode": "",
+        "reduceOptions": {
+          "values": false,
+          "fields": "",
+          "calcs": [
+            "mean"
+          ]
+        }
+      }
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": false,
+      "error": false,
+      "gridPos": {
+        "h": 3,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "hideTimeOverride": true,
+      "id": 2,
+      "isNew": false,
+      "span": 0,
+      "title": "In-Memory Series",
+      "transparent": false,
+      "type": "stat",
+      "colors": null,
+      "colorValue": false,
+      "colorBackground": false,
+      "decimals": 0,
+      "format": "",
+      "gauge": {
+        "maxValue": 0,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": false
+      },
+      "maxDataPoints": 100,
+      "nullPointMode": "",
+      "sparkline": {},
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "prometheus_tsdb_head_series",
+          "intervalFactor": 1,
+          "interval": "10s",
+          "step": 10
+        }
+      ],
+      "thresholds": "",
+      "valueFontSize": "",
+      "valueMaps": null,
+      "valueName": "",
+      "options": {
+        "orientation": "horizontal",
+        "textMode": "auto",
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "displayMode": "",
+        "content": "",
+        "mode": "",
+        "reduceOptions": {
+          "values": false,
+          "fields": "",
+          "calcs": [
+            "mean"
+          ]
+        }
+      }
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 3
+      },
+      "id": 6,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Container CPU Usage",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "decimals": 2,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "connected",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "hide": true,
+          "expr": "sum by (name) (rate(container_cpu_user_seconds_total{container_label_org_label_schema_group=\"monitoring\"}[1m]) * 100  / scalar(count(node_cpu{mode=\"user\"})))",
+          "intervalFactor": 10,
+          "step": 10,
+          "legendFormat": "{{ name }}",
+          "format": "time_series"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum by (name) (rate(container_cpu_user_seconds_total{container_label_org_label_schema_group=\"monitoring\"}[1m]) * 100  / scalar(count(node_cpu_seconds_total{mode=\"user\"})))",
+          "intervalFactor": 10,
+          "legendFormat": "{{ name }}",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "cumulative",
+        "msResolution": true,
+        "sort": 2
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "percent",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 7,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Container Memory Usage",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "decimals": 2,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "connected",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum by (name) (container_memory_usage_bytes{container_label_org_label_schema_group=\"monitoring\"})",
+          "intervalFactor": 10,
+          "step": 10,
+          "legendFormat": "{{ name }}",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "cumulative",
+        "msResolution": true,
+        "sort": 2
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "bytes",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 17
+      },
+      "id": 73,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Alerts",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "decimals": 0,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": false,
+        "min": false,
+        "rightSide": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": false,
+      "linewidth": 2,
+      "nullPointMode": "connected",
+      "percentage": false,
+      "pointradius": 5,
+      "points": true,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "sum(ALERTS{alertstate=\"firing\"}) by (alertname)",
+          "intervalFactor": 1,
+          "interval": "30s",
+          "step": 10,
+          "legendFormat": "{{ alertname }}",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": false,
+        "value_type": "cumulative",
+        "msResolution": true
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": false,
+      "error": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 22,
+      "isNew": false,
+      "span": 0,
+      "title": "Prometheus Metrics",
+      "transparent": false,
+      "type": "row",
+      "panels": [],
+      "collapsed": false
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": false,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 25
+      },
+      "id": 18,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "File Descriptors",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Max": "#e24d42",
+        "Open": "#508642"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "process_max_fds{job=\"prometheus\"}",
+          "intervalFactor": 1,
+          "legendFormat": "Max",
+          "format": "time_series"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "process_open_fds{job=\"prometheus\"}",
+          "intervalFactor": 1,
+          "legendFormat": "Open",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 25
+      },
+      "id": 58,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Memory",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Allocated bytes": "#7EB26D",
+        "Allocated bytes - 1m max": "#BF1B00",
+        "Allocated bytes - 1m min": "#BF1B00",
+        "Allocated bytes - 5m max": "#BF1B00",
+        "Allocated bytes - 5m min": "#BF1B00",
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833",
+        "RSS": "#447EBC"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "seriesOverrides": [
+        {
+          "alias": "/-/",
+          "fill": 0
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "process_resident_memory_bytes{job=\"prometheus\"}",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "RSS",
+          "format": "time_series"
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "prometheus_local_storage_target_heap_size_bytes{job=\"prometheus\"}",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Target heap size",
+          "format": "time_series"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "go_memstats_next_gc_bytes{job=\"prometheus\"}",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Next GC",
+          "format": "time_series"
+        },
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "go_memstats_alloc_bytes{job=\"prometheus\"}",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Allocated",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "bytes",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 25
+      },
+      "id": 60,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Allocations",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Allocated bytes": "#F9BA8F",
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833",
+        "RSS": "#890F02"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(go_memstats_alloc_bytes_total{job=\"prometheus\"}[1m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Allocated",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "Bps",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 32
+      },
+      "id": 20,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Head Time series",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833",
+        "Time series": "#70dbed"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "prometheus_tsdb_head_series",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Time series",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 32
+      },
+      "id": 24,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Head Active Appenders",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "prometheus_tsdb_head_active_appenders",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Head Appenders",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 32
+      },
+      "id": 26,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Samples Appended",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "samples/s": "#e5a8e2"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "connected",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_head_samples_appended_total[1m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Samples",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "Bps",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 39
+      },
+      "id": 28,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Head Chunks",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833",
+        "To persist": "#9AC48A"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "seriesOverrides": [
+        {
+          "alias": "/Max.*/",
+          "fill": 0
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "prometheus_tsdb_head_chunks",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Chunks",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 39
+      },
+      "id": 30,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Head Chunks Created",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_head_chunks_created_total[1m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Created",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "ops",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 39
+      },
+      "id": 32,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Head Chunks Removed",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833",
+        "Removed": "#e5ac0e"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_head_chunks_removed_total[1m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Removed",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "ops",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 46
+      },
+      "id": 34,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Head Time Range",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max": "#447ebc",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833",
+        "Min": "#447ebc",
+        "Now": "#7eb26d"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "seriesOverrides": [
+        {
+          "alias": "Max",
+          "fillBelowTo": "Min",
+          "lines": false
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "prometheus_tsdb_head_min_time",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Min",
+          "format": "time_series"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "time() * 1000",
+          "intervalFactor": 2,
+          "legendFormat": "Now",
+          "format": "time_series"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "prometheus_tsdb_head_max_time",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Max",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "dateTimeAsIso",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 46
+      },
+      "id": 36,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Head GC Time/s",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_head_gc_duration_seconds_sum[1m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "GC Time",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "s",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 46
+      },
+      "id": 38,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Blocks Loaded",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "seriesOverrides": [
+        {
+          "alias": "Queue length",
+          "yaxis": 2
+        }
+      ],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "prometheus_tsdb_blocks_loaded",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Blocks Loaded",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "min": 0,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 53
+      },
+      "id": 40,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "TSDB Reloads",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Failed Compactions": "#bf1b00",
+        "Failed Reloads": "#bf1b00",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_reloads_total[10m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Reloads",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "ops",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 53
+      },
+      "id": 44,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "TSDB Problems",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Failed Compactions": "#bf1b00",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833",
+        "{instance=\"demo.robustperception.io:9090\",job=\"prometheus\"}": "#bf1b00"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_wal_corruptions_total[10m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "WAL Corruptions",
+          "format": "time_series"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_reloads_failures_total[10m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Reload Failures",
+          "format": "time_series"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_head_series_not_found[10m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Head Series Not Found",
+          "format": "time_series"
+        },
+        {
+          "refId": "D",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_compactions_failed_total[10m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Compaction Failures",
+          "format": "time_series"
+        },
+        {
+          "refId": "E",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_retention_cutoffs_failures_total[10m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Retention Cutoff Failures",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "none",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 53
+      },
+      "id": 42,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "WAL Latencies",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Failed Compactions": "#bf1b00",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_wal_fsync_duration_seconds_sum[1m]) / rate(prometheus_tsdb_wal_fsync_duration_seconds_count[1m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Fsync Latency",
+          "format": "time_series"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_wal_truncate_duration_seconds_sum[1m]) / rate(prometheus_tsdb_wal_truncate_duration_seconds_count[1m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Truncate Latency",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "s",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 60
+      },
+      "id": 46,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Compactions",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Failed Compactions": "#bf1b00",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_compactions_total[10m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Compactions",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "none",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 60
+      },
+      "id": 48,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Compaction Time",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_compaction_duration_seconds_sum[10m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Compaction Time",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "s",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 60
+      },
+      "id": 50,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Retention Cutoffs",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Allocated bytes": "#F9BA8F",
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833",
+        "RSS": "#890F02"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_retention_cutoffs_total[10m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Retention Cutoffs",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "none",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 67
+      },
+      "id": 56,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "First Compaction, Avg Chunk Samples",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_tsdb_compaction_chunk_samples_sum[10m]) / rate(prometheus_tsdb_compaction_chunk_samples_count[10m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Chunk Samples",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "none",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 67
+      },
+      "id": 10,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Target Scrapes",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "connected",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_target_interval_length_seconds_count[5m])",
+          "intervalFactor": 2,
+          "step": 2,
+          "legendFormat": "{{ interval }}",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "cumulative",
+        "msResolution": true
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 67
+      },
+      "id": 11,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Scrape Duration",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "connected",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "prometheus_target_interval_length_seconds{quantile!=\"0.01\", quantile!=\"0.05\"}",
+          "intervalFactor": 2,
+          "step": 2,
+          "legendFormat": "{{quantile}} ({{interval}})",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "cumulative",
+        "msResolution": true
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 74
+      },
+      "id": 62,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "HTTP requests",
+      "description": "",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_http_request_duration_seconds_count[1m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "{{handler}}",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "reqps",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 74
+      },
+      "id": 64,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "HTTP request latency",
+      "description": "",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_http_request_duration_seconds_sum[1m]) / rate(prometheus_http_request_duration_seconds_count[1m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "{{handler}}",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "s",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 74
+      },
+      "id": 66,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Time spent in HTTP requests",
+      "description": "",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": false,
+        "avg": false,
+        "current": false,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": false,
+        "min": false,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": true,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_http_request_duration_seconds_sum[1m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "{{handler}}",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "s",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 81
+      },
+      "id": 68,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Query engine timings",
+      "description": "Time spent in each mode, per second",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": true,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_engine_query_duration_seconds_sum[1m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "{{slice}}",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "s",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 81
+      },
+      "id": 70,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Rule group evaulation problems",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": true,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_rule_group_iterations_missed_total[1m])  ",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Rule group missed",
+          "format": "time_series"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_rule_evaluation_failures_total[1m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Rule evals failed",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "editable": true,
+      "error": false,
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 81
+      },
+      "id": 72,
+      "isNew": false,
+      "renderer": "flot",
+      "span": 0,
+      "title": "Evaluation time of rule groups",
+      "transparent": false,
+      "type": "graph",
+      "aliasColors": {
+        "Chunks": "#1F78C1",
+        "Chunks to persist": "#508642",
+        "Max chunks": "#052B51",
+        "Max to persist": "#3F6833"
+      },
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "fill": 1,
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": true,
+        "hideEmpty": false,
+        "hideZero": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 2,
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "expr": "rate(prometheus_rule_group_duration_seconds_sum[1m])",
+          "intervalFactor": 2,
+          "step": 10,
+          "legendFormat": "Rule evaluation duration",
+          "format": "time_series"
+        }
+      ],
+      "tooltip": {
+        "shared": true,
+        "value_type": "individual"
+      },
+      "xaxis": {
+        "format": "",
+        "logBase": 0,
+        "show": true
+      },
+      "yaxes": [
+        {
+          "format": "s",
+          "logBase": 1,
+          "min": 0,
+          "show": true
+        },
+        {
+          "format": "short",
+          "logBase": 1,
+          "show": false
+        }
+      ]
+    }
+  ],
+  "rows": null,
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": [
+      {
+        "name": "Annotations & Alerts",
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "showLine": false,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "lineColor": "",
+        "iconSize": 0,
+        "enable": true,
+        "query": "",
+        "expr": "",
+        "step": "",
+        "textField": "",
+        "textFormat": "",
+        "titleFormat": "",
+        "tagsField": "",
+        "tags": null,
+        "tagKeys": "",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "refresh": "10s",
+  "schemaVersion": 37,
+  "version": 14,
+  "links": [],
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "graphTooltip": 1
+}

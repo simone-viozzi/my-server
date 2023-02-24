@@ -35,7 +35,6 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "certs:/certs/"
-    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
@@ -56,6 +55,7 @@ services:
 
       # middleware redirect
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    restart: unless-stopped
 
   homepage:
     image: ghcr.io/benphelps/homepage:latest
@@ -65,15 +65,14 @@ services:
     volumes:
       - /home/simone/containers/traefik/homepage-config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
-    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.homepage.rule=Host(`${PUBLIC_HOMEPAGE_DOMAIN}`)"
       - "traefik.http.routers.homepage.entrypoints=websecure"
       - "traefik.http.routers.homepage.tls.certresolver=leresolver"
       - "traefik.http.routers.homepage.tls=true"
-      - "traefik.http.routers.homepage.service=homepage-svc"
-      - "traefik.http.services.homepage-svc.loadbalancer.server.port=3000"
+      - "traefik.http.services.homepage.loadbalancer.server.port=3000"
+    restart: unless-stopped
 
 volumes:
   certs:

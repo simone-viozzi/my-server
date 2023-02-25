@@ -80,6 +80,13 @@ services:
       - "homepage.icon=https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/jellyfin.svg"
       - "homepage.href=https://${JELLYFIN_DOMAIN}"
       - "homepage.description=View media from anywhere"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
 volumes:
   jellyfin-config:

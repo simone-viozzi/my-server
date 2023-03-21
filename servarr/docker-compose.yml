@@ -90,7 +90,7 @@ services:
     restart: unless-stopped
 
   radarr:
-    image: lscr.io/linuxserver/radarr:latest
+    image: cr.hotio.dev/hotio/radarr
     container_name: radarr
     environment:
       - PUID=1002

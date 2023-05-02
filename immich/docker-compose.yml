@@ -60,8 +60,13 @@ services:
 
   immich-machine-learning:
     container_name: immich_machine_learning
-    image: ghcr.io/immich-app/immich-machine-learning:release
+    build: 
+      context: ./machine-learning
+      dockerfile: Dockerfile
+    #image: ghcr.io/immich-app/immich-machine-learning:release
+    command: python main.py
     volumes:
+      - ./machine-learning/src:/usr/src/app
       - immich-upload:/usr/src/app/upload
       - model-cache:/cache
     env_file:
@@ -74,6 +79,13 @@ services:
       # set watchtower to monitor only and do not perform the update
       com.centurylinklabs.watchtower.monitor-only: "true"
     restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
 
   immich-web:
     container_name: immich_web

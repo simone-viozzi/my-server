@@ -5,7 +5,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
   PIP_NO_CACHE_DIR=true
 
 RUN python -m venv /opt/venv
-RUN /opt/venv/bin/pip install --pre torch  -f https://download.pytorch.org/whl/cu118
+RUN /opt/venv/bin/pip install wheel
+RUN /opt/venv/bin/pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 RUN /opt/venv/bin/pip install transformers tqdm numpy scikit-learn scipy nltk sentencepiece fastapi Pillow uvicorn[standard]
 RUN /opt/venv/bin/pip install --no-deps sentence-transformers
 
@@ -25,4 +26,4 @@ WORKDIR /usr/src/app
 
 COPY . .
 ENV PYTHONPATH=`pwd`
-CMD ["python", "main.py"]
+CMD ["python", "src/main.py"]

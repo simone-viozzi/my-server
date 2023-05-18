@@ -1,6 +1,0 @@
-*.zip
-*.onnx
-upload/
-venv/
-__pycache__/
-model-cache/

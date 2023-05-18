@@ -60,13 +60,13 @@ services:
 
   immich-machine-learning:
     container_name: immich_machine_learning
-    build: 
-      context: ./machine-learning
-      dockerfile: Dockerfile
-    #image: ghcr.io/immich-app/immich-machine-learning:release
-    command: python main.py
+    image: ghcr.io/immich-app/immich-machine-learning:release
+    #build: 
+    #  context: ./machine-learning
+    #  dockerfile: Dockerfile
+    #command: python main.py
     volumes:
-      - ./machine-learning/src:/usr/src/app
+      #- ./machine-learning/src:/usr/src/app
       - immich-upload:/usr/src/app/upload
       - model-cache:/cache
     env_file:

@@ -81,6 +81,10 @@ services:
       # set watchtower to monitor only and do not perform the update
       com.centurylinklabs.watchtower.monitor-only: "true"
     restart: always
+    logging:
+      options:
+        max-size: "50m"
+        max-file: "3"
     deploy:
       resources:
         reservations:

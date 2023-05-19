@@ -92,6 +92,8 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+        limits:
+          cpus: '3'
 
   immich-web:
     container_name: immich_web

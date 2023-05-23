@@ -10,8 +10,6 @@ services:
       - immich-upload:/usr/src/app/upload
     env_file:
       - .env
-    environment:
-      - NODE_ENV=production
     depends_on:
       - redis
       - database
@@ -45,8 +43,6 @@ services:
       - immich-upload:/usr/src/app/upload
     env_file:
       - .env
-    environment:
-      - NODE_ENV=production
     depends_on:
       - redis
       - database

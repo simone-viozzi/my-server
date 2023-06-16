@@ -3,8 +3,8 @@ version: "3.8"
 services:
   immich-server:
     container_name: immich_server
-    image: ghcr.io/immich-app/immich-server:release
-    command: [ "start-server.sh" ]
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    command: [ "start.sh", "immich" ]
     volumes:
       #- ${UPLOAD_LOCATION}:/usr/src/app/upload
       - immich-upload:/usr/src/app/upload
@@ -36,8 +36,8 @@ services:
 
   immich-microservices:
     container_name: immich_microservices
-    image: ghcr.io/immich-app/immich-server:release
-    command: [ "start-microservices.sh" ]
+    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+    command: [ "start.sh", "microservices" ]
     volumes:
       #- ${UPLOAD_LOCATION}:/usr/src/app/upload
       - immich-upload:/usr/src/app/upload
@@ -56,7 +56,7 @@ services:
 
   immich-machine-learning:
     container_name: immich_machine_learning
-    image: ghcr.io/immich-app/immich-machine-learning:release
+    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
     #build: 
     #  context: ./machine-learning
     #  dockerfile: Dockerfile
@@ -67,8 +67,6 @@ services:
       - model-cache:/cache
     env_file:
       - .env
-    environment:
-      - NODE_ENV=production
     networks:
       - immich
     ports:
@@ -93,7 +91,7 @@ services:
 
   immich-web:
     container_name: immich_web
-    image: ghcr.io/immich-app/immich-web:release
+    image: ghcr.io/immich-app/immich-web:${IMMICH_VERSION:-release}
     env_file:
       - .env
     networks:
@@ -116,10 +114,9 @@ services:
   typesense:
     container_name: immich_typesense
     image: typesense/typesense:0.25.0.rc14
-    command: '--data-dir /data --api-key=${TYPESENSE_API_KEY}'
-    #environment:
-    #  - TYPESENSE_API_KEY=${TYPESENSE_API_KEY}
-    #  - TYPESENSE_DATA_DIR=/data
+    environment:
+      - TYPESENSE_API_KEY=${TYPESENSE_API_KEY}
+      - TYPESENSE_DATA_DIR=/data
     logging:
       driver: none
     volumes:

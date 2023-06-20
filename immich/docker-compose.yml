@@ -17,6 +17,8 @@ services:
     networks:
       - proxy
       - immich
+    logging:
+      driver: "local"
     labels:
       traefik.enable: "true"
       traefik.docker.network: proxy
@@ -49,6 +51,8 @@ services:
       - typesense
     networks:
       - immich
+    logging:
+      driver: "local"
     labels:
       # set watchtower to monitor only and do not perform the update
       com.centurylinklabs.watchtower.monitor-only: "true"
@@ -70,9 +74,7 @@ services:
       com.centurylinklabs.watchtower.monitor-only: "true"
     restart: always
     logging:
-      options:
-        max-size: "50m"
-        max-file: "3"
+      driver: "local"
     deploy:
       resources:
         reservations:
@@ -91,6 +93,8 @@ services:
     networks:
       - proxy
       - immich
+    logging:
+      driver: "local"
     labels:
       traefik.enable: "true"
       traefik.docker.network: proxy
@@ -127,6 +131,8 @@ services:
     image: redis:6.2
     networks:
       - immich
+    logging:
+      driver: "local"
     labels:
       # set watchtower to monitor only and do not perform the update
       com.centurylinklabs.watchtower.monitor-only: "true"
@@ -146,6 +152,8 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       - immich
+    logging:
+      driver: "local"
     labels:
       # set watchtower to monitor only and do not perform the update
       com.centurylinklabs.watchtower.monitor-only: "true" 

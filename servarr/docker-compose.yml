@@ -20,6 +20,8 @@ services:
       - 6881:6881/udp
     networks:
       media:
+    logging:
+      driver: "local"
     restart: unless-stopped
 
   jackett:
@@ -39,6 +41,8 @@ services:
       - 9117:9117
     networks:
       media:
+    logging:
+      driver: "local"
     restart: unless-stopped
 
   flaresolverr:
@@ -54,6 +58,8 @@ services:
       - 8191:8191
     networks:
       media:
+    logging:
+      driver: "local"
     restart: unless-stopped
 
   prowlarr:
@@ -70,6 +76,8 @@ services:
       - "9696:9696"
     networks:
       media:
+    logging:
+      driver: "local"
     restart: unless-stopped
 
   sonarr:
@@ -87,6 +95,8 @@ services:
       - "8989:8989"
     networks:
       media:
+    logging:
+      driver: "local"
     restart: unless-stopped
 
   radarr:
@@ -104,6 +114,8 @@ services:
       - "7878:7878"
     networks:
       media:
+    logging:
+      driver: "local"
     restart: unless-stopped
 
   readarr:
@@ -121,6 +133,8 @@ services:
       - "8787:8787"
     networks:
       media:
+    logging:
+      driver: "local"
     restart: unless-stopped
 
   jellyseerr:
@@ -136,7 +150,6 @@ services:
       proxy:
     volumes:
       - jellyseerr-config:/app/config
-    restart: unless-stopped
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
@@ -146,13 +159,15 @@ services:
       - "traefik.http.routers.jellyseerr.tls=true"
       - "traefik.http.routers.jellyseerr.service=jellyseerr-svc"
       - "traefik.http.services.jellyseerr-svc.loadbalancer.server.port=5055"
-      
 
       - homepage.group=Media
       - homepage.name=Discover
       - homepage.icon=https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/jellyseerr.svg
       - homepage.href=https://${JELLYSEERR_DOMAIN}
       - homepage.description=Discover media and request it
+    logging:
+      driver: "local"
+    restart: unless-stopped
 
 networks:
   media:

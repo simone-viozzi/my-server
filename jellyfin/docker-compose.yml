@@ -80,6 +80,8 @@ services:
       - "homepage.icon=https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/jellyfin.svg"
       - "homepage.href=https://${JELLYFIN_DOMAIN}"
       - "homepage.description=View media from anywhere"
+    logging:
+      driver: "local"
     deploy:
       resources:
         reservations:
@@ -92,6 +94,7 @@ volumes:
   jellyfin-config:
     external: true
   jellyfin-cache:
+    external: true
 
 
 networks:

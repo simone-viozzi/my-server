@@ -55,6 +55,8 @@ services:
 
       # middleware redirect
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+    logging:
+      driver: "local"
     restart: unless-stopped
 
   homepage:
@@ -72,10 +74,13 @@ services:
       - "traefik.http.routers.homepage.tls.certresolver=leresolver"
       - "traefik.http.routers.homepage.tls=true"
       - "traefik.http.services.homepage.loadbalancer.server.port=3000"
+    logging:
+      driver: "local"
     restart: unless-stopped
 
 volumes:
   certs:
+
 
 networks:
   proxy:

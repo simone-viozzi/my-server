@@ -31,4 +31,3 @@ services:
 networks:
   apprise:
     external: true
-

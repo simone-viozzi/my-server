@@ -139,8 +139,8 @@ def _get_model(model, task=None):
         if task:
             if task == 'facial-recognition':
                 face_model = FaceAnalysis(
-                    name=model, 
-                    root=cache_folder, 
+                    name=model,
+                    root=cache_folder,
                     allowed_modules=["detection", "recognition"],
                     providers=['CUDAExecutionProvider'],
                 )

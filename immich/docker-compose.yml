@@ -156,7 +156,7 @@ services:
       driver: "local"
     labels:
       # set watchtower to monitor only and do not perform the update
-      com.centurylinklabs.watchtower.monitor-only: "true" 
+      com.centurylinklabs.watchtower.monitor-only: "true"
     restart: unless-stopped
 
 volumes:

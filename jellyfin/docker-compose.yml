@@ -94,7 +94,6 @@ volumes:
   jellyfin-config:
     external: true
   jellyfin-cache:
-    external: true
 
 
 networks:

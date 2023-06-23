@@ -222,6 +222,8 @@ services:
     image: ${TIKA_IMAGE:-apache/tika:latest-full}
     networks:
       proxy:
+    logging:
+      driver: "local"
     restart: unless-stopped
 
 

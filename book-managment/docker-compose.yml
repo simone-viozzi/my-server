@@ -1,0 +1,19 @@
+version: '3'
+services:
+  kavita:
+    build: ./kavita
+    container_name: kavita
+    volumes:
+      - ./books:/books
+      - ./config_kavita:/kavita/config
+    ports:
+      - 5000:5000
+    restart: unless-stopped
+
+    # Uncomment if you want to implement healthchecks
+    healthcheck:
+      test: curl --fail http://localhost:5000 || exit 1
+      interval: 300s
+      retries: 3
+      start_period: 30s
+      timeout: 15s

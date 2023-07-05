@@ -67,8 +67,6 @@ services:
       - .env
     networks:
       - immich
-    ports:
-      - 3003:3003
     labels:
       # set watchtower to monitor only and do not perform the update
       com.centurylinklabs.watchtower.monitor-only: "true"

@@ -1,41 +1,48 @@
 version: "3.4"
 services:
-  kavita:
-    build: ./kavita
-    container_name: kavita
-    volumes:
-      - ./books:/books
-      - ./config_kavita:/kavita/config
-    ports:
-      - 5000:5000
-    restart: unless-stopped
-
-    # Uncomment if you want to implement healthchecks
-    healthcheck:
-      test: curl --fail http://localhost:5000 || exit 1
-      interval: 300s
-      retries: 3
-      start_period: 30s
-      timeout: 15s
+  #kavita:
+  #  build: ./kavita
+  #  container_name: kavita
+  #  volumes:
+  #    - ./books:/books
+  #    - ./config_kavita:/kavita/config
+  #  ports:
+  #    - 5000:5000
+  #  restart: unless-stopped
+#
+  #  # Uncomment if you want to implement healthchecks
+  #  healthcheck:
+  #    test: curl --fail http://localhost:5000 || exit 1
+  #    interval: 300s
+  #    retries: 3
+  #    start_period: 30s
+  #    timeout: 15s
 
 
   broker:
+    container_name: paperless_broker
     image: docker.io/library/redis:7
     restart: unless-stopped
     volumes:
       - redisdata:/data
+    networks:
+      - internal
 
   db:
+    container_name: paperless_db
     image: docker.io/library/postgres:15
     restart: unless-stopped
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - paperless-pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: paperless
       POSTGRES_USER: paperless
       POSTGRES_PASSWORD: paperless
+    networks:
+      - internal
 
   webserver:
+    container_name: paperless_webserver
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     user: 1000:1000
     restart: unless-stopped
@@ -46,14 +53,17 @@ services:
       - tika
     ports:
       - "8150:8000"
+    networks:
+      - proxy
+      - internal
     healthcheck:
       test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
       interval: 30s
       timeout: 10s
       retries: 5
     volumes:
-      - data:/usr/src/paperless/data
-      - media:/usr/src/paperless/media
+      - paperless-data:/usr/src/paperless/data
+      - paperless-media:/usr/src/paperless/media
       - ./export:/usr/src/paperless/export
       - ./paperless:/usr/src/paperless/consume
     env_file: .env
@@ -63,8 +73,21 @@ services:
       PAPERLESS_TIKA_ENABLED: 1
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+
+      - "traefik.http.routers.paperless.rule=Host(`${PAPERLESS_DOMAIN}`)"
+      - "traefik.http.routers.paperless.entryPoints=websecure"
+
+      - "traefik.http.routers.paperless.tls=true"
+      - "traefik.http.routers.paperless.tls.certResolver=leresolver"
+
+      - "traefik.http.routers.paperless.service=paperless-svc"
+      - "traefik.http.services.paperless-svc.loadbalancer.server.port=8000"
 
   gotenberg:
+    container_name: paperless_gotenberg
     image: docker.io/gotenberg/gotenberg:7.8
     restart: unless-stopped
 
@@ -74,10 +97,16 @@ services:
       - "gotenberg"
       - "--chromium-disable-javascript=true"
       - "--chromium-allow-list=file:///tmp/.*"
+    networks:
+      - internal
 
   tika:
+    container_name: paperless_tika
     image: ghcr.io/paperless-ngx/tika:latest
+    networks:
+      - internal
     restart: unless-stopped
+
 
   change-vol-ownership:
     # We can use any image we want as long as we can chown
@@ -89,12 +118,20 @@ services:
       - '1000'
     volumes:
       # The volume to chown
-      - media:/tmp/change-ownership/1
-      - data:/tmp/change-ownership/2
+      - paperless-media:/tmp/change-ownership/1
+      - paperless-data:/tmp/change-ownership/2
     command: chown -R 1000:1000 /tmp/change-ownership
 
+networks:
+  proxy:
+    external: true
+  internal:
+
 volumes:
-  data:
-  media:
-  pgdata:
+  paperless-data:
+    external: true
+  paperless-media:
+    external: true
+  paperless-pgdata:
+    external: true
   redisdata:

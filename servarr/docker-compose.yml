@@ -153,8 +153,10 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
+
       - "traefik.http.routers.jellyseerr.rule=Host(`${JELLYSEERR_DOMAIN}`)"
-      - "traefik.http.routers.jellyseerr.entrypoints=websecure"
+      - "traefik.http.routers.jellyseerr.entryPoints=websecure"
+
       - "traefik.http.routers.jellyseerr.tls.certresolver=leresolver"
       - "traefik.http.routers.jellyseerr.tls=true"
       - "traefik.http.routers.jellyseerr.service=jellyseerr-svc"

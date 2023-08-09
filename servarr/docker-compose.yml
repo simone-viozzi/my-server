@@ -149,6 +149,7 @@ services:
       media:
       proxy:
     volumes:
+      - ./jellyseerr_logs:/app/config/logs
       - jellyseerr-config:/app/config
     labels:
       - "traefik.enable=true"

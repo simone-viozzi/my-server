@@ -18,7 +18,10 @@ services:
       - proxy
       - immich
     logging:
-      driver: "local"
+      # driver: "local"
+      driver: "journald"
+      options:
+        tag: "immich-server"
     labels:
       traefik.enable: "true"
       traefik.docker.network: proxy

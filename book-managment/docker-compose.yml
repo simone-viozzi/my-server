@@ -62,6 +62,7 @@ services:
       timeout: 10s
       retries: 5
     volumes:
+      - ./logs:/usr/src/paperless/data/log
       - paperless-data:/usr/src/paperless/data
       - paperless-media:/usr/src/paperless/media
       - ./export:/usr/src/paperless/export

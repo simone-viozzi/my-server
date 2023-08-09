@@ -7,6 +7,7 @@ services:
     user: 1002:1002
     #network_mode: "host"
     volumes:
+      - ./logs/:/config/log/
       - jellyfin-config:/config
       - jellyfin-cache:/cache
       - /data/hdd/media-lib/media:/media

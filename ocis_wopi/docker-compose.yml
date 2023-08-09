@@ -16,7 +16,8 @@ services:
     command: ["-c", "ocis init || true; ocis server"]
     environment:
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
+      OCIS_LOG_FILE: /var/lib/ocis/logs/ocis.log
+      OCIS_LOG_LEVEL: info
       OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       GATEWAY_GRPC_ADDR: 0.0.0.0:9142 # make the REVA gateway accessible to the app drivers
@@ -39,6 +40,7 @@ services:
       #NOTIFICATIONS_SMTP_INSECURE: "true" # the mail catcher uses self signed certificates
     volumes:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
+      - ./logs:/var/lib/ocis/logs
       - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
     labels:

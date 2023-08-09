@@ -150,7 +150,7 @@ services:
       POSTGRES_DB: ${DB_DATABASE_NAME}
       PG_DATA: /var/lib/postgresql/data
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - immich-pgdata:/var/lib/postgresql/data
     networks:
       - immich
     logging:
@@ -161,7 +161,8 @@ services:
     restart: unless-stopped
 
 volumes:
-  pgdata:
+  immich-pgdata:
+    external: true
   immich-upload:
     external: true
   model-cache:

@@ -75,17 +75,17 @@ services:
       PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
       PAPERLESS_TIKA_ENDPOINT: http://tika:9998
     labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
+      traefik.enable: "true"
+      traefik.docker.network: proxy
 
-      - "traefik.http.routers.paperless.rule=Host(`${PAPERLESS_DOMAIN}`)"
-      - "traefik.http.routers.paperless.entryPoints=websecure"
+      traefik.http.routers.paperless.rule: "Host(`${PAPERLESS_DOMAIN}`)"
+      traefik.http.routers.paperless.entryPoints: websecure
 
-      - "traefik.http.routers.paperless.tls=true"
-      - "traefik.http.routers.paperless.tls.certResolver=leresolver"
+      traefik.http.routers.paperless.tls: "true"
+      traefik.http.routers.paperless.tls.certResolver: leresolver
 
-      - "traefik.http.routers.paperless.service=paperless-svc"
-      - "traefik.http.services.paperless-svc.loadbalancer.server.port=8000"
+      traefik.http.routers.paperless.service: paperless-svc
+      traefik.http.services.paperless-svc.loadbalancer.server.port: "8000"
 
   gotenberg:
     container_name: paperless_gotenberg

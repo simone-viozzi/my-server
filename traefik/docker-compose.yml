@@ -12,7 +12,7 @@ services:
           - ${COLLABORA_DOMAIN}
           - ${ONLYOFFICE_DOMAIN}
           - ${JELLYFIN_DOMAIN}
-      monitor-net:
+      homepage-net:
     command:
       - --log.level=INFO
       - --entrypoints.web.address=:80
@@ -61,7 +61,10 @@ services:
       - homepage.name=Traefik
       - homepage.icon=https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/traefik.svg
       - homepage.href=https://${TRAEFIK_DOMAIN}
-      - homepage.widget.type=emby
+      - homepage.widget.type=traefik
+      - homepage.widget.username=${TRAEFIK_USER}
+      - homepage.widget.password=${TRAEFIK_PASSWORD}
+      - homepage.widget.url=https://${TRAEFIK_DOMAIN}
     logging:
       driver: "local"
     restart: unless-stopped
@@ -76,6 +79,8 @@ services:
       driver: "local"
     ports:
       - "3000:3000"
+    networks:
+      homepage-net:
     restart: unless-stopped
 
   homarr:
@@ -109,5 +114,5 @@ volumes:
 networks:
   proxy:
     external: true
-  monitor-net:
+  homepage-net:
     external: true

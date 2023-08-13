@@ -1,4 +1,6 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json
 
+version: "3"
 
 services:
   portainer:
@@ -7,10 +9,22 @@ services:
     ports:
       - 8000:8000
       - 9443:9443
+    networks:
+      homepage-net:
+      internal:
     volumes:
       - portainer-data:/data
     logging:
       driver: "local"
+    labels:
+      - homepage.group=Network
+      - homepage.name=Portainer
+      - homepage.icon=https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/portainer.svg
+      - homepage.href=https://localhost:9443
+      - homepage.widget.type=portainer
+      - homepage.widget.url=https://portainer:9443
+      - homepage.widget.env=8
+      - homepage.widget.key=${PORTAINER_API_KEY}
     restart: unless-stopped
 
   agent:
@@ -18,6 +32,8 @@ services:
     container_name: portainer_agent
     ports:
       - 9001:9001
+    networks:
+      internal:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes:/var/lib/docker/volumes
@@ -27,3 +43,8 @@ services:
 
 volumes:
   portainer-data:
+
+networks:
+  homepage-net:
+    external: true
+  internal:

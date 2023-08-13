@@ -1,0 +1,42 @@
+{
+    // set the default formatter for docker compose files to redhat.vscode-yaml
+    //"[dockercompose]": {
+    //    "editor.insertSpaces": true,
+    //    "editor.tabSize": 2,
+    //    "editor.autoIndent": "advanced",
+    //    "editor.quickSuggestions": {
+    //        "other": true,
+    //        "comments": false,
+    //        "strings": true
+    //    },
+    //    "editor.defaultFormatter": "redhat.vscode-yaml",
+    //},
+    //"[yaml]": {
+    //    "editor.insertSpaces": true,
+    //    "editor.tabSize": 2,
+    //    "editor.autoIndent": "keep",
+    //    "diffEditor.ignoreTrimWhitespace": false,
+    //    "editor.quickSuggestions": {
+    //        "other": true,
+    //        "comments": false,
+    //        "strings": true
+    //    },
+    //    "editor.defaultFormatter": "redhat.vscode-yaml",
+    //},
+    //"yaml.format.enable": true,
+    //"yaml.schemaStore.enable": true,
+    //"yaml.schemas": {
+    //    "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "docker-compose.yml"
+    //}
+    "[dockercompose]": {
+        "editor.insertSpaces": true,
+        "editor.tabSize": 2,
+        "editor.autoIndent": "advanced",
+        "editor.quickSuggestions": {
+            "other": true,
+            "comments": false,
+            "strings": true
+        },
+        "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+    }
+}

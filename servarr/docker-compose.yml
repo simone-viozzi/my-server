@@ -112,8 +112,17 @@ services:
       - /data/hdd/media-lib:/data
     ports:
       - "7878:7878"
+    labels:
+      - homepage.group=servarr
+      - homepage.name=Radarr
+      - homepage.icon=https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/radarr.svg
+      - homepage.href=http://radarr:7878
+      - homepage.widget.type=radarr
+      - homepage.widget.url=http://radarr:7878
+      - homepage.widget.key=${RADARR_API_KEY}
     networks:
       media:
+      homepage-net:
     logging:
       driver: "local"
     restart: unless-stopped
@@ -148,6 +157,7 @@ services:
     networks:
       media:
       proxy:
+      homepage-net:
     volumes:
       - ./jellyseerr_logs:/app/config/logs
       - jellyseerr-config:/app/config
@@ -167,7 +177,9 @@ services:
       - homepage.name=Discover
       - homepage.icon=https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/jellyseerr.svg
       - homepage.href=https://${JELLYSEERR_DOMAIN}
-      - homepage.description=Discover media and request it
+      - homepage.widget.type=jellyseerr
+      - homepage.widget.url=http://jellyseerr:5055
+      - homepage.widget.key=${JELLYSEERR_API_KEY}
     logging:
       driver: "local"
     restart: unless-stopped
@@ -177,6 +189,9 @@ networks:
     external: true
   proxy:
     external: true
+  homepage-net:
+    external: true
+  
 
 volumes:
   qbit-config:

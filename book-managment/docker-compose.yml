@@ -19,16 +19,16 @@ services:
   #    timeout: 15s
 
 
-  broker:
+  paperless_broker:
     container_name: paperless_broker
     image: docker.io/library/redis:7
     restart: unless-stopped
     volumes:
       - redisdata:/data
     networks:
-      - internal
+      internal:
 
-  db:
+  paperless_db:
     container_name: paperless_db
     image: docker.io/library/postgres:15
     restart: unless-stopped
@@ -39,28 +39,24 @@ services:
       POSTGRES_USER: paperless
       POSTGRES_PASSWORD: paperless
     networks:
-      - internal
+      internal:
 
-  webserver:
-    container_name: paperless_webserver
+  paperless_webserver:
+    container_name: paperless-webserver
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     user: 1000:1000
     restart: unless-stopped
     depends_on:
-      - db
-      - broker
-      - gotenberg
-      - tika
+      - paperless_db
+      - paperless_broker
+      - paperless_gotenberg
+      - paperless_tika
     ports:
       - "8150:8000"
     networks:
-      - proxy
-      - internal
-    healthcheck:
-      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+      proxy:
+      internal:
+      homepage-net:
     volumes:
       - ./logs:/usr/src/paperless/data/log
       - paperless-data:/usr/src/paperless/data
@@ -69,11 +65,11 @@ services:
       - ./paperless:/usr/src/paperless/consume
     env_file: .env
     environment:
-      PAPERLESS_REDIS: redis://broker:6379
-      PAPERLESS_DBHOST: db
+      PAPERLESS_REDIS: redis://paperless_broker:6379
+      PAPERLESS_DBHOST: paperless_db
       PAPERLESS_TIKA_ENABLED: 1
-      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
-      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://paperless_gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://paperless_tika:9998
     labels:
       traefik.enable: "true"
       traefik.docker.network: proxy
@@ -87,7 +83,20 @@ services:
       traefik.http.routers.paperless.service: paperless-svc
       traefik.http.services.paperless-svc.loadbalancer.server.port: "8000"
 
-  gotenberg:
+      homepage.group: Media
+      homepage.name: Paperless-ngx
+      homepage.icon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/paperless-ngx.svg
+      homepage.href: https://${PAPERLESS_DOMAIN}
+      homepage.widget.type: paperlessngx
+      homepage.widget.url: http://paperless-webserver:8000
+      homepage.widget.key: ${PAPERLESS_TOKEN}
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "-S", "--max-time", "2", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  paperless_gotenberg:
     container_name: paperless_gotenberg
     image: docker.io/gotenberg/gotenberg:7.8
     restart: unless-stopped
@@ -99,9 +108,9 @@ services:
       - "--chromium-disable-javascript=true"
       - "--chromium-allow-list=file:///tmp/.*"
     networks:
-      - internal
+      internal:
 
-  tika:
+  paperless_tika:
     container_name: paperless_tika
     image: ghcr.io/paperless-ngx/tika:latest
     networks:
@@ -127,6 +136,8 @@ networks:
   proxy:
     external: true
   internal:
+  homepage-net:
+    external: true
 
 volumes:
   paperless-data:

@@ -37,34 +37,34 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - certs:/certs/
     labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=proxy"
-      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN}`)"
-      - "traefik.http.routers.traefik.service=api@internal"
-      - "traefik.http.routers.traefik.tls.certresolver=leresolver"
-      - "traefik.http.routers.traefik.entrypoints=websecure"
+      traefik.enable: "true"
+      traefik.docker.network: proxy
+      traefik.http.routers.traefik.rule: "Host(`${TRAEFIK_DOMAIN}`)"
+      traefik.http.routers.traefik.service: api@internal
+      traefik.http.routers.traefik.tls.certresolver: leresolver
+      traefik.http.routers.traefik.entrypoints: websecure
 
       # add auth middleware
-      - "traefik.http.routers.traefik.middlewares=traefik-auth"
+      traefik.http.routers.traefik.middlewares: traefik-auth
       # you need to replace $ with $$ !
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=${BASIC_AUTH}"
+      traefik.http.middlewares.traefik-auth.basicauth.users: "${BASIC_AUTH}"
 
       # global redirect to https
-      - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
-      - "traefik.http.routers.http-catchall.entrypoints=web"
-      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      traefik.http.routers.http-catchall.rule: hostregexp(`{host:.+}`)
+      traefik.http.routers.http-catchall.entrypoints: web
+      traefik.http.routers.http-catchall.middlewares: redirect-to-https
 
       # middleware redirect
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: https
 
-      - homepage.group=Network
-      - homepage.name=Traefik
-      - homepage.icon=https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/traefik.svg
-      - homepage.href=https://${TRAEFIK_DOMAIN}
-      - homepage.widget.type=traefik
-      - homepage.widget.username=${TRAEFIK_USER}
-      - homepage.widget.password=${TRAEFIK_PASSWORD}
-      - homepage.widget.url=https://${TRAEFIK_DOMAIN}
+      homepage.group: Network
+      homepage.name: Traefik
+      homepage.icon: traefik.svg
+      homepage.href: https://${TRAEFIK_DOMAIN}
+      homepage.widget.type: traefik
+      homepage.widget.username: ${TRAEFIK_USER}
+      homepage.widget.password: ${TRAEFIK_PASSWORD}
+      homepage.widget.url: https://${TRAEFIK_DOMAIN}
     logging:
       driver: "local"
     restart: unless-stopped
@@ -73,12 +73,14 @@ services:
     image: ghcr.io/benphelps/homepage:latest
     container_name: homepage
     volumes:
-      - /home/simone/containers/traefik/homepage-config:/app/config
+      - ./homepage-config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock
     logging:
       driver: "local"
     ports:
       - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       homepage-net:
     restart: unless-stopped
@@ -89,8 +91,8 @@ services:
     networks:
       proxy:
     environment:
-      - BASE_URL=${PUBLIC_HOMEPAGE_DOMAIN}
-      - DISABLE_EDIT_MODE=true
+      BASE_URL: ${PUBLIC_HOMEPAGE_DOMAIN}
+      DISABLE_EDIT_MODE: "true"
     volumes:
       - ./homarr/configs:/app/data/configs
       - ./homarr/icons:/app/public/icons
@@ -99,13 +101,41 @@ services:
     logging:
       driver: "local"
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.homepage.rule=Host(`${PUBLIC_HOMEPAGE_DOMAIN}`)"
-      - "traefik.http.routers.homepage.entrypoints=websecure"
-      - "traefik.http.routers.homepage.tls.certresolver=leresolver"
-      - "traefik.http.routers.homepage.tls=true"
-      - "traefik.http.services.homepage.loadbalancer.server.port=7575"
+      traefik.enable: "true"
+      traefik.http.routers.homepage.rule: "Host(`${PUBLIC_HOMEPAGE_DOMAIN}`)"
+      traefik.http.routers.homepage.entrypoints: websecure
+      traefik.http.routers.homepage.tls.certresolver: leresolver
+      traefik.http.routers.homepage.tls: "true"
+      traefik.http.services.homepage.loadbalancer.server.port: "7575"
     restart: unless-stopped
+
+
+  speedtest-tracker:
+    image: 'ghcr.io/alexjustesen/speedtest-tracker:latest'
+    container_name: speedtest-tracker
+    ports:
+      - '4674:80'
+      - '4675:443'
+    networks:
+      homepage-net:
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Rome
+    labels:
+      homepage.group: Network
+      homepage.name: Speedtest tracker
+      homepage.icon: si-speedtest.svg
+      homepage.href: http://localhost:4674
+      homepage.widget.type: speedtest
+      homepage.widget.url: http://speedtest-tracker:80
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./speedtest-tracker/config:/config
+      - ./speedtest-tracker/web:/etc/ssl/web
+      - ./speedtest-tracker/icon:/app/public/icons
+    restart: unless-stopped
+
 
 volumes:
   certs:

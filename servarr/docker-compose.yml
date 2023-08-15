@@ -236,7 +236,7 @@ networks:
     external: true
   homepage-net:
     external: true
-  
+
 
 volumes:
   qbit-config:

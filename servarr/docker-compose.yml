@@ -18,6 +18,9 @@ services:
       - 8078:8078
       - 6881:6881
       - 6881:6881/udp
+    networks:
+      media:
+      homepage-net:
     labels:
       homepage.group: servarr
       homepage.name: qbittorrent
@@ -27,9 +30,6 @@ services:
       homepage.widget.url: http://qbittorrent:8078
       homepage.widget.username: ${QBITTORRENT_USERNAME}
       homepage.widget.password: ${QBITTORRENT_PASSWORD}
-    networks:
-      media:
-      homepage-net:
     logging:
       driver: local
     restart: unless-stopped
@@ -49,6 +49,9 @@ services:
       - jackett-downloads:/downloads
     ports:
       - 9117:9117
+    networks:
+      media:
+      homepage-net:
     labels:
       homepage.group: servarr
       homepage.name: Jackett
@@ -56,9 +59,6 @@ services:
       homepage.href: http://localhost:9117
       homepage.widget.type: jackett
       homepage.widget.url: http://jackett:9117
-    networks:
-      media:
-      homepage-net:
     logging:
       driver: "local"
     restart: unless-stopped
@@ -92,6 +92,9 @@ services:
       - prowlarr-config:/config
     ports:
       - "9696:9696"
+    networks:
+      media:
+      homepage-net:
     labels:
       homepage.group: servarr
       homepage.name: Prowlarr
@@ -100,9 +103,6 @@ services:
       homepage.widget.type: prowlarr
       homepage.widget.url: http://prowlarr:9696
       homepage.widget.key: ${PROWLARR_API_KEY}
-    networks:
-      media:
-      homepage-net:
     logging:
       driver: "local"
     restart: unless-stopped
@@ -120,6 +120,9 @@ services:
       - /data/hdd/media-lib:/data
     ports:
       - "8989:8989"
+    networks:
+      media:
+      homepage-net:
     labels:
       homepage.group: servarr
       homepage.name: Sonarr
@@ -128,9 +131,6 @@ services:
       homepage.widget.type: sonarr
       homepage.widget.url: http://sonarr:8989
       homepage.widget.key: ${SONARR_API_KEY}
-    networks:
-      media:
-      homepage-net:
     logging:
       driver: "local"
     restart: unless-stopped
@@ -148,6 +148,9 @@ services:
       - /data/hdd/media-lib:/data
     ports:
       - "7878:7878"
+    networks:
+      media:
+      homepage-net:
     labels:
       homepage.group: servarr
       homepage.name: Radarr
@@ -156,9 +159,6 @@ services:
       homepage.widget.type: radarr
       homepage.widget.url: http://radarr:7878
       homepage.widget.key: ${RADARR_API_KEY}
-    networks:
-      media:
-      homepage-net:
     logging:
       driver: "local"
     restart: unless-stopped
@@ -176,6 +176,9 @@ services:
       - /data/hdd/media-lib:/data
     ports:
       - "8787:8787"
+    networks:
+      media:
+      homepage-net:
     labels:
       homepage.group: servarr
       homepage.name: readarr
@@ -184,9 +187,6 @@ services:
       homepage.widget.type: readarr
       homepage.widget.url: http://readarr:8787
       homepage.widget.key: ${READARR_API_KEY}
-    networks:
-      media:
-      homepage-net:
     logging:
       driver: "local"
     restart: unless-stopped

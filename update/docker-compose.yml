@@ -38,7 +38,7 @@ services:
     labels:
       homepage.group: Update
       homepage.name: Apprise
-      homepage.icon: apprise.svg
+      homepage.icon: mdi-bullhorn-outline.svg
       homepage.href: http://localhost:8005
     logging:
       driver: "local"

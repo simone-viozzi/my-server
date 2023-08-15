@@ -16,7 +16,7 @@ services:
       WATCHTOWER_HTTP_API_TOKEN: ${WATCHTOWER_HTTP_API_TOKEN}
       WATCHTOWER_HTTP_API_METRICS: "true"
     labels:
-      homepage.group: update
+      homepage.group: Update
       homepage.name: watchtower
       homepage.icon: watchtower.svg
       homepage.widget.type: watchtower
@@ -35,6 +35,11 @@ services:
       - 8005:8000
     volumes:
       - ./apprise_config:/config
+    labels:
+      homepage.group: Update
+      homepage.name: Apprise
+      homepage.icon: apprise.svg
+      homepage.href: http://localhost:8005
     logging:
       driver: "local"
     restart: unless-stopped

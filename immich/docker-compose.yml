@@ -39,7 +39,7 @@ services:
 
       homepage.group: Media
       homepage.name: Immich
-      homepage.icon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/immich.svg
+      homepage.icon: immich.svg
       homepage.href: https://${IMMICH_DOMAIN}
       homepage.widget.type: immich
       homepage.widget.url: https://${IMMICH_DOMAIN} #http://immich_server:3001

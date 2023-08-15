@@ -19,7 +19,7 @@ services:
     labels:
       - homepage.group=Network
       - homepage.name=Portainer
-      - homepage.icon=https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/portainer.svg
+      - homepage.icon=portainer.svg
       - homepage.href=https://localhost:9443
       - homepage.widget.type=portainer
       - homepage.widget.url=https://portainer:9443

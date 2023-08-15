@@ -18,7 +18,7 @@ services:
     labels:
       homepage.group: update
       homepage.name: watchtower
-      homepage.icon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/watchtower.svg
+      homepage.icon: watchtower.svg
       homepage.widget.type: watchtower
       homepage.widget.url: http://watchtower:8080
       homepage.widget.key: ${WATCHTOWER_HTTP_API_TOKEN}

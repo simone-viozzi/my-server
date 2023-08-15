@@ -21,7 +21,7 @@ services:
     labels:
       homepage.group: servarr
       homepage.name: qbittorrent
-      homepage.icon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/qbittorrent.svg
+      homepage.icon: qbittorrent.svg
       homepage.href: http://localhost:8078
       homepage.widget.type: qbittorrent
       homepage.widget.url: http://qbittorrent:8078
@@ -52,7 +52,7 @@ services:
     labels:
       homepage.group: servarr
       homepage.name: Jackett
-      homepage.icon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/jackett.svg
+      homepage.icon: jackett.svg
       homepage.href: http://localhost:9117
       homepage.widget.type: jackett
       homepage.widget.url: http://jackett:9117
@@ -95,7 +95,7 @@ services:
     labels:
       homepage.group: servarr
       homepage.name: Prowlarr
-      homepage.icon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/prowlarr.svg
+      homepage.icon: prowlarr.svg
       homepage.href: http://localhost:9696
       homepage.widget.type: prowlarr
       homepage.widget.url: http://prowlarr:9696
@@ -123,7 +123,7 @@ services:
     labels:
       homepage.group: servarr
       homepage.name: Sonarr
-      homepage.icon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/sonarr.svg
+      homepage.icon: sonarr.svg
       homepage.href: http://localhost:8989
       homepage.widget.type: sonarr
       homepage.widget.url: http://sonarr:8989
@@ -151,7 +151,7 @@ services:
     labels:
       homepage.group: servarr
       homepage.name: Radarr
-      homepage.icon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/radarr.svg
+      homepage.icon: radarr.svg
       homepage.href: http://localhost:7878
       homepage.widget.type: radarr
       homepage.widget.url: http://radarr:7878
@@ -179,7 +179,7 @@ services:
     labels:
       homepage.group: servarr
       homepage.name: readarr
-      homepage.icon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/readarr.svg
+      homepage.icon: readarr.svg
       homepage.href: http://localhost:8787
       homepage.widget.type: readarr
       homepage.widget.url: http://readarr:8787
@@ -220,7 +220,7 @@ services:
 
       homepage.group: Media
       homepage.name: Discover
-      homepage.icon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/jellyseerr.svg
+      homepage.icon: jellyseerr.svg
       homepage.href: https://${JELLYSEERR_DOMAIN}
       homepage.widget.type: jellyseerr
       homepage.widget.url: http://jellyseerr:5055

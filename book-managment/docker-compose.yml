@@ -85,7 +85,7 @@ services:
 
       homepage.group: Media
       homepage.name: Paperless-ngx
-      homepage.icon: https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/paperless-ngx.svg
+      homepage.icon: paperless-ngx.svg
       homepage.href: https://${PAPERLESS_DOMAIN}
       homepage.widget.type: paperlessngx
       homepage.widget.url: http://paperless-webserver:8000

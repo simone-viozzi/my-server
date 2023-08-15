@@ -52,11 +52,10 @@ services:
       - "traefik.http.routers.ocis.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
 
-      - "homepage.group=Storage"
+      - "homepage.group=Media"
       - "homepage.name=Owncloud"
-      - "homepage.icon=https://raw.githubusercontent.com/owncloud/core/eebd754771a99bc44820eb67a6d57cea238e6b86/core/img/logo-icon.svg"
+      - "homepage.icon=si-owncloud.svg"
       - "homepage.href=https://${OCIS_DOMAIN}"
-      - "homepage.description=Store whatever you want"
 
       # set watchtower to monitor only and do not perform the update
       - "com.centurylinklabs.watchtower.monitor-only=true"

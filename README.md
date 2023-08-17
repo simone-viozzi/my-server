@@ -1,7 +1,15 @@
 
 # my server setup
 
-## show case [WIP]
+## show case
+
+### Internal Dashboard
+
+![internal dashboard](assets/internal.png)
+
+### External Dashboard
+
+![external dashboard](assets/external.png)
 
 ## bare metal description
 

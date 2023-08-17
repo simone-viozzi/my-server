@@ -16,7 +16,7 @@ services:
       WATCHTOWER_HTTP_API_TOKEN: ${WATCHTOWER_HTTP_API_TOKEN}
       WATCHTOWER_HTTP_API_METRICS: "true"
     labels:
-      homepage.group: Update
+      homepage.group: Update & Monitor
       homepage.name: watchtower
       homepage.icon: watchtower.svg
       homepage.widget.type: watchtower
@@ -36,7 +36,7 @@ services:
     volumes:
       - ./apprise_config:/config
     labels:
-      homepage.group: Update
+      homepage.group: Update & Monitor
       homepage.name: Apprise
       homepage.icon: mdi-bullhorn-outline.svg
       homepage.href: http://localhost:8005

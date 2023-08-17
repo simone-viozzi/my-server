@@ -22,8 +22,17 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       NETDATA_EXTRA_APK_PACKAGES: lm-sensors
+    labels:
+      homepage.group: Update & Monitor
+      homepage.name: Netdata
+      homepage.icon: netdata.svg
+      homepage.href: https://app.netdata.cloud/
     restart: unless-stopped
 
 volumes:
   netdatalib:
   netdatacache:
+
+networks:
+  homepage-net:
+    external: true

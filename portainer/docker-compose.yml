@@ -17,14 +17,14 @@ services:
     logging:
       driver: "local"
     labels:
-      - homepage.group=Network
-      - homepage.name=Portainer
-      - homepage.icon=portainer.svg
-      - homepage.href=https://localhost:9443
-      - homepage.widget.type=portainer
-      - homepage.widget.url=https://portainer:9443
-      - homepage.widget.env=8
-      - homepage.widget.key=${PORTAINER_API_KEY}
+      homepage.group: Network
+      homepage.name: Portainer
+      homepage.icon: portainer.svg
+      homepage.href: https://localhost:9443
+      homepage.widget.type: portainer
+      homepage.widget.url: https://portainer:9443
+      homepage.widget.env: 8
+      homepage.widget.key: ${PORTAINER_API_KEY}
     restart: unless-stopped
 
   agent:

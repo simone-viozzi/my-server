@@ -16,39 +16,40 @@
 ```bash
 $ sudo inxi --filter --width 90 -SGIMCPDp --ms
 System:
-  Kernel: 6.1.2-arch1-1 arch: x86_64 bits: 64 Console: pty pts/3 Distro: Arch Linux
+  Kernel: 6.4.10-arch1-1 arch: x86_64 bits: 64 Console: pty pts/4 Distro: Arch Linux
 Machine:
   Type: Desktop Mobo: ASRock model: 970M Pro3 serial: <filter> UEFI: American Megatrends
     v: P1.60 date: 06/17/2016
 Memory:
-  RAM: total: 7.73 GiB used: 2.71 GiB (35.0%)
+  System RAM: total: 8 GiB available: 7.73 GiB used: 4.46 GiB (57.7%)
   Report: arrays: 1 slots: 4 modules: 2 type: DDR3
 CPU:
   Info: 6-core model: AMD Phenom II X6 1090T bits: 64 type: MCP cache: L2: 3 MiB
-  Speed (MHz): avg: 933 min/max: 800/3200 cores: 1: 1600 2: 800 3: 800 4: 800 5: 800
+  Speed (MHz): avg: 800 min/max: 800/3200 cores: 1: 800 2: 800 3: 800 4: 800 5: 800
     6: 800
 Graphics:
-  Device-1: AMD Redwood XT [Radeon HD 5670/5690/5730] driver: radeon v: kernel
-  Display: server: No display server data found. Headless machine? tty: 176x50
-  API: N/A Message: No display API data available in console. Headless machine?
+  Device-1: NVIDIA GP107 [GeForce GTX 1050 Ti] driver: nvidia v: 535.98
+  Display: server: X.org v: 1.21.1.8 driver: N/A resolution: <missing: xdpyinfo/xrandr>
+  API: OpenGL Message: Unable to show GL data. Required tool glxinfo missing.
 Drives:
-  Local Storage: total: 4.2 TiB used: 91.04 GiB (2.1%)
-  ID-1: /dev/sda vendor: Kingston model: SA400S37120G size: 111.79 GiB
+  Local Storage: total: 4.31 TiB used: 187.3 GiB (4.2%)
+  ID-1: /dev/sda vendor: Kingston model: SA400S37240G size: 223.57 GiB
   ID-2: /dev/sdb vendor: Western Digital model: WD40EFAX-68JH4N1 size: 3.64 TiB
   ID-3: /dev/sdc vendor: Seagate model: ST3500312CS size: 465.76 GiB
 Partition:
-  ID-1: / size: 111.47 GiB used: 16.46 GiB (14.8%) fs: btrfs dev: /dev/sda2
-  ID-2: /boot size: 329.3 MiB used: 108.4 MiB (32.9%) fs: vfat dev: /dev/sda1
-  ID-3: /data/wd-red size: 3.64 TiB used: 74.48 GiB (2.0%) fs: btrfs dev: /dev/sdb1
-  ID-4: /home size: 111.47 GiB used: 16.46 GiB (14.8%) fs: btrfs dev: /dev/sda2
-  ID-5: /srv size: 111.47 GiB used: 16.46 GiB (14.8%) fs: btrfs dev: /dev/sda2
+  ID-1: / size: 223.28 GiB used: 69.95 GiB (31.3%) fs: btrfs dev: /dev/sda2
   [...]
-  ID-7: /var/cache size: 111.47 GiB used: 16.46 GiB (14.8%) fs: btrfs dev: /dev/sda2
+  ID-3: /boot size: 299.4 MiB used: 56.5 MiB (18.9%) fs: vfat dev: /dev/sda1
   [...]
-  ID-11: /var/log size: 111.47 GiB used: 16.46 GiB (14.8%) fs: btrfs dev: /dev/sda2
-  ID-12: /var/tmp size: 111.47 GiB used: 16.46 GiB (14.8%) fs: btrfs dev: /dev/sda2
+  ID-24: /srv size: 223.28 GiB used: 69.95 GiB (31.3%) fs: btrfs dev: /dev/sda2
+  ID-25: /swap size: 223.28 GiB used: 69.95 GiB (31.3%) fs: btrfs dev: /dev/sda2
+  [...]
+  ID-27: /var/cache size: 223.28 GiB used: 69.95 GiB (31.3%) fs: btrfs dev: /dev/sda2
+  [...]
+  ID-37: /var/log size: 223.28 GiB used: 69.95 GiB (31.3%) fs: btrfs dev: /dev/sda2
+  ID-38: /var/tmp size: 223.28 GiB used: 69.95 GiB (31.3%) fs: btrfs dev: /dev/sda2
 Info:
-  Processes: 318 Uptime: 57m Init: systemd Shell: Zsh inxi: 3.3.24
+  Processes: 531 Uptime: 12h 29m Shell: Sudo inxi: 3.3.28
 ```
 
 - `/dev/sda` is a 120GB Kingston ssd, hold the root of the system.

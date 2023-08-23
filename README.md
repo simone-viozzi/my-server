@@ -376,21 +376,3 @@ Then, if for example you what a notification when an item is added, you need to 
 ## Jellyserr link inside Jellyfin menu
 
 Follow [this](https://jellyfin.org/docs/general/clients/web-config/#custom-menu-links) and [this](https://gist.github.com/thornbill/bfdcdb2d79440095b108e8c1f9e38a2f). The secret is to not put the `menuLinks` at the end, but in the middle under `themes`.
-
-## Jellyfin metrics
-
-As per [documentation](https://jellyfin.org/docs/general/networking/monitoring/#prometheus-metrics) you need to edit the `system.xml` file.
-
-The file is located inside the `jellyfin-config:/config` volume, relative to the inside of the container the path is `/config/config/system.xml`.
-
-To make the `/metrics` endpoint not accessible from the outside you need to change the traefik rule for jellyfin from:
-
-```yaml
-      - "traefik.http.routers.jellyfin.rule=Host(`${JELLYFIN_DOMAIN}`)"
-```
-
-to:
-
-```yaml
-      - "traefik.http.routers.jellyfin.rule=Host(`${JELLYFIN_DOMAIN}`) && !Path(`/metrics`)"
-```

@@ -54,6 +54,7 @@ services:
       homepage.href: http://localhost:7534/
       homepage.widget.type: scrutiny
       homepage.widget.url: http://scrutiny:8080
+    restart: unless-stopped
 
 volumes:
   netdatalib:

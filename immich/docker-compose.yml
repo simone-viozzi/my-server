@@ -127,6 +127,7 @@ services:
     environment:
       - TYPESENSE_API_KEY=${TYPESENSE_API_KEY}
       - TYPESENSE_DATA_DIR=/data
+      - GLOG_minloglevel=1
     logging:
       driver: none
     volumes:

@@ -1,6 +1,4 @@
-version: "3.1"
 services:
-
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
@@ -33,6 +31,10 @@ services:
     logging:
       driver: local
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
 
   jackett:
     image: lscr.io/linuxserver/jackett:latest

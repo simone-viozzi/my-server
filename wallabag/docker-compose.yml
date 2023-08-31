@@ -1,0 +1,76 @@
+
+services:
+  wallabag:
+    image: wallabag/wallabag
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      SYMFONY__ENV__DATABASE_DRIVER: pdo_mysql
+      SYMFONY__ENV__DATABASE_HOST: db
+      SYMFONY__ENV__DATABASE_PORT: 3306
+      SYMFONY__ENV__DATABASE_NAME: wallabag
+      SYMFONY__ENV__DATABASE_USER: wallabag
+      SYMFONY__ENV__DATABASE_PASSWORD: ${SYMFONY__ENV__DATABASE_PASSWORD}
+      SYMFONY__ENV__DATABASE_CHARSET: utf8mb4
+      SYMFONY__ENV__DATABASE_TABLE_PREFIX: "wallabag_"
+      SYMFONY__ENV__MAILER_DSN: smtp://127.0.0.1
+      SYMFONY__ENV__FROM_EMAIL: wallabag@example.com
+      SYMFONY__ENV__DOMAIN_NAME: https://${WALLABAG_DOMAIN}
+      SYMFONY__ENV__SERVER_NAME: "wallabag"
+    networks:
+      proxy:
+      homepage-net:
+      internal:
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: proxy
+      traefik.http.routers.wallabag.rule: Host(`${WALLABAG_DOMAIN}`)
+      traefik.http.routers.wallabag.entryPoints: websecure
+      traefik.http.routers.wallabag.tls: "true"
+      traefik.http.routers.wallabag.tls.certResolver: leresolver
+      traefik.http.services.wallabag.loadbalancer.server.port: "80"
+
+      homepage.group: Media
+      homepage.name: Wallabag
+      homepage.icon: wallabag.svg
+      homepage.href: https://${WALLABAG_DOMAIN}
+    volumes:
+      - ./wallabag/images:/var/www/wallabag/web/assets/images
+    healthcheck:
+      test: ["CMD", "wget" ,"--no-verbose", "--tries=1", "--spider", "http://localhost"]
+      interval: 1m
+      timeout: 3s
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+  db:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - wallabag-mariadb:/var/lib/mysql
+    networks:
+      internal:
+    restart: unless-stopped
+
+  redis:
+    image: redis:alpine
+    networks:
+      internal:
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 20s
+      timeout: 3s
+    restart: unless-stopped
+
+volumes:
+  wallabag-mariadb:
+    external: true
+
+networks:
+  internal:
+  proxy:
+    external: true
+  homepage-net:
+    external: true

@@ -1,4 +1,3 @@
-version: '3'
 services:
   netdata:
     image: netdata/netdata:stable
@@ -56,10 +55,59 @@ services:
       homepage.widget.url: http://scrutiny:8080
     restart: unless-stopped
 
+
+  speedtest-tracker:
+    image: 'ghcr.io/alexjustesen/speedtest-tracker:latest'
+    container_name: speedtest-tracker
+    ports:
+      - '4674:80'
+      - '4675:443'
+    networks:
+      homepage-net:
+      speedtest-net:
+    environment:
+      PUID: 1000
+      PGID: 1000
+      DB_CONNECTION: pgsql
+      DB_HOST: speedtestdb
+      DB_PORT: 5432
+      DB_DATABASE: speedtest_tracker
+      DB_USERNAME: speedy
+      DB_PASSWORD: password
+      TZ: Europe/Rome
+    labels:
+      homepage.group: Network
+      homepage.name: Speedtest tracker
+      homepage.icon: si-speedtest.svg
+      homepage.href: http://localhost:4674
+      homepage.widget.type: speedtest
+      homepage.widget.url: http://speedtest-tracker:80
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./speedtest-tracker/config:/config
+      - ./speedtest-tracker/web:/etc/ssl/web
+    depends_on:
+      - speedtestdb
+    restart: unless-stopped
+
+  speedtestdb:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: speedtest_tracker
+      POSTGRES_USER: speedy
+      POSTGRES_PASSWORD: password
+    volumes:
+      - speedtest-db:/var/lib/postgresql/data
+    networks:
+      speedtest-net:
+    restart: unless-stopped
+
 volumes:
   netdatalib:
   netdatacache:
+  speedtest-db:
 
 networks:
+  speedtest-net:
   homepage-net:
     external: true

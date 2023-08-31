@@ -12,6 +12,7 @@ services:
           - ${COLLABORA_DOMAIN}
           - ${ONLYOFFICE_DOMAIN}
           - ${JELLYFIN_DOMAIN}
+          - ${WALLABAG_DOMAIN}
       homepage-net:
     command:
       - --log.level=INFO
@@ -108,34 +109,6 @@ services:
       traefik.http.routers.homepage.tls: "true"
       traefik.http.services.homepage.loadbalancer.server.port: "7575"
     restart: unless-stopped
-
-
-  speedtest-tracker:
-    image: 'ghcr.io/alexjustesen/speedtest-tracker:latest'
-    container_name: speedtest-tracker
-    ports:
-      - '4674:80'
-      - '4675:443'
-    networks:
-      homepage-net:
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Rome
-    labels:
-      homepage.group: Network
-      homepage.name: Speedtest tracker
-      homepage.icon: si-speedtest.svg
-      homepage.href: http://localhost:4674
-      homepage.widget.type: speedtest
-      homepage.widget.url: http://speedtest-tracker:80
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ./speedtest-tracker/config:/config
-      - ./speedtest-tracker/web:/etc/ssl/web
-      - ./speedtest-tracker/icon:/app/public/icons
-    restart: unless-stopped
-
 
 volumes:
   certs:

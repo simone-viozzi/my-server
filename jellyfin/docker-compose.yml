@@ -9,7 +9,7 @@ services:
       - ./logs/:/config/log/
       - jellyfin-config:/config
       - jellyfin-cache:/cache
-      - /data/hdd/media-lib/media:/media
+      - media-lib:/media-lib
       - ./config.json:/jellyfin/jellyfin-web/config.json
     restart: unless-stopped
     networks:
@@ -97,6 +97,8 @@ volumes:
   jellyfin-config:
     external: true
   jellyfin-cache:
+  media-lib:
+    external: true
 
 
 networks:

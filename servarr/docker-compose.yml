@@ -10,7 +10,7 @@ services:
     volumes:
       - qbit-config:/config
       - qbit-torrents:/torrents
-      - /data/hdd/media-lib/torrents:/data/torrents
+      - media-lib:/data
       - ./engines:/config/qBittorrent/nova3/engines
     ports:
       - 8078:8078
@@ -119,7 +119,7 @@ services:
       UMASK: "002"
     volumes:
       - sonarr-config:/config
-      - /data/hdd/media-lib:/data
+      - media-lib:/data
     ports:
       - "8989:8989"
     networks:
@@ -147,7 +147,7 @@ services:
       UMASK: "002"
     volumes:
       - radarr-config:/config
-      - /data/hdd/media-lib:/data
+      - media-lib:/data
     ports:
       - "7878:7878"
     networks:
@@ -175,7 +175,7 @@ services:
       - UMASK=002
     volumes:
       - readarr-config:/config
-      - /data/hdd/media-lib:/data
+      - media-lib:/data
     ports:
       - "8787:8787"
     networks:
@@ -258,4 +258,6 @@ volumes:
   readarr-config:
     external: true
   jellyseerr-config:
+    external: true
+  media-lib:
     external: true

@@ -85,13 +85,6 @@ services:
       homepage.widget.key: ${JELLYFIN_API_KEY}
     logging:
       driver: "local"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [ gpu ]
 
 volumes:
   jellyfin-config:

@@ -27,6 +27,8 @@ services:
       homepage.icon: netdata.svg
       homepage.href: https://app.netdata.cloud/
     restart: unless-stopped
+    logging:
+      driver: "local"
 
   scrutiny:
     container_name: scrutiny
@@ -43,7 +45,6 @@ services:
     devices:
       - "/dev/sda"
       - "/dev/sdb"
-      - "/dev/sdc"
     networks:
       homepage-net:
     labels:
@@ -54,6 +55,8 @@ services:
       homepage.widget.type: scrutiny
       homepage.widget.url: http://scrutiny:8080
     restart: unless-stopped
+    logging:
+      driver: "local"
 
 
   speedtest-tracker:
@@ -69,12 +72,13 @@ services:
       PUID: 1000
       PGID: 1000
       DB_CONNECTION: pgsql
-      DB_HOST: speedtestdb
+      DB_HOST: speedtest-tracker-db
       DB_PORT: 5432
       DB_DATABASE: speedtest_tracker
       DB_USERNAME: speedy
       DB_PASSWORD: password
       TZ: Europe/Rome
+      #APP_KEY: OLTzZ+zxMZmIbUQ60ZqpYYz9GyqiczbuH5U2TWyji60=
     labels:
       homepage.group: Network
       homepage.name: Speedtest tracker
@@ -87,11 +91,14 @@ services:
       - ./speedtest-tracker/config:/config
       - ./speedtest-tracker/web:/etc/ssl/web
     depends_on:
-      - speedtestdb
+      - speedtest-tracker-db
     restart: unless-stopped
+    logging:
+      driver: "local"
 
-  speedtestdb:
+  speedtest-tracker-db:
     image: postgres:15
+    container_name: speedtest-tracker-db
     environment:
       POSTGRES_DB: speedtest_tracker
       POSTGRES_USER: speedy
@@ -101,6 +108,8 @@ services:
     networks:
       speedtest-net:
     restart: unless-stopped
+    logging:
+      driver: "local"
 
 volumes:
   netdatalib:

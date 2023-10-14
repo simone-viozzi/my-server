@@ -83,18 +83,13 @@ services:
     labels:
       # set watchtower to monitor only and do not perform the update
       com.centurylinklabs.watchtower.monitor-only: "true"
-    restart: always
+    restart: unless-stopped
     logging:
       driver: "local"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-        limits:
-          cpus: '3'
+    #deploy:
+    #  resources:
+    #    limits:
+    #      cpus: '5'
 
   immich-web:
     container_name: immich_web

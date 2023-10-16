@@ -1,0 +1,60 @@
+services:
+  speedtest-tracker:
+    image: 'ghcr.io/alexjustesen/speedtest-tracker:latest'
+    container_name: speedtest-tracker
+    ports:
+      - '4674:80'
+      - '4675:443'
+    networks:
+      homepage-net:
+      speedtest-net:
+    environment:
+      PUID: 1000
+      PGID: 1000
+      DB_CONNECTION: pgsql
+      DB_HOST: speedtest-tracker-db
+      DB_PORT: 5432
+      DB_DATABASE: speedtest_tracker
+      DB_USERNAME: speedy
+      DB_PASSWORD: password
+      TZ: Europe/Rome
+      #APP_KEY: OLTzZ+zxMZmIbUQ60ZqpYYz9GyqiczbuH5U2TWyji60=
+    labels:
+      homepage.group: Network
+      homepage.name: Speedtest tracker
+      homepage.icon: si-speedtest.svg
+      homepage.href: http://localhost:4674
+      homepage.widget.type: speedtest
+      homepage.widget.url: http://speedtest-tracker:80
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./configs/config:/config
+      - ./configs/web:/etc/ssl/web
+    depends_on:
+      - speedtest-tracker-db
+    restart: unless-stopped
+    logging:
+      driver: "local"
+
+  speedtest-tracker-db:
+    image: postgres:15
+    container_name: speedtest-tracker-db
+    environment:
+      POSTGRES_DB: speedtest_tracker
+      POSTGRES_USER: speedy
+      POSTGRES_PASSWORD: password
+    volumes:
+      - speedtest-db:/var/lib/postgresql/data
+    networks:
+      speedtest-net:
+    restart: unless-stopped
+    logging:
+      driver: "local"
+
+volumes:
+  speedtest-db:
+
+networks:
+  speedtest-net:
+  homepage-net:
+    external: true

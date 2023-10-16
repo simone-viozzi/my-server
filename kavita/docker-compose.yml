@@ -1,6 +1,7 @@
 services:
   kavita:
     image: kizaing/kavita:latest
+    container_name: kavita
     volumes:
       - ./data/manga:/manga
       - ./data/comics:/comics
@@ -10,4 +11,34 @@ services:
       - TZ=Europe/Rome
     ports:
       - "5000:5000"
+    networks:
+      proxy:
+      homepage-net:
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: proxy
+
+      traefik.http.routers.kavita.rule: "Host(`${KAVITA_DOMAIN}`)"
+      traefik.http.routers.kavita.entryPoints: websecure
+
+      traefik.http.routers.kavita.tls: "true"
+      traefik.http.routers.kavita.tls.certResolver: leresolver
+
+      traefik.http.routers.kavita.service: kavita-svc
+      traefik.http.services.kavita-svc.loadbalancer.server.port: "5000"
+
+      homepage.group: Media
+      homepage.name: Kavita
+      homepage.icon: kavita.svg
+      homepage.href: https://${KAVITA_DOMAIN}
+      homepage.widget.type: kavita
+      homepage.widget.url: http://kavita:5000
+      homepage.widget.username: ${KAVITA_USERNAME}
+      homepage.widget.password: ${KAVITA_PASSWORD}
     restart: unless-stopped
+
+networks:
+  proxy:
+    external: true
+  homepage-net:
+    external: true

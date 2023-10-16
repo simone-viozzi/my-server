@@ -1,0 +1,30 @@
+services:
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      homepage-net:
+    environment:
+      WATCHTOWER_NOTIFICATION_REPORT: "true"
+      WATCHTOWER_NOTIFICATION_URL: "telegram://${TOKEN}@telegram?chats=${CHAT}"
+      WATCHTOWER_POLL_INTERVAL: "3600"
+      WATCHTOWER_HTTP_API_TOKEN: ${WATCHTOWER_HTTP_API_TOKEN}
+      WATCHTOWER_HTTP_API_METRICS: "true"
+    labels:
+      homepage.group: Update & Monitor
+      homepage.name: watchtower
+      homepage.icon: watchtower.svg
+      homepage.widget.type: watchtower
+      homepage.widget.url: http://watchtower:8080
+      homepage.widget.key: ${WATCHTOWER_HTTP_API_TOKEN}
+    logging:
+      driver: "local"
+    restart: unless-stopped
+
+
+networks:
+  homepage-net:
+    external: true

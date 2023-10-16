@@ -71,7 +71,7 @@ services:
     restart: unless-stopped
 
   homepage:
-    image: ghcr.io/benphelps/homepage:latest
+    image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     volumes:
       - ./homepage-config:/app/config

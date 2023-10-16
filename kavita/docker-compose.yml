@@ -3,10 +3,8 @@ services:
     image: kizaing/kavita:latest
     container_name: kavita
     volumes:
-      - ./data/manga:/manga
-      - ./data/comics:/comics
-      - ./data/books:/books
-      - ./config:/kavita/config
+      - media-lib:/data
+      - kavita-config:/kavita/config
     environment:
       - TZ=Europe/Rome
     ports:
@@ -41,4 +39,10 @@ networks:
   proxy:
     external: true
   homepage-net:
+    external: true
+
+volumes:
+  media-lib:
+    external: true
+  kavita-config:
     external: true

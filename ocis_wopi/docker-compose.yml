@@ -15,6 +15,7 @@ services:
     # therefore we ignore the error and then start the ocis server
     command: ["-c", "ocis init || true; ocis server"]
     environment:
+      #OCIS_RUN_SERVICES: "storage-users,nats,storage-system"
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_FILE: /var/lib/ocis/logs/ocis.log
       OCIS_LOG_LEVEL: info
@@ -32,33 +33,38 @@ services:
       # fulltext search
       SEARCH_EXTRACTOR_TYPE: tika
       SEARCH_EXTRACTOR_TIKA_TIKA_URL: http://tika:9998
+      FRONTEND_FULL_TEXT_SEARCH_ENABLED: "true"
+
       # email server (in this case inbucket acts as mail catcher)
       #NOTIFICATIONS_SMTP_HOST: inbucket
       #NOTIFICATIONS_SMTP_PORT: 2500
       #NOTIFICATIONS_SMTP_SENDER: oCIS notifications <notifications@${OCIS_DOMAIN:-ocis.owncloud.test}>
       #NOTIFICATIONS_SMTP_USERNAME: notifications@${OCIS_DOMAIN:-ocis.owncloud.test}
       #NOTIFICATIONS_SMTP_INSECURE: "true" # the mail catcher uses self signed certificates
+
+      # make the registry available to the app provider containers
+      MICRO_REGISTRY: "mdns"
     volumes:
       - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
       - ./logs:/var/lib/ocis/logs
       - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`)"
-      - "traefik.http.routers.ocis.entrypoints=websecure"
-      - "traefik.http.routers.ocis.tls.certresolver=leresolver"
-      - "traefik.http.routers.ocis.tls=true"
-      - "traefik.http.routers.ocis.service=ocis"
-      - "traefik.http.services.ocis.loadbalancer.server.port=9200"
+      traefik.enable: "true"
+      traefik.http.routers.ocis.rule: "Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`)"
+      traefik.http.routers.ocis.entrypoints: "websecure"
+      traefik.http.routers.ocis.tls.certresolver: "leresolver"
+      traefik.http.routers.ocis.tls: "true"
+      traefik.http.routers.ocis.service: "ocis"
+      traefik.http.services.ocis.loadbalancer.server.port: "9200"
 
-      - "homepage.group=Media"
-      - "homepage.name=Owncloud"
-      - "homepage.icon=si-owncloud.svg"
-      - "homepage.href=https://${OCIS_DOMAIN}"
+      homepage.group: "Media"
+      homepage.name: "Owncloud"
+      homepage.icon: "si-owncloud.svg"
+      homepage.href: "https://${OCIS_DOMAIN}"
 
       # set watchtower to monitor only and do not perform the update
-      - "com.centurylinklabs.watchtower.monitor-only=true"
+      com.centurylinklabs.watchtower.monitor-only: "true"
     logging:
       driver: "local"
     restart: unless-stopped
@@ -73,9 +79,13 @@ services:
     command: ["/bin/sh", "-c", "ocis app-provider server"]
     #command: app-provider server
     environment:
-      REVA_GATEWAY: ${REVA_GATEWAY:-ocis:9142}
+      # use the internal service name of the gateway
+      REVA_GATEWAY: ${REVA_GATEWAY:-com.owncloud.api.gateway}
       APP_PROVIDER_GRPC_ADDR: 0.0.0.0:9164
-      APP_PROVIDER_EXTERNAL_ADDR: ocis-appprovider-collabora:9164
+      # configure the service name to avoid collision with onlyoffice
+      APP_PROVIDER_SERVICE_NAME: app-provider-collabora
+      # use the internal service name
+      APP_PROVIDER_EXTERNAL_ADDR: com.owncloud.api.app-provider-collabora
       APP_PROVIDER_DRIVER: wopi
       APP_PROVIDER_WOPI_APP_NAME: Collabora
       APP_PROVIDER_WOPI_APP_ICON_URI: https://${COLLABORA_DOMAIN:-collabora.owncloud.test}/favicon.ico
@@ -83,12 +93,14 @@ services:
       APP_PROVIDER_WOPI_INSECURE: "${INSECURE:-false}"
       APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
       APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      # share the registry with the ocis container
+      MICRO_REGISTRY: "mdns"
     volumes:
       - ocis-config:/etc/ocis
       - ./config/wait.sh:/wait.sh
     labels:
       # set watchtower to monitor only and do not perform the update
-      - "com.centurylinklabs.watchtower.monitor-only=true"
+      com.centurylinklabs.watchtower.monitor-only: "true"
     logging:
       driver: "local"
     restart: unless-stopped
@@ -107,9 +119,13 @@ services:
     #  - /entrypoint-override.sh
     #command: app-provider server
     environment:
-      REVA_GATEWAY: ${REVA_GATEWAY:-ocis:9142}
+      # use the internal service name of the gateway
+      REVA_GATEWAY: ${REVA_GATEWAY:-com.owncloud.api.gateway}
       APP_PROVIDER_GRPC_ADDR: 0.0.0.0:9164
-      APP_PROVIDER_EXTERNAL_ADDR: ocis-appprovider-onlyoffice:9164
+      # configure the service name to avoid collision with collabora
+      APP_PROVIDER_SERVICE_NAME: app-provider-onlyoffice
+      # use the internal service name
+      APP_PROVIDER_EXTERNAL_ADDR: com.owncloud.api.app-provider-onlyoffice
       APP_PROVIDER_DRIVER: wopi
       APP_PROVIDER_WOPI_APP_NAME: OnlyOffice
       APP_PROVIDER_WOPI_APP_ICON_URI: https://${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}/web-apps/apps/documenteditor/main/resources/img/favicon.ico
@@ -117,19 +133,21 @@ services:
       APP_PROVIDER_WOPI_INSECURE: "${INSECURE:-false}"
       APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
       APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      # share the registry with the ocis container
+      MICRO_REGISTRY: "mdns"
     volumes:
       - ./config/ocis-appprovider-onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-config:/etc/ocis
       - ./config/wait.sh:/wait.sh
     labels:
       # set watchtower to monitor only and do not perform the update
-      - "com.centurylinklabs.watchtower.monitor-only=true"
+      com.centurylinklabs.watchtower.monitor-only: "true"
     logging:
       driver: "local"
     restart: unless-stopped
 
   wopiserver:
-    image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v9.4.0}
+    image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v10.1.0}
     container_name: ocis-wopiserver
     networks:
       proxy:
@@ -145,22 +163,22 @@ services:
       - ./config/wopiserver/wopiserver.conf.dist:/etc/wopi/wopiserver.conf.dist
       - wopi-recovery:/var/spool/wopirecovery
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.wopiserver.rule=Host(`${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}`)"
-      - "traefik.http.routers.wopiserver.entrypoints=websecure"
-      - "traefik.http.routers.wopiserver.tls=true"
-      - "traefik.http.routers.wopiserver.tls.certresolver=leresolver"
-      - "traefik.http.routers.wopiserver.service=wopiserver"
-      - "traefik.http.services.wopiserver.loadbalancer.server.port=8880"
+      traefik.enable: "true"
+      traefik.http.routers.wopiserver.rule: "Host(`${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}`)"
+      traefik.http.routers.wopiserver.entrypoints: "websecure"
+      traefik.http.routers.wopiserver.tls: "true"
+      traefik.http.routers.wopiserver.tls.certresolver: "leresolver"
+      traefik.http.routers.wopiserver.service: "wopiserver"
+      traefik.http.services.wopiserver.loadbalancer.server.port: "8880"
 
       # set watchtower to monitor only and do not perform the update
-      - "com.centurylinklabs.watchtower.monitor-only=true"
+      com.centurylinklabs.watchtower.monitor-only: "true"
     logging:
       driver: "local"
     restart: unless-stopped
 
   collabora:
-    image: collabora/code:22.05.10.1.1
+    image: collabora/code:22.05.14.3.1
     container_name: ocis-collabora
     networks:
       proxy:
@@ -173,22 +191,22 @@ services:
     cap_add:
       - MKNOD
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.collabora.rule=Host(`${COLLABORA_DOMAIN:-collabora.owncloud.test}`)"
-      - "traefik.http.routers.collabora.entrypoints=websecure"
-      - "traefik.http.routers.collabora.tls=true"
-      - "traefik.http.routers.collabora.tls.certresolver=leresolver"
-      - "traefik.http.routers.collabora.service=collabora"
-      - "traefik.http.services.collabora.loadbalancer.server.port=9980"
+      traefik.enable: "true"
+      traefik.http.routers.collabora.rule: "Host(`${COLLABORA_DOMAIN:-collabora.owncloud.test}`)"
+      traefik.http.routers.collabora.entrypoints: "websecure"
+      traefik.http.routers.collabora.tls: "true"
+      traefik.http.routers.collabora.tls.certresolver: "leresolver"
+      traefik.http.routers.collabora.service: "collabora"
+      traefik.http.services.collabora.loadbalancer.server.port: "9980"
 
       # set watchtower to monitor only and do not perform the update
-      - "com.centurylinklabs.watchtower.monitor-only=true"
+      com.centurylinklabs.watchtower.monitor-only: "true"
     logging:
       driver: "local"
     restart: unless-stopped
 
   onlyoffice:
-    image: onlyoffice/documentserver:7.3.0
+    image: onlyoffice/documentserver:7.3.3
     container_name: ocis-onlyoffice
     networks:
       proxy:
@@ -202,23 +220,24 @@ services:
       - ./config/onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/onlyoffice/local.json:/etc/onlyoffice/documentserver/local.dist.json
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.onlyoffice.rule=Host(`${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}`)"
-      - "traefik.http.routers.onlyoffice.entrypoints=websecure"
-      - "traefik.http.routers.onlyoffice.tls=true"
-      - "traefik.http.routers.onlyoffice.tls.certresolver=leresolver"
+      traefik.enable: "true"
+      traefik.http.routers.onlyoffice.rule: "Host(`${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}`)"
+      traefik.http.routers.onlyoffice.entrypoints: "websecure"
+      traefik.http.routers.onlyoffice.tls: "true"
+      traefik.http.routers.onlyoffice.tls.certresolver: "leresolver"
 
-      - "traefik.http.routers.onlyoffice.service=onlyoffice"
-      - "traefik.http.services.onlyoffice.loadbalancer.server.port=80"
+      traefik.http.routers.onlyoffice.service: "onlyoffice"
+      traefik.http.services.onlyoffice.loadbalancer.server.port: "80"
       # websockets can't be opend when this is ommitted
-      - "traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.routers.onlyoffice.middlewares=onlyoffice"
+      traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Proto: "https"
+      traefik.http.routers.onlyoffice.middlewares: "onlyoffice"
 
       # set watchtower to monitor only and do not perform the update
-      - "com.centurylinklabs.watchtower.monitor-only=true"
+      com.centurylinklabs.watchtower.monitor-only: "true"
     logging:
       driver: "local"
     restart: unless-stopped
+
   tika:
     image: ${TIKA_IMAGE:-apache/tika:latest-full}
     networks:
@@ -238,6 +257,5 @@ volumes:
   wopi-recovery:
 
 networks:
-  #ocis-net:
   proxy:
     external: true

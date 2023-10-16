@@ -1,0 +1,13 @@
+services:
+  kavita:
+    image: kizaing/kavita:latest
+    volumes:
+      - ./data/manga:/manga
+      - ./data/comics:/comics
+      - ./data/books:/books
+      - ./config:/kavita/config
+    environment:
+      - TZ=Europe/Rome
+    ports:
+      - "5000:5000"
+    restart: unless-stopped

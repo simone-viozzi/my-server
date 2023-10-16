@@ -2,3 +2,5 @@ books
 config_*
 db_*
 logs
+export/
+paperless/

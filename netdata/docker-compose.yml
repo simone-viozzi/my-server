@@ -21,6 +21,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       NETDATA_EXTRA_APK_PACKAGES: lm-sensors
+      NETDATA_CLAIM_TOKEN: ${NETDATA_CLAIM_TOKEN}
+      NETDATA_CLAIM_URL: https://app.netdata.cloud
+      NETDATA_CLAIM_ROOMS: ${NETDATA_CLAIM_ROOMS}
     labels:
       homepage.group: Update & Monitor
       homepage.name: Netdata

@@ -1,0 +1,46 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    volumes:
+      - ./homepage-config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    logging:
+      driver: "local"
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      homepage-net:
+    restart: unless-stopped
+
+  homarr:
+    container_name: homarr
+    image: ghcr.io/ajnart/homarr:latest
+    networks:
+      proxy:
+    environment:
+      BASE_URL: ${PUBLIC_HOMEPAGE_DOMAIN}
+      DISABLE_EDIT_MODE: "true"
+    volumes:
+      - ./homarr/configs:/app/data/configs
+      - ./homarr/icons:/app/public/icons
+    ports:
+      - '7575:7575'
+    logging:
+      driver: "local"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.homepage.rule: "Host(`${PUBLIC_HOMEPAGE_DOMAIN}`)"
+      traefik.http.routers.homepage.entrypoints: websecure
+      traefik.http.routers.homepage.tls.certresolver: leresolver
+      traefik.http.routers.homepage.tls: "true"
+      traefik.http.services.homepage.loadbalancer.server.port: "7575"
+    restart: unless-stopped
+
+networks:
+  proxy:
+    external: true
+  homepage-net:
+    external: true

@@ -31,10 +31,6 @@ services:
     logging:
       driver: local
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: 1G
 
   jackett:
     image: lscr.io/linuxserver/jackett:latest

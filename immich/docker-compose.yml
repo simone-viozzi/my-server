@@ -141,7 +141,7 @@ services:
     networks:
       immich:
     logging:
-      driver: "local"
+      driver: none
     labels:
       # set watchtower to monitor only and do not perform the update
       com.centurylinklabs.watchtower.monitor-only: "true"

@@ -1,6 +1,6 @@
 services:
   kavita:
-    image: kizaing/kavita:latest
+    image: jvmilazz0/kavita:latest
     container_name: kavita
     volumes:
       - media-lib:/data
@@ -33,6 +33,8 @@ services:
       homepage.widget.url: http://kavita:5000
       homepage.widget.username: ${KAVITA_USERNAME}
       homepage.widget.password: ${KAVITA_PASSWORD}
+    logging:
+      driver: "local"
     restart: unless-stopped
 
 networks:

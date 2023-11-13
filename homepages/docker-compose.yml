@@ -22,10 +22,10 @@ services:
       proxy:
     environment:
       BASE_URL: ${PUBLIC_HOMEPAGE_DOMAIN}
-      DISABLE_EDIT_MODE: "true"
     volumes:
       - ./homarr/configs:/app/data/configs
       - ./homarr/icons:/app/public/icons
+      - ./homarr/data:/data
     ports:
       - '7575:7575'
     logging:

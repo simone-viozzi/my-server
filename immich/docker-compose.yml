@@ -6,7 +6,7 @@ services:
   immich-server:
     container_name: immich_server
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
-    command: ["start.sh", "immich"]
+    command: [ "start.sh", "immich" ]
     volumes:
       - immich-upload:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
@@ -15,7 +15,6 @@ services:
     depends_on:
       - redis
       - database
-      - typesense
     networks:
       proxy:
       immich:
@@ -52,7 +51,7 @@ services:
     # extends:
     #   file: hwaccel.yml
     #   service: hwaccel
-    command: ["start.sh", "microservices"]
+    command: [ "start.sh", "microservices" ]
     volumes:
       - immich-upload:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
@@ -61,7 +60,6 @@ services:
     depends_on:
       - redis
       - database
-      - typesense
     networks:
       immich:
     logging:
@@ -91,28 +89,9 @@ services:
     #    limits:
     #      cpus: '5'
 
-
-  typesense:
-    container_name: immich_typesense
-    image: typesense/typesense:0.25.0.rc14
-    environment:
-      - TYPESENSE_API_KEY=${TYPESENSE_API_KEY}
-      - TYPESENSE_DATA_DIR=/data
-      - GLOG_minloglevel=1
-    logging:
-      driver: none
-    volumes:
-      - tsdata:/data
-    networks:
-      immich:
-    labels:
-      # set watchtower to monitor only and do not perform the update
-      com.centurylinklabs.watchtower.monitor-only: "true"
-    restart: unless-stopped
-
   redis:
     container_name: immich_redis
-    image: redis:6.2-alpine@sha256:70a7a5b641117670beae0d80658430853896b5ef269ccf00d1827427e3263fa3
+    image: redis:6.2-alpine@sha256:b6124ab2e45cc332e16398022a411d7e37181f21ff7874835e0180f56a09e82a
     networks:
       immich:
     logging:
@@ -124,7 +103,7 @@ services:
 
   database:
     container_name: immich_postgres
-    image: postgres:14-alpine@sha256:28407a9961e76f2d285dc6991e8e48893503cc3836a4755bbc2d40bcc272a441
+    image: tensorchord/pgvecto-rs:pg14-v0.1.11@sha256:0335a1a22f8c5dd1b697f14f079934f5152eaaa216c09b61e293be285491f8ee
     env_file:
       - .env
     environment:
@@ -149,7 +128,6 @@ volumes:
   immich-upload:
     external: true
   model-cache:
-  tsdata:
 
 networks:
   proxy:

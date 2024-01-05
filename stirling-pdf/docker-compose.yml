@@ -1,8 +1,6 @@
 services:
   stirling-pdf:
     image: frooodle/s-pdf:latest
-    ports:
-      - '6154:8080'
     networks:
       - proxy
     volumes:

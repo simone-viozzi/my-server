@@ -1,0 +1,33 @@
+services:
+  stirling-pdf:
+    image: frooodle/s-pdf:latest
+    ports:
+      - '6154:8080'
+    networks:
+      - proxy
+    volumes:
+      - ./configs:/configs
+      - ./logs:/logs/
+    environment:
+      DOCKER_ENABLE_SECURITY: true
+      SECURITY_ENABLE_LOGIN: true
+      SECURITY_INITIALLOGIN_USERNAME: ${SECURITY_INITIALLOGIN_USERNAME}
+      SECURITY_INITIALLOGIN_PASSWORD: ${SECURITY_INITIALLOGIN_PASSWORD}
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: proxy
+      traefik.http.routers.pdf.rule: Host(`${PDF_DOMAIN}`)
+      traefik.http.routers.pdf.entryPoints: websecure
+      traefik.http.routers.pdf.tls: "true"
+      traefik.http.routers.pdf.tls.certResolver: leresolver
+      traefik.http.services.pdf.loadbalancer.server.port: "8080"
+
+      homepage.group: Media
+      homepage.name: Stirling-PDF
+      homepage.icon: stirling-pdf.svg
+      homepage.href: https://${PDF_DOMAIN}
+
+
+networks:
+  proxy:
+    external: true

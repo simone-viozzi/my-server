@@ -24,6 +24,8 @@ services:
       homepage.name: Stirling-PDF
       homepage.icon: stirling-pdf.svg
       homepage.href: https://${PDF_DOMAIN}
+    restart:
+      unless-stopped
 
 
 networks:

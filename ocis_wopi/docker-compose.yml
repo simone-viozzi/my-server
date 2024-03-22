@@ -16,20 +16,20 @@ services:
     command: ["-c", "ocis init || true; ocis server"]
     environment:
       #OCIS_RUN_SERVICES: "storage-users,nats,storage-system"
-      OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      OCIS_URL: https://${OCIS_DOMAIN}
       OCIS_LOG_FILE: /var/lib/ocis/logs/ocis.log
       OCIS_LOG_LEVEL: info
-      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR}"
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       GATEWAY_GRPC_ADDR: 0.0.0.0:9142 # make the REVA gateway accessible to the app drivers
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
-      OCIS_INSECURE: "${INSECURE:-false}"
+      OCIS_INSECURE: "${INSECURE}"
       # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
-      PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
+      PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH}"
       # admin user password
-      IDM_ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}" # this overrides the admin password from the configuration file
+      IDM_ADMIN_PASSWORD: "${ADMIN_PASSWORD}" # this overrides the admin password from the configuration file
       # demo users
-      IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
+      IDM_CREATE_DEMO_USERS: "${DEMO_USERS}"
       # fulltext search
       SEARCH_EXTRACTOR_TYPE: tika
       SEARCH_EXTRACTOR_TIKA_TIKA_URL: http://tika:9998
@@ -43,15 +43,18 @@ services:
       #NOTIFICATIONS_SMTP_INSECURE: "true" # the mail catcher uses self signed certificates
 
       # make the registry available to the app provider containers
-      MICRO_REGISTRY: "mdns"
+      # make the registry available to the app provider containers
+      MICRO_REGISTRY_ADDRESS: 127.0.0.1:9233
+      NATS_NATS_HOST: 0.0.0.0
+      NATS_NATS_PORT: 9233
     volumes:
-      - ./config/ocis/app-registry.yaml:/etc/ocis/app-registry.yaml
+      - ./config/ocis/:/etc/ocis/
       - ./logs:/var/lib/ocis/logs
-      - ocis-config:/etc/ocis
+      #- ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
     labels:
       traefik.enable: "true"
-      traefik.http.routers.ocis.rule: "Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`)"
+      traefik.http.routers.ocis.rule: "Host(`${OCIS_DOMAIN}`)"
       traefik.http.routers.ocis.entrypoints: "websecure"
       traefik.http.routers.ocis.tls.certresolver: "leresolver"
       traefik.http.routers.ocis.tls: "true"
@@ -70,17 +73,17 @@ services:
     restart: unless-stopped
 
   ocis-appprovider-collabora:
-    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    image: owncloud/ocis:${OCIS_DOCKER_TAG}
     container_name: ocis-appprovider-collabora
     networks:
       proxy:
-    entrypoint:
-      - "/wait.sh"
-    command: ["/bin/sh", "-c", "ocis app-provider server"]
-    #command: app-provider server
+    #entrypoint:
+    #  - "/wait.sh"
+    #command: ["/bin/sh", "-c", "ocis app-provider server"]
+    command: app-provider server
     environment:
       # use the internal service name of the gateway
-      REVA_GATEWAY: ${REVA_GATEWAY:-com.owncloud.api.gateway}
+      REVA_GATEWAY: ${REVA_GATEWAY}
       APP_PROVIDER_GRPC_ADDR: 0.0.0.0:9164
       # configure the service name to avoid collision with onlyoffice
       APP_PROVIDER_SERVICE_NAME: app-provider-collabora
@@ -88,16 +91,16 @@ services:
       APP_PROVIDER_EXTERNAL_ADDR: com.owncloud.api.app-provider-collabora
       APP_PROVIDER_DRIVER: wopi
       APP_PROVIDER_WOPI_APP_NAME: Collabora
-      APP_PROVIDER_WOPI_APP_ICON_URI: https://${COLLABORA_DOMAIN:-collabora.owncloud.test}/favicon.ico
-      APP_PROVIDER_WOPI_APP_URL: https://${COLLABORA_DOMAIN:-collabora.owncloud.test}
-      APP_PROVIDER_WOPI_INSECURE: "${INSECURE:-false}"
-      APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
-      APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      APP_PROVIDER_WOPI_APP_ICON_URI: https://${COLLABORA_DOMAIN}/favicon.ico
+      APP_PROVIDER_WOPI_APP_URL: https://${COLLABORA_DOMAIN}
+      APP_PROVIDER_WOPI_INSECURE: "${INSECURE}"
+      APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN}
+      APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL: https://${OCIS_DOMAIN}
       # share the registry with the ocis container
-      MICRO_REGISTRY: "mdns"
+      MICRO_REGISTRY_ADDRESS: ocis:9233
     volumes:
       - ocis-config:/etc/ocis
-      - ./config/wait.sh:/wait.sh
+      #- ./config/wait.sh:/wait.sh
     labels:
       # set watchtower to monitor only and do not perform the update
       com.centurylinklabs.watchtower.monitor-only: "true"
@@ -111,16 +114,16 @@ services:
     networks:
       proxy:
     user: "0" # needed for apk add in entrypoint script
-    entrypoint:
-      - "/wait.sh"
-    command: ["/bin/sh", "-c", "/entrypoint-override.sh"]
     #entrypoint:
-    #  - /bin/sh
-    #  - /entrypoint-override.sh
+    #  - "/wait.sh"
+    #command: ["/bin/sh", "-c", "/entrypoint-override.sh"]
+    entrypoint:
+      - /bin/sh
+      - /entrypoint-override.sh
     #command: app-provider server
     environment:
       # use the internal service name of the gateway
-      REVA_GATEWAY: ${REVA_GATEWAY:-com.owncloud.api.gateway}
+      REVA_GATEWAY: ${REVA_GATEWAY}
       APP_PROVIDER_GRPC_ADDR: 0.0.0.0:9164
       # configure the service name to avoid collision with collabora
       APP_PROVIDER_SERVICE_NAME: app-provider-onlyoffice
@@ -128,17 +131,17 @@ services:
       APP_PROVIDER_EXTERNAL_ADDR: com.owncloud.api.app-provider-onlyoffice
       APP_PROVIDER_DRIVER: wopi
       APP_PROVIDER_WOPI_APP_NAME: OnlyOffice
-      APP_PROVIDER_WOPI_APP_ICON_URI: https://${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}/web-apps/apps/documenteditor/main/resources/img/favicon.ico
-      APP_PROVIDER_WOPI_APP_URL: https://${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
-      APP_PROVIDER_WOPI_INSECURE: "${INSECURE:-false}"
-      APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
-      APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
+      APP_PROVIDER_WOPI_APP_ICON_URI: https://${ONLYOFFICE_DOMAIN}/web-apps/apps/documenteditor/main/resources/img/favicon.ico
+      APP_PROVIDER_WOPI_APP_URL: https://${ONLYOFFICE_DOMAIN}
+      APP_PROVIDER_WOPI_INSECURE: "${INSECURE}"
+      APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN}
+      APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL: https://${OCIS_DOMAIN}
       # share the registry with the ocis container
-      MICRO_REGISTRY: "mdns"
+      MICRO_REGISTRY_ADDRESS: ocis:9233
     volumes:
       - ./config/ocis-appprovider-onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-config:/etc/ocis
-      - ./config/wait.sh:/wait.sh
+      #- ./config/wait.sh:/wait.sh
     labels:
       # set watchtower to monitor only and do not perform the update
       com.centurylinklabs.watchtower.monitor-only: "true"
@@ -147,7 +150,7 @@ services:
     restart: unless-stopped
 
   wopiserver:
-    image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v10.1.0}
+    image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v10.3.0}
     container_name: ocis-wopiserver
     networks:
       proxy:
@@ -155,16 +158,16 @@ services:
       - /bin/sh
       - /entrypoint-override.sh
     environment:
-      WOPISERVER_INSECURE: "${INSECURE:-false}"
-      WOPISECRET: ${WOPI_JWT_SECRET:-LoremIpsum567}
-      WOPISERVER_DOMAIN: ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+      WOPISERVER_INSECURE: "${INSECURE}"
+      WOPISECRET: ${WOPI_JWT_SECRET}
+      WOPISERVER_DOMAIN: ${WOPISERVER_DOMAIN}
     volumes:
       - ./config/wopiserver/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/wopiserver/wopiserver.conf.dist:/etc/wopi/wopiserver.conf.dist
       - wopi-recovery:/var/spool/wopirecovery
     labels:
       traefik.enable: "true"
-      traefik.http.routers.wopiserver.rule: "Host(`${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}`)"
+      traefik.http.routers.wopiserver.rule: "Host(`${WOPISERVER_DOMAIN}`)"
       traefik.http.routers.wopiserver.entrypoints: "websecure"
       traefik.http.routers.wopiserver.tls: "true"
       traefik.http.routers.wopiserver.tls.certresolver: "leresolver"
@@ -178,21 +181,21 @@ services:
     restart: unless-stopped
 
   collabora:
-    image: collabora/code:22.05.14.3.1
+    image: collabora/code:23.05.5.2.1
     container_name: ocis-collabora
     networks:
       proxy:
     environment:
-      aliasgroup1: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}:443
+      aliasgroup1: https://${WOPISERVER_DOMAIN}:443
       DONT_GEN_SSL_CERT: "YES"
-      extra_params: --o:ssl.enable=false --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=${OCIS_DOMAIN:-ocis.owncloud.test}
+      extra_params: --o:ssl.enable=false --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=${OCIS_DOMAIN}
       username: ${COLLABORA_ADMIN_USER}
       password: ${COLLABORA_ADMIN_PASSWORD}
     cap_add:
       - MKNOD
     labels:
       traefik.enable: "true"
-      traefik.http.routers.collabora.rule: "Host(`${COLLABORA_DOMAIN:-collabora.owncloud.test}`)"
+      traefik.http.routers.collabora.rule: "Host(`${COLLABORA_DOMAIN}`)"
       traefik.http.routers.collabora.entrypoints: "websecure"
       traefik.http.routers.collabora.tls: "true"
       traefik.http.routers.collabora.tls.certresolver: "leresolver"
@@ -206,7 +209,7 @@ services:
     restart: unless-stopped
 
   onlyoffice:
-    image: onlyoffice/documentserver:7.3.3
+    image: onlyoffice/documentserver:7.5.0
     container_name: ocis-onlyoffice
     networks:
       proxy:
@@ -215,13 +218,13 @@ services:
       - /entrypoint-override.sh
     environment:
       WOPI_ENABLED: "true"
-      USE_UNAUTHORIZED_STORAGE: "${INSECURE:-false}" # self signed certificates
+      USE_UNAUTHORIZED_STORAGE: "${INSECURE}" # self signed certificates
     volumes:
       - ./config/onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/onlyoffice/local.json:/etc/onlyoffice/documentserver/local.dist.json
     labels:
       traefik.enable: "true"
-      traefik.http.routers.onlyoffice.rule: "Host(`${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}`)"
+      traefik.http.routers.onlyoffice.rule: "Host(`${ONLYOFFICE_DOMAIN}`)"
       traefik.http.routers.onlyoffice.entrypoints: "websecure"
       traefik.http.routers.onlyoffice.tls: "true"
       traefik.http.routers.onlyoffice.tls.certresolver: "leresolver"
@@ -249,6 +252,31 @@ services:
       com.centurylinklabs.watchtower.monitor-only: "true"
     restart: unless-stopped
 
+  companion:
+    image: ${COMPANION_IMAGE:-transloadit/companion:4.5.1}
+    networks:
+      proxy:
+    environment:
+      NODE_ENV: production
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+      COMPANION_DATADIR: /tmp/companion/
+      COMPANION_DOMAIN: ${COMPANION_DOMAIN}
+      COMPANION_PROTOCOL: https
+      COMPANION_UPLOAD_URLS: "^https://${OCIS_DOMAIN}/"
+      COMPANION_ONEDRIVE_KEY: "${COMPANION_ONEDRIVE_KEY}"
+      COMPANION_ONEDRIVE_SECRET: "${COMPANION_ONEDRIVE_SECRET}"
+    volumes:
+      - companion-data:/tmp/companion/
+    labels:
+      traefik.enable: true
+      traefik.http.routers.companion.entrypoints: "websecure"
+      traefik.http.routers.companion.rule: "Host(`${COMPANION_DOMAIN}`)"
+      traefik.http.routers.companion.tls.certresolver: "leresolver"
+      traefik.http.routers.companion.service: "companion"
+      traefik.http.services.companion.loadbalancer.server.port: 3020
+    logging:
+      driver: "local"
+    restart: always
 
 
 volumes:
@@ -258,6 +286,7 @@ volumes:
   ocis-data:
     external: true
   wopi-recovery:
+  companion-data:
 
 networks:
   proxy:

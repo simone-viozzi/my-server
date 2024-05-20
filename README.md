@@ -106,9 +106,9 @@ sudo snapper -c home create-config /home
 
 ### fix snapper sub-volume layout
 
-As described in [Snapper#Suggested filesystem layout](https://wiki.archlinux.org/title/Snapper#Suggested_filesystem_layout) i moved the `.../.snapshots` out of the sub-volume I'm taking a snapshot of.
+As described in [Snapper#Suggested filesystem layout](https://wiki.archlinux.org/title/Snapper#Suggested_filesystem_layout) I moved the `.../.snapshots` out of the sub-volume I'm taking a snapshot of.
 
-To do so i created a folder in the btrfs root (`snapshots/`) and inside the sub-volumes that will hold the snapshots:
+To do so I created a folder in the btrfs root (`snapshots/`) and inside the sub-volumes that will hold the snapshots:
 
 ```bash
 sudo btrfs subvolume list /
@@ -118,7 +118,7 @@ ID 414 gen 3397 top level 5 path snapshots/@home-snap
 [...]
 ```
 
-Than i mapped the sub-volumes to the `.../.snapshots` using `fstab`:
+Than I mapped the sub-volumes to the `.../.snapshots` using `fstab`:
 
 ```fstab
 UUID=<...> /.snapshots btrfs rw,relatime,ssd,space_cache=v2,subvolid=413,subvol=/snapshots/@root-snap,compress=zstd  0 0
@@ -132,7 +132,7 @@ The configs are located in `/etc/snapper/configs`. I enabled `NUMBER_CLEANUP`, `
 
 ### topgrade snapper pre-snap
 
-To upgrade my system i use topgrade. I could have added snapper to a pacman hook, but since topgrade also does a lot of other stuff i preferred to add a pre and post step. The full topgrade config can be found [here](https://github.com/simone-viozzi/my-dot-files/blob/dotfiles-server/.config/topgrade.toml)
+To upgrade my system I use topgrade. I could have added snapper to a pacman hook, but since topgrade also does a lot of other stuff I preferred to add a pre and post step. The full topgrade config can be found [here](https://github.com/simone-viozzi/my-dot-files/blob/dotfiles-server/.config/topgrade.toml)
 
 ```toml
 [pre_commands]
@@ -148,9 +148,9 @@ To upgrade my system i use topgrade. I could have added snapper to a pacman hook
 
 ### snap-sync setup
 
-The ssd is kind of old and will die before the WD Red. To prepare for this scenario i used `snap-sync` ([link](https://github.com/qubidt/snap-sync)) to send the snapshots from the ssd to the hdd.
+The ssd is kind of old and will die before the WD Red. To prepare for this scenario I used `snap-sync` ([link](https://github.com/qubidt/snap-sync)) to send the snapshots from the ssd to the hdd.
 
-To set this up i created a sub-volume in the WD Red, `@system-backup`, and mounted it with `fstab` to `/system-backup`. To configure `snap-sync` you have to run in manually the first time:
+To set this up I created a sub-volume in the WD Red, `@system-backup`, and mounted it with `fstab` to `/system-backup`. To configure `snap-sync` you have to run in manually the first time:
 
 ```bash
 sudo snap-sync --UUID <UUID of WD Red> --subvolid <subvol id of @system-backup> -c "root home" -q -n
@@ -207,7 +207,7 @@ To debug the unit you can run it with `sc-start`, it will do it's stuff and exit
 
 #### meaning of systemd-inhibit
 
-`snap-sync` is a wrapper around btrfs send receive, for this reason it could take some time to move the data between the 2 drives. With `systemd-inhibit` i can prevent the shutdown of the server while the process is running. The poweroff / reboot command must include `--check-inhibitors=yes`, so for example:
+`snap-sync` is a wrapper around btrfs send receive, for this reason it could take some time to move the data between the 2 drives. With `systemd-inhibit` I can prevent the shutdown of the server while the process is running. The poweroff / reboot command must include `--check-inhibitors=yes`, so for example:
 
 ```bash
 systemctl poweroff --check-inhibitors=yes
@@ -270,11 +270,11 @@ To create a docker volume mapped to a btrfs sub-volume you need to:
 
 ### docker volumes backup
 
-To back up some of the docker volumes to an external cloud storage i wrote [my own backup script](https://github.com/simone-viozzi/btrfs2cloud-backup). To set it up you just need to configure snapper for the docker volume, as described on the arch wiki (with .snapshots mapped to a subvolume outsise the one you are taking a backup of).
+To back up some of the docker volumes to an external cloud storage I wrote [my own backup script](https://github.com/simone-viozzi/btrfs2cloud-backup). To set it up you just need to configure snapper for the docker volume, as described on the arch wiki (with .snapshots mapped to a subvolume outsise the one you are taking a backup of).
 
 ## Traekik reverse proxy
 
-As a reverse proxy for every service that need to be exposed to the web i use traefik. Is configured to work on the network `proxy`, created with:
+As a reverse proxy for every service that need to be exposed to the web I use traefik. Is configured to work on the network `proxy`, created with:
 
 ```bash
 docker network create proxy
@@ -314,7 +314,7 @@ service:
 
 ## Apprise
 
-To get notification from the servers i did set up [apprise](https://github.com/caronc/apprise-api) and a telegram bot.
+To get notification from the servers I did set up [apprise](https://github.com/caronc/apprise-api) and a telegram bot.
 
 In the apprise configuration interface you can set up some topics:
 
@@ -332,17 +332,17 @@ curl -X POST -d '{"tag":"admin", "body":"test message"}' \
     http://localhost:8005/notify/apprise
 ```
 
-To connect it with other containers i created an external network, then added both apprise and the other container to that network.
+To connect it with other containers I created an external network, then added both apprise and the other container to that network.
 
 ### Use outside docker network vs use inside the docker network
 
-Apprise use the port 8000, but in my case it war already used by portainer. To overcome this i set the port mapping of apprise to `- 8005:8000`. This means that a notification from the system must be sent to `http://localhost:8005/notify/apprise`. While a notification from within the docker network must be sent to `http://apprise:8000/notify/apprise`.
+Apprise use the port 8000, but in my case it war already used by portainer. To overcome this I set the port mapping of apprise to `- 8005:8000`. This means that a notification from the system must be sent to `http://localhost:8005/notify/apprise`. While a notification from within the docker network must be sent to `http://apprise:8000/notify/apprise`.
 
-### Jellyfin + Apprise = <3
+###  + Apprise = <3
 
-To enable notifications through apprise you need the [Webhook](https://github.com/jellyfin/jellyfin-plugin-webhook) plugin, it can be installed directly from the plugin section of jellyfin.
+To enable notifications through apprise you need the [Webhook](https://github.com/jellyfin/jellyfin-plugin-webhook) plugin. It can be installed directly from the [plugin section of Jellyfin](https://jellyfin.org/docs/general/server/plugins/).
 
-Then, if for example you what a notification when an item is added, you need to create a `generic destination`:
+Then, if for example you want a notification when an item is added, you need to create a `generic destination`:
 
 1. set the correct webhook url: `http://apprise:8000/notify/apprise`. You can confirm that the url is correct with `docker exec -it jellyfin bash` than using curl from within the container.
 1. check `Item Added`
@@ -366,7 +366,7 @@ Then, if for example you what a notification when an item is added, you need to 
 
     I took the template from [here](https://github.com/jellyfin/jellyfin-plugin-webhook/blob/master/Jellyfin.Plugin.Webhook/Templates/Telegram.handlebars) and modified it following [this](https://github.com/caronc/apprise/wiki/Notify_telegram).
 
-    With the `tag` key you can specify to wich topic the notification will be sent.
+    With the `tag` key you can specify to which topic the notification will be sent.
 
 1. Add a request header:
 
@@ -376,3 +376,4 @@ Then, if for example you what a notification when an item is added, you need to 
 ## Jellyserr link inside Jellyfin menu
 
 Follow [this](https://jellyfin.org/docs/general/clients/web-config/#custom-menu-links) and [this](https://gist.github.com/thornbill/bfdcdb2d79440095b108e8c1f9e38a2f). The secret is to not put the `menuLinks` at the end, but in the middle under `themes`.
+

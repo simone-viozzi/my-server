@@ -15,10 +15,6 @@ services:
       - 'STORAGE_ENCRYPTION_KEY'
     environment:
       TZ: Europe/Rome
-      #AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: '/run/secrets/JWT_SECRET'
-      #AUTHELIA_SESSION_SECRET_FILE: '/run/secrets/SESSION_SECRET'
-      #AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE: '/run/secrets/STORAGE_PASSWORD'
-      #AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: '/run/secrets/STORAGE_ENCRYPTION_KEY'
     labels:
       traefik.enable: "true"
       traefik.docker.network: proxy

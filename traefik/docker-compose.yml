@@ -81,15 +81,15 @@ services:
       traefik.http.routers.traefik.service: api@internal
 
       # add auth middleware
-      #traefik.http.routers.api.middlewares: authelia@docker
-      traefik.http.routers.traefik.middlewares: traefik-auth
+      traefik.http.routers.traefik.middlewares: authelia@docker
+      #traefik.http.routers.traefik.middlewares: traefik-auth
       # you need to replace $ with $$ !
-      traefik.http.middlewares.traefik-auth.basicauth.users: "${BASIC_AUTH}"
+      #traefik.http.middlewares.traefik-auth.basicauth.users: "${BASIC_AUTH}"
 
       # global redirect to https
-      traefik.http.routers.http-catchall.rule: hostregexp(`{host:.+}`)
-      traefik.http.routers.http-catchall.entrypoints: web
-      traefik.http.routers.http-catchall.middlewares: redirect-to-https
+      #traefik.http.routers.http-catchall.rule: hostregexp(`{host:.+}`)
+      #traefik.http.routers.http-catchall.entrypoints: web
+      #traefik.http.routers.http-catchall.middlewares: redirect-to-https
 
       # middleware redirect
       traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: https

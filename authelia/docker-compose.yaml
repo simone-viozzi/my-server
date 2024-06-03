@@ -1,0 +1,57 @@
+services:
+  authelia:
+    image: authelia/authelia:latest
+    container_name: authelia
+    networks:
+      - proxy
+    user: "1000:1000"
+    volumes:
+      - ./config:/config
+      - ./data:/var/lib/authelia
+    secrets:
+      - 'JWT_SECRET'
+      - 'SESSION_SECRET'
+      - 'STORAGE_PASSWORD'
+      - 'STORAGE_ENCRYPTION_KEY'
+    environment:
+      TZ: Europe/Rome
+      #AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE: '/run/secrets/JWT_SECRET'
+      #AUTHELIA_SESSION_SECRET_FILE: '/run/secrets/SESSION_SECRET'
+      #AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE: '/run/secrets/STORAGE_PASSWORD'
+      #AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE: '/run/secrets/STORAGE_ENCRYPTION_KEY'
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: proxy
+
+      traefik.http.routers.authelia.rule: "Host(`${AUTH_DOMAIN}`)"
+      traefik.http.routers.authelia.entrypoints: websecure
+
+      traefik.http.routers.authelia.tls: "true"
+      traefik.http.routers.authelia.tls.certResolver: leresolver
+
+      traefik.http.routers.authelia.service: authelia-svc
+      traefik.http.services.authelia-svc.loadbalancer.server.port: "9091"
+
+      traefik.http.middlewares.authelia.forwardAuth.address: http://authelia:9091/api/authz/forward-auth
+      ## The following commented line is for configuring the Authelia URL in the proxy. We strongly suggest this is
+      ## configured in the Session Cookies section of the Authelia configuration.
+      # - 'traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/authz/forward-auth?authelia_url=https%3A%2F%2Fauth.example.com%2F'
+      traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader: "true"
+      traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders: Remote-User,Remote-Groups,Remote-Email,Remote-Name
+    restart: unless-stopped
+
+networks:
+  proxy:
+    external: true
+
+secrets:
+  JWT_SECRET:
+    file: ./secrets/authelia_jwt_secret
+  SESSION_SECRET:
+    file: ./secrets/authelia_session_secret
+  STORAGE_PASSWORD:
+    file: ./secrets/authelia_storage_password
+  STORAGE_ENCRYPTION_KEY:
+    file: ./secrets/authelia_storage_encryption_key
+  SMTP_PASSWORD:
+    file: ./secrets/authelia_smtp_password

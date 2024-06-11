@@ -1,13 +1,32 @@
 services:
   app:
-    image: spliit2:latest
-    ports:
-      - 3000:3000
+    build:
+      context: ./spliit
     env_file:
       - .env
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: proxy
+
+      traefik.http.routers.spliit-app.rule: Host(`${SPLIIT_DOMAIN}`)
+      traefik.http.routers.spliit-app.entrypoints: websecure
+
+      traefik.http.routers.spliit-app.tls: "true"
+      traefik.http.routers.spliit-app.tls.certresolver: leresolver
+
+      traefik.http.routers.spliit-app.service: spliit-app-svc
+      traefik.http.services.spliit-app-svc.loadbalancer.server.port: "3000"
+
+      traefik.http.routers.spliit-app.middlewares: authelia@docker
+    networks:
+      - proxy
+      - local
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
+    logging:
+      driver: "local"
 
   db:
     image: postgres:latest
@@ -16,9 +35,24 @@ services:
     env_file:
       - .env
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - spliit-db:/var/lib/postgresql/data
+    networks:
+      - local
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: [ 'CMD-SHELL', 'pg_isready -U postgres' ]
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+    logging:
+      driver: "local"
+
+networks:
+  proxy:
+    external: true
+  local:
+
+
+volumes:
+  spliit-db:
+    external: true

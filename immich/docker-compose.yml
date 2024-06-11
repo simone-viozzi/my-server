@@ -5,7 +5,6 @@ services:
   immich-server:
     container_name: immich_server
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
-    command: [ "start.sh", "immich" ]
     volumes:
       - immich-upload:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
@@ -42,30 +41,6 @@ services:
       homepage.widget.type: immich
       homepage.widget.url: https://${IMMICH_DOMAIN} #http://immich_server:3001
       homepage.widget.key: "${IMMICH_API_KEY}"
-    restart: unless-stopped
-
-  immich-microservices:
-    container_name: immich_microservices
-    image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
-    # extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/hardware-transcoding
-    #   file: hwaccel.transcoding.yml
-    #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
-    command: [ "start.sh", "microservices" ]
-    volumes:
-      - immich-upload:/usr/src/app/upload
-      - /etc/localtime:/etc/localtime:ro
-    env_file:
-      - .env
-    depends_on:
-      - redis
-      - database
-    networks:
-      immich:
-    logging:
-      driver: "local"
-    labels:
-      # set watchtower to monitor only and do not perform the update
-      com.centurylinklabs.watchtower.monitor-only: "true"
     restart: unless-stopped
 
   immich-machine-learning:

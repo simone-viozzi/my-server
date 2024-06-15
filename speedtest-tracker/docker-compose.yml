@@ -1,6 +1,6 @@
 services:
   speedtest-tracker:
-    image: 'ghcr.io/alexjustesen/speedtest-tracker:latest'
+    image: lscr.io/linuxserver/speedtest-tracker:latest
     container_name: speedtest-tracker
     ports:
       - '4674:80'
@@ -11,6 +11,7 @@ services:
     environment:
       PUID: 1000
       PGID: 1000
+      APP_KEY: base64:wXFlRDt743f84/grmHmDZc+7GSYT5e4yzhqqBFdHnb8=
       DB_CONNECTION: pgsql
       DB_HOST: speedtest-tracker-db
       DB_PORT: 5432
@@ -18,7 +19,6 @@ services:
       DB_USERNAME: speedy
       DB_PASSWORD: password
       TZ: Europe/Rome
-      #APP_KEY: OLTzZ+zxMZmIbUQ60ZqpYYz9GyqiczbuH5U2TWyji60=
     labels:
       homepage.group: Network
       homepage.name: Speedtest tracker

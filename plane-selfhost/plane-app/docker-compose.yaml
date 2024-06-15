@@ -39,6 +39,7 @@ x-app-env: &app-env
     - SPACE_BASE_URL=${SPACE_BASE_URL}
     - APP_BASE_URL=${APP_BASE_URL}
 
+
 services:
   web:
     <<: *app-env
@@ -47,11 +48,24 @@ services:
     pull_policy: ${PULL_POLICY:-always}
     restart: unless-stopped
     command: node web/server.js web
+    ports:
+      - 45362:80
     deploy:
       replicas: ${WEB_REPLICAS:-1}
     depends_on:
       - api
       - worker
+    networks:
+      - proxy
+      - local
+    labels:
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.plane_web.rule: "Host(`${WEB_URL}`)"
+      traefik.http.routers.plane_web.entryPoints: websecure
+      traefik.http.routers.plane_web.tls: true
+      traefik.http.routers.plane_web.tls.certResolver: leresolver
+
 
   space:
     <<: *app-env
@@ -66,6 +80,17 @@ services:
       - api
       - worker
       - web
+    networks:
+      - proxy
+      - local
+    labels:
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.plane_space.rule: "Host(`${SPACE_BASE_URL}`)"
+      traefik.http.routers.plane_space.entryPoints: websecure
+      traefik.http.routers.plane_space.tls: true
+      traefik.http.routers.plane_space.tls.certResolver: leresolver
+
 
   admin:
     <<: *app-env
@@ -79,6 +104,17 @@ services:
     depends_on:
       - api
       - web
+    networks:
+      - proxy
+      - local
+    labels:
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.plane_admin.rule: "Host(`${ADMIN_BASE_URL}`)"
+      traefik.http.routers.plane_admin.entryPoints: websecure
+      traefik.http.routers.plane_admin.tls: true
+      traefik.http.routers.plane_admin.tls.certResolver: leresolver
+
 
   api:
     <<: *app-env
@@ -94,6 +130,17 @@ services:
     depends_on:
       - plane-db
       - plane-redis
+    networks:
+      - proxy
+      - local
+    labels:
+      traefik.enable: true
+      traefik.docker.network: proxy
+      traefik.http.routers.plane_api.rule: "Host(`${API_DOMAIN}`)"
+      traefik.http.routers.plane_api.entryPoints: websecure
+      traefik.http.routers.plane_api.tls: true
+      traefik.http.routers.plane_api.tls.certResolver: leresolver
+
 
   worker:
     <<: *app-env
@@ -108,6 +155,8 @@ services:
       - api
       - plane-db
       - plane-redis
+    networks:
+      - local
 
   beat-worker:
     <<: *app-env
@@ -122,6 +171,8 @@ services:
       - api
       - plane-db
       - plane-redis
+    networks:
+      - local
 
   migrator:
     <<: *app-env
@@ -135,6 +186,8 @@ services:
     depends_on:
       - plane-db
       - plane-redis
+    networks:
+      - local
 
   plane-db:
     <<: *app-env
@@ -144,6 +197,8 @@ services:
     command: postgres -c 'max_connections=1000'
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - local
 
   plane-redis:
     <<: *app-env
@@ -152,6 +207,8 @@ services:
     restart: unless-stopped
     volumes:
       - redisdata:/data
+    networks:
+      - local
 
   plane-minio:
     <<: *app-env
@@ -161,19 +218,8 @@ services:
     command: server /export --console-address ":9090"
     volumes:
       - uploads:/export
-
-  # Comment this if you already have a reverse proxy running
-  proxy:
-    <<: *app-env
-    image: ${DOCKERHUB_USER:-makeplane}/plane-proxy:${APP_RELEASE:-stable}
-    platform: ${DOCKER_PLATFORM:-}
-    pull_policy: ${PULL_POLICY:-always}
-    ports:
-      - ${NGINX_PORT}:80
-    depends_on:
-      - web
-      - api
-      - space
+    networks:
+      - local
 
 volumes:
   pgdata:
@@ -183,3 +229,8 @@ volumes:
   logs_worker:
   logs_beat-worker:
   logs_migrator:
+
+networks:
+  proxy:
+    external: true
+  local:

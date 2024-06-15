@@ -18,6 +18,13 @@ services:
       traefik.http.services.spliit-app-svc.loadbalancer.server.port: "3000"
 
       traefik.http.routers.spliit-app.middlewares: authelia@docker
+
+
+      homepage.group: Media
+      homepage.name: Spliit
+      homepage.icon: https://github.com/spliit-app/spliit/blob/main/public/logo-with-text.png?raw=true
+      homepage.href: https://${SPLIIT_DOMAIN}
+
     networks:
       - proxy
       - local

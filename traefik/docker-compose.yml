@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:v2.9.1
+    image: traefik:latest
     container_name: traefik
     networks:
       proxy:
@@ -14,7 +14,7 @@ services:
       homepage-net:
     command:
       - '--api=true'
-      - '--pilot.dashboard=false'
+      #- '--pilot.dashboard=false'
       - '--global.sendAnonymousUsage=false'
       - '--global.checkNewVersion=false'
 
@@ -98,10 +98,6 @@ services:
       homepage.name: Traefik
       homepage.icon: traefik.svg
       homepage.href: https://${TRAEFIK_DOMAIN}
-      homepage.widget.type: traefik
-      homepage.widget.username: ${TRAEFIK_USER}
-      homepage.widget.password: ${TRAEFIK_PASSWORD}
-      homepage.widget.url: https://${TRAEFIK_DOMAIN}
     logging:
       driver: "local"
     restart: unless-stopped

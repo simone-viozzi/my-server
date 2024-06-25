@@ -59,13 +59,15 @@ services:
       - proxy
       - local
     labels:
-      traefik.enable: true
-      traefik.docker.network: proxy
-      traefik.http.routers.plane_web.rule: "Host(`${WEB_URL}`)"
-      traefik.http.routers.plane_web.entryPoints: websecure
-      traefik.http.routers.plane_web.tls: true
-      traefik.http.routers.plane_web.tls.certResolver: leresolver
-
+      traefik.enable: "true"
+      traefik.docker.network: "proxy"
+      traefik.http.routers.plane-frontend.rule: "Host(`${APP_BASE_URL}`) && !PathPrefix(`/api`)"
+      traefik.http.routers.plane-frontend.priority: "1"
+      traefik.http.routers.plane-frontend.entrypoints: websecure
+      traefik.http.routers.plane-frontend.tls: "true"
+      traefik.http.routers.plane-frontend.tls.certresolver: "leresolver"
+      traefik.http.routers.plane-frontend.middlewares: "retry@file, cors@file"
+      traefik.http.services.plane-frontend.loadbalancer.server.port: "3000"
 
   space:
     <<: *app-env
@@ -81,15 +83,7 @@ services:
       - worker
       - web
     networks:
-      - proxy
       - local
-    labels:
-      traefik.enable: true
-      traefik.docker.network: proxy
-      traefik.http.routers.plane_space.rule: "Host(`${SPACE_BASE_URL}`)"
-      traefik.http.routers.plane_space.entryPoints: websecure
-      traefik.http.routers.plane_space.tls: true
-      traefik.http.routers.plane_space.tls.certResolver: leresolver
 
 
   admin:
@@ -105,15 +99,7 @@ services:
       - api
       - web
     networks:
-      - proxy
       - local
-    labels:
-      traefik.enable: true
-      traefik.docker.network: proxy
-      traefik.http.routers.plane_admin.rule: "Host(`${ADMIN_BASE_URL}`)"
-      traefik.http.routers.plane_admin.entryPoints: websecure
-      traefik.http.routers.plane_admin.tls: true
-      traefik.http.routers.plane_admin.tls.certResolver: leresolver
 
 
   api:
@@ -134,12 +120,15 @@ services:
       - proxy
       - local
     labels:
-      traefik.enable: true
-      traefik.docker.network: proxy
-      traefik.http.routers.plane_api.rule: "Host(`${API_DOMAIN}`)"
-      traefik.http.routers.plane_api.entryPoints: websecure
-      traefik.http.routers.plane_api.tls: true
-      traefik.http.routers.plane_api.tls.certResolver: leresolver
+      traefik.enable: "true"
+      traefik.docker.network: "proxy"
+      traefik.http.routers.plane-backend.rule: "Host(`${APP_BASE_URL}`) && PathPrefix(`/api`)"
+      traefik.http.routers.plane-backend.priority: "2"
+      traefik.http.routers.plane-backend.entrypoints: websecure
+      traefik.http.routers.plane-backend.tls: "true"
+      traefik.http.routers.plane-backend.tls.certresolver: "leresolver"
+      traefik.http.routers.plane-backend.middlewares: "retry@file, cors@file"
+      traefik.http.services.plane-backend.loadbalancer.server.port: "8000"
 
 
   worker:

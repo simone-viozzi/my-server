@@ -39,7 +39,6 @@ x-app-env: &app-env
     - SPACE_BASE_URL=${SPACE_BASE_URL}
     - APP_BASE_URL=${APP_BASE_URL}
 
-
 services:
   web:
     <<: *app-env
@@ -48,26 +47,14 @@ services:
     pull_policy: ${PULL_POLICY:-always}
     restart: unless-stopped
     command: node web/server.js web
-    ports:
-      - 45362:80
     deploy:
       replicas: ${WEB_REPLICAS:-1}
     depends_on:
       - api
       - worker
     networks:
-      - proxy
       - local
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: "proxy"
-      traefik.http.routers.plane-frontend.rule: "Host(`${APP_BASE_URL}`) && !PathPrefix(`/api`)"
-      traefik.http.routers.plane-frontend.priority: "1"
-      traefik.http.routers.plane-frontend.entrypoints: websecure
-      traefik.http.routers.plane-frontend.tls: "true"
-      traefik.http.routers.plane-frontend.tls.certresolver: "leresolver"
-      traefik.http.routers.plane-frontend.middlewares: "retry@file, cors@file"
-      traefik.http.services.plane-frontend.loadbalancer.server.port: "3000"
+
 
   space:
     <<: *app-env
@@ -117,18 +104,8 @@ services:
       - plane-db
       - plane-redis
     networks:
-      - proxy
       - local
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: "proxy"
-      traefik.http.routers.plane-backend.rule: "Host(`${APP_BASE_URL}`) && PathPrefix(`/api`)"
-      traefik.http.routers.plane-backend.priority: "2"
-      traefik.http.routers.plane-backend.entrypoints: websecure
-      traefik.http.routers.plane-backend.tls: "true"
-      traefik.http.routers.plane-backend.tls.certresolver: "leresolver"
-      traefik.http.routers.plane-backend.middlewares: "retry@file, cors@file"
-      traefik.http.services.plane-backend.loadbalancer.server.port: "8000"
+
 
 
   worker:
@@ -207,8 +184,30 @@ services:
     command: server /export --console-address ":9090"
     volumes:
       - uploads:/export
+
+  # Comment this if you already have a reverse proxy running
+  proxy:
+    <<: *app-env
+    image: ${DOCKERHUB_USER:-makeplane}/plane-proxy:${APP_RELEASE:-stable}
+    platform: ${DOCKER_PLATFORM:-}
+    pull_policy: ${PULL_POLICY:-always}
+    restart: unless-stopped
+    depends_on:
+      - web
+      - api
+      - space
     networks:
+      - proxy
       - local
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "proxy"
+      traefik.http.routers.plane-backend.rule: "Host(`${APP_BASE_URL}`)"
+      traefik.http.routers.plane-backend.entrypoints: websecure
+      traefik.http.routers.plane-backend.tls: "true"
+      traefik.http.routers.plane-backend.tls.certresolver: "leresolver"
+      traefik.http.routers.plane-backend.middlewares: "retry@file, cors@file"
+      traefik.http.services.plane-backend.loadbalancer.server.port: "80"
 
 volumes:
   pgdata:

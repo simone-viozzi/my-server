@@ -20,7 +20,7 @@ services:
       traefik.http.routers.pdf.tls.certResolver: leresolver
       traefik.http.services.pdf.loadbalancer.server.port: "8080"
 
-      homepage.group: Media
+      homepage.group: Other
       homepage.name: Stirling-PDF
       homepage.icon: stirling-pdf.svg
       homepage.href: https://${PDF_DOMAIN}

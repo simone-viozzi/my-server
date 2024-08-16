@@ -16,8 +16,7 @@ x-app-env: &app-env
     - POSTGRES_DB=${POSTGRES_DB:-plane}
     - POSTGRES_PORT=${POSTGRES_PORT:-5432}
     - PGDATA=${PGDATA:-/var/lib/postgresql/data}
-    - DATABASE_URL=${DATABASE_URL:-postgresql://plane:plane@plane-db/plane}
-    # REDIS SETTINGS
+    - DATABASE_URL=${DATABASE_URL:-postgresql://plane:plane@plane-db:5432/plane}
     - REDIS_HOST=${REDIS_HOST:-plane-redis}
     - REDIS_PORT=${REDIS_PORT:-6379}
     - REDIS_URL=${REDIS_URL:-redis://plane-redis:6379/}
@@ -48,8 +47,6 @@ services:
     pull_policy: ${PULL_POLICY:-always}
     restart: unless-stopped
     command: node web/server.js web
-    deploy:
-      replicas: ${WEB_REPLICAS:-1}
     depends_on:
       - api
       - worker
@@ -79,8 +76,6 @@ services:
     pull_policy: ${PULL_POLICY:-always}
     restart: unless-stopped
     command: node admin/server.js admin
-    deploy:
-      replicas: ${ADMIN_REPLICAS:-1}
     depends_on:
       - api
       - web
@@ -158,13 +153,13 @@ services:
     restart: unless-stopped
     command: postgres -c 'max_connections=1000'
     volumes:
-      - plane-db:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     networks:
       - local
 
   plane-redis:
     <<: *app-env
-    image: valkey/valkey:7.2.5-alpine
+    image: redis:7.2.4-alpine
     pull_policy: if_not_present
     restart: unless-stopped
     volumes:
@@ -179,11 +174,10 @@ services:
     restart: unless-stopped
     command: server /export --console-address ":9090"
     volumes:
-      - plane-uploads:/export
+      - uploads:/export
     networks:
       - local
 
-  # Comment this if you already have a reverse proxy running
   proxy:
     <<: *app-env
     image: ${DOCKERHUB_USER:-makeplane}/plane-proxy:${APP_RELEASE:-stable}
@@ -200,23 +194,17 @@ services:
     labels:
       traefik.enable: "true"
       traefik.docker.network: "proxy"
+      #traefik.http.routers.plane.rule: "Host(`${APP_BASE_URL_}`) || Host(`${SPACE_BASE_URL_}`) || Host(`${ADMIN_BASE_URL_}`)"
       traefik.http.routers.plane.rule: "Host(`${APP_BASE_URL_}`)"
       traefik.http.routers.plane.entrypoints: websecure
       traefik.http.routers.plane.tls: "true"
       traefik.http.routers.plane.tls.certresolver: "leresolver"
       traefik.http.services.plane.loadbalancer.server.port: "80"
 
-      homepage.group: Other
-      homepage.name: Plane
-      homepage.icon: plane.svg
-      homepage.href: https://${APP_BASE_URL_}
-
 volumes:
-  plane-db:
-    external: true
+  pgdata:
   redisdata:
-  plane-uploads:
-    external: true
+  uploads:
   logs_api:
   logs_worker:
   logs_beat-worker:

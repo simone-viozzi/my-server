@@ -20,7 +20,7 @@ services:
       traefik.http.routers.spliit-app.middlewares: authelia@docker
 
 
-      homepage.group: Media
+      homepage.group: Other
       homepage.name: Spliit
       homepage.icon: https://github.com/spliit-app/spliit/blob/main/public/logo-with-text.png?raw=true
       homepage.href: https://${SPLIIT_DOMAIN}

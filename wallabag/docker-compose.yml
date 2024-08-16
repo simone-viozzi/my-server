@@ -29,7 +29,7 @@ services:
       traefik.http.routers.wallabag.tls.certResolver: leresolver
       traefik.http.services.wallabag.loadbalancer.server.port: "80"
 
-      homepage.group: Media
+      homepage.group: Other
       homepage.name: Wallabag
       homepage.icon: wallabag.svg
       homepage.href: https://${WALLABAG_DOMAIN}

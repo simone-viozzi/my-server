@@ -1,60 +1,27 @@
 services:
-  speedtest-tracker:
-    image: lscr.io/linuxserver/speedtest-tracker:latest
-    container_name: speedtest-tracker
+  myspeed:
+    image: germannewsmaker/myspeed
+    container_name: MySpeed
     ports:
-      - '4674:80'
-      - '4675:443'
-    networks:
-      homepage-net:
-      speedtest-net:
-    environment:
-      PUID: 1000
-      PGID: 1000
-      APP_KEY: base64:wXFlRDt743f84/grmHmDZc+7GSYT5e4yzhqqBFdHnb8=
-      DB_CONNECTION: pgsql
-      DB_HOST: speedtest-tracker-db
-      DB_PORT: 5432
-      DB_DATABASE: speedtest_tracker
-      DB_USERNAME: speedy
-      DB_PASSWORD: password
-      TZ: Europe/Rome
+      - "4674:5216"
+    volumes:
+      - myspeed:/myspeed/data
+    restart: unless-stopped
     labels:
       homepage.group: Network
       homepage.name: Speedtest tracker
       homepage.icon: si-speedtest.svg
       homepage.href: http://localhost:4674
-      homepage.widget.type: speedtest
-      homepage.widget.url: http://speedtest-tracker:80
-    volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ./configs/config:/config
-      - ./configs/web:/etc/ssl/web
-    depends_on:
-      - speedtest-tracker-db
-    restart: unless-stopped
+      homepage.widget.type: myspeed
+      homepage.widget.url: http://myspeed:5216
     logging:
       driver: "local"
-
-  speedtest-tracker-db:
-    image: postgres:15
-    container_name: speedtest-tracker-db
-    environment:
-      POSTGRES_DB: speedtest_tracker
-      POSTGRES_USER: speedy
-      POSTGRES_PASSWORD: password
-    volumes:
-      - speedtest-db:/var/lib/postgresql/data
     networks:
-      speedtest-net:
-    restart: unless-stopped
-    logging:
-      driver: "local"
+      homepage-net:
 
 volumes:
-  speedtest-db:
+  myspeed:
 
 networks:
-  speedtest-net:
   homepage-net:
     external: true

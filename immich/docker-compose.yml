@@ -1,4 +1,3 @@
-
 name: immich
 
 services:
@@ -25,7 +24,7 @@ services:
       traefik.enable: "true"
       traefik.docker.network: proxy
       traefik.http.routers.media-immich-api.rule: Host(`${IMMICH_DOMAIN}`)
-      traefik.http.services.media-immich-api.loadbalancer.server.port: "3001"
+      traefik.http.services.media-immich-api.loadbalancer.server.port: "2283"
 
       traefik.http.routers.media-immich-api.entrypoints: websecure
       traefik.http.routers.media-immich-api.tls: "true"
@@ -100,8 +99,7 @@ services:
       interval: 5m
       start_interval: 30s
       start_period: 5m
-    command: ["postgres", "-c" ,"shared_preload_libraries=vectors.so", "-c", 'search_path="$$user", public, vectors', "-c", "logging_collector=on", "-c", "max_wal_size=2GB", "-c", "shared_buffers=512MB", "-c", "wal_compression=on"]
-
+    command: [ 'postgres', '-c', 'shared_preload_libraries=vectors.so', '-c', 'search_path="$$user", public, vectors', '-c', 'logging_collector=on', '-c', 'max_wal_size=2GB', '-c', 'shared_buffers=512MB', '-c', 'wal_compression=on' ]
 
     networks:
       immich:
@@ -118,6 +116,7 @@ volumes:
   immich-upload:
     external: true
   model-cache:
+
 
 networks:
   proxy:

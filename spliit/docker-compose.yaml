@@ -19,7 +19,6 @@ services:
 
       traefik.http.routers.spliit-app.middlewares: authelia@docker
 
-
       homepage.group: Other
       homepage.name: Spliit
       homepage.icon: https://github.com/spliit-app/spliit/blob/main/public/logo-with-text.png?raw=true
@@ -28,6 +27,7 @@ services:
     networks:
       - proxy
       - local
+      - homepage-net
     depends_on:
       db:
         condition: service_healthy
@@ -56,6 +56,8 @@ services:
 
 networks:
   proxy:
+    external: true
+  homepage-net:
     external: true
   local:
 

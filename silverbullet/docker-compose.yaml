@@ -1,0 +1,46 @@
+
+
+services:
+  silverbullet:
+    image: zefhemel/silverbullet
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - GUID=1000
+    volumes:
+      - silverbullet-space:/space
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: proxy
+
+      traefik.http.routers.silverbullet.rule: Host(`${SILVERBULLET_DOMAIN}`)
+      traefik.http.routers.silverbullet.entrypoints: websecure
+
+      traefik.http.routers.silverbullet.tls: "true"
+      traefik.http.routers.silverbullet.tls.certresolver: leresolver
+
+      traefik.http.routers.silverbullet.service: silverbullet-svc
+      traefik.http.services.silverbullet-svc.loadbalancer.server.port: "3000"
+
+      traefik.http.routers.silverbullet.middlewares: authelia@docker
+
+      homepage.group: Other
+      homepage.name: Silverbullet
+      homepage.icon: silverbullet.png
+      homepage.href: https://${SILVERBULLET_DOMAIN}
+
+    networks:
+      - proxy
+      - homepage-net
+    logging:
+      driver: "local"
+
+volumes:
+  silverbullet-space:
+    external: true
+
+networks:
+  homepage-net:
+    external: true
+  proxy:
+    external: true

@@ -3,13 +3,10 @@ services:
     image: ghcr.io/mealie-recipes/mealie
     container_name: mealie
     restart: unless-stopped
-    ports:
-        - "9925:9000"
     deploy:
       resources:
         limits:
           memory: 1000M
-
     volumes:
       - mealie-data:/app/data/
     environment:
@@ -28,27 +25,60 @@ services:
       POSTGRES_SERVER: postgres
       POSTGRES_PORT: 5432
       POSTGRES_DB: mealie
+
+      # OIDC Configuration
+      OIDC_AUTH_ENABLED: "true"
+      OIDC_SIGNUP_ENABLED: "true"
+      OIDC_CONFIGURATION_URL: "https://${AUTH_DOMAIN}/.well-known/openid-configuration"
+      OIDC_CLIENT_ID: "${OIDC_CLIENT_ID}"
+      OIDC_CLIENT_SECRET: "${OIDC_CLIENT_SECRET}"
+      OIDC_AUTO_REDIRECT: "false"
+      OIDC_ADMIN_GROUP: "admins"
+      OIDC_USER_GROUP: "users"
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: proxy
+
+      traefik.http.routers.mealie.rule: "Host(`${MEALIE_DOMAIN}`)"
+      traefik.http.routers.mealie.entryPoints: websecure
+
+      traefik.http.routers.mealie.tls: "true"
+      traefik.http.routers.mealie.tls.certResolver: leresolver
+
+      traefik.http.routers.mealie.service: mealie-svc
+      traefik.http.services.mealie-svc.loadbalancer.server.port: "9000"
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - proxy
+      - local
 
   postgres:
     container_name: postgres
     image: postgres:15
     restart: unless-stopped
     volumes:
-      - mealie-pgdata:/var/lib/postgresql/data
+      - mealie-pgdata:/var/lib/postgresql
     environment:
       POSTGRES_PASSWORD: mealie
       POSTGRES_USER: mealie
+      PGDATA: /var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready"]
       interval: 30s
       timeout: 20s
       retries: 3
+    networks:
+      - local
 
 volumes:
   mealie-data:
     external: true
   mealie-pgdata:
     external: true
+
+networks:
+  proxy:
+    external: true
+  local:

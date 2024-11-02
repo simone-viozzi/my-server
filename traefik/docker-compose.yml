@@ -83,12 +83,7 @@ services:
       traefik.http.routers.traefik.service: api@internal
 
       # Attach Authentik authentication middleware to the Traefik router
-      traefik.http.routers.traefik.middlewares: authentik-auth@docker
-
-      # Middleware definition for Authentik authentication
-      traefik.http.middlewares.authentik-auth.forwardauth.address: "http://authentik-proxy:9000/outpost.goauthentik.io/auth/traefik"
-      traefik.http.middlewares.authentik-auth.forwardauth.trustForwardHeader: "true"
-      traefik.http.middlewares.authentik-auth.forwardauth.authResponseHeaders: "X-Auth-User"
+      traefik.http.routers.traefik.middlewares: authentik@docker
 
       # global redirect to https
       #traefik.http.routers.http-catchall.rule: hostregexp(`{host:.+}`)
@@ -105,37 +100,6 @@ services:
     logging:
       driver: "local"
     restart: unless-stopped
-
-  authentik-proxy:
-    image: ghcr.io/goauthentik/proxy
-    container_name: authentik-proxy
-    networks:
-      - proxy
-    ports:
-      - "9000:9000"
-      - "9443:9443"
-    environment:
-      AUTHENTIK_HOST: "https://${AUTHENTIK_DOMAIN}"
-      AUTHENTIK_INSECURE: "false"
-      AUTHENTIK_TOKEN: "${AUTHENTIK_TOKEN}"
-      # Uncomment and configure if needed
-      # AUTHENTIK_HOST_BROWSER: "https://${EXTERNAL_DOMAIN}"
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: proxy
-      traefik.http.routers.authentik-proxy.rule: "Host(`${TRAEFIK_DOMAIN}`) && PathPrefix(`/outpost.goauthentik.io/`)"
-      traefik.http.routers.authentik-proxy.entrypoints: "websecure"
-      traefik.http.routers.authentik-proxy.tls: "true"
-      traefik.http.routers.authentik-proxy.tls.certresolver: "leresolver"
-
-      traefik.http.routers.authentik-proxy.service: "authentik-proxy-svc"
-      traefik.http.services.authentik-proxy-svc.loadbalancer.server.port: "9000"
-
-      traefik.http.middlewares.authentik-proxy.forwardauth.address: "http://authentik-proxy:9000/outpost.goauthentik.io/auth/traefik"
-      traefik.http.middlewares.authentik-proxy.forwardauth.trustForwardHeader: true
-      traefik.http.middlewares.authentik-proxy.forwardauth.authResponseHeaders: "X-authentik-username,X-authentik-groups,X-authentik-email,X-authentik-name,X-authentik-uid,X-authentik-jwt,X-authentik-meta-jwks,X-authentik-meta-outpost,X-authentik-meta-provider,X-authentik-meta-app,X-authentik-meta-version"
-    restart: unless-stopped
-
 
 volumes:
   certs:

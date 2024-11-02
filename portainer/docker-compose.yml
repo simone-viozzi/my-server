@@ -1,4 +1,5 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json
+
+# WARNING obsoleto da rivedere!
 
 version: "3"
 
@@ -8,7 +9,7 @@ services:
     container_name: portainer
     ports:
       - 8000:8000
-      - 9443:9443
+      - 9445:9443
     networks:
       homepage-net:
       internal:
@@ -20,9 +21,9 @@ services:
       homepage.group: Network
       homepage.name: Portainer
       homepage.icon: portainer.svg
-      homepage.href: https://localhost:9443
+      homepage.href: https://localhost:9445
       homepage.widget.type: portainer
-      homepage.widget.url: https://portainer:9443
+      homepage.widget.url: https://portainer:9445
       homepage.widget.env: 8
       homepage.widget.key: ${PORTAINER_API_KEY}
     restart: unless-stopped

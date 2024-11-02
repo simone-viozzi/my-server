@@ -83,7 +83,7 @@ services:
       traefik.http.routers.traefik.service: api@internal
 
       # Attach Authentik authentication middleware to the Traefik router
-      traefik.http.routers.traefik.middlewares: authentik@docker
+      traefik.http.routers.traefik.middlewares: authelia@docker
 
       # global redirect to https
       #traefik.http.routers.http-catchall.rule: hostregexp(`{host:.+}`)

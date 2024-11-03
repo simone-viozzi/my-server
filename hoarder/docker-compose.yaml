@@ -1,0 +1,81 @@
+services:
+  hoarder-web:
+    image: ghcr.io/hoarder-app/hoarder:${HOARDER_VERSION:-release}
+    restart: unless-stopped
+    volumes:
+      - hoarder-data:/data
+    env_file:
+      - .env
+    environment:
+      MEILI_ADDR: http://hoarder-meilisearch:7700
+      BROWSER_WEB_URL: http://hoarder-chrome:9222
+      # OPENAI_API_KEY: ...
+      DATA_DIR: /data
+      PUID: 1000
+      GUID: 1000
+      NEXTAUTH_URL: https://${HOARDER_DOMAIN}
+      OAUTH_WELLKNOWN_URL: "https://${AUTH_DOMAIN}/.well-known/openid-configuration"
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: proxy
+
+      traefik.http.routers.hoarder-web.rule: Host(`${HOARDER_DOMAIN}`)
+      traefik.http.routers.hoarder-web.entrypoints: websecure
+
+      traefik.http.routers.hoarder-web.tls: "true"
+      traefik.http.routers.hoarder-web.tls.certresolver: leresolver
+
+      traefik.http.routers.hoarder-web.service: hoarder-web-svc
+      traefik.http.services.hoarder-web-svc.loadbalancer.server.port: "3000"
+
+      homepage.group: Other
+      homepage.name: Hoarder
+      homepage.icon: hoarder.png
+      homepage.href: https://${HOARDER_DOMAIN}
+    networks:
+      - proxy
+      - homepage-net
+      - local
+    logging:
+      driver: "local"
+
+  hoarder-chrome:
+    image: gcr.io/zenika-hub/alpine-chrome:123
+    restart: unless-stopped
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --disable-dev-shm-usage
+      - --remote-debugging-address=0.0.0.0
+      - --remote-debugging-port=9222
+      - --hide-scrollbars
+    networks:
+      - local
+    logging:
+      driver: "local"
+
+  hoarder-meilisearch:
+    image: getmeili/meilisearch:v1.6
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - hoarder-meilisearch:/meili_data
+    networks:
+      - local
+    logging:
+      driver: "local"
+
+volumes:
+  hoarder-meilisearch:
+  hoarder-data:
+    external: true
+
+networks:
+  proxy:
+    external: true
+  homepage-net:
+    external: true
+  local:

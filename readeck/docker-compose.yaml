@@ -1,0 +1,48 @@
+
+services:
+  readeck:
+    image: codeberg.org/readeck/readeck:latest
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - GUID=1000
+    volumes:
+      - readeck-data:/readeck
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: proxy
+
+      traefik.http.routers.readeck.rule: Host(`${READECK_DOMAIN}`)
+      traefik.http.routers.readeck.entrypoints: websecure
+
+      traefik.http.routers.readeck.tls: "true"
+      traefik.http.routers.readeck.tls.certresolver: leresolver
+
+      traefik.http.routers.readeck.service: readeck-svc
+      traefik.http.services.readeck-svc.loadbalancer.server.port: "8000"
+
+      homepage.group: Other
+      homepage.name: Readeck
+      homepage.icon: readeck.png
+      homepage.href: https://${READECK_DOMAIN}
+
+    networks:
+      - proxy
+      - homepage-net
+    logging:
+      driver: "local"
+    healthcheck:
+      test: ["CMD", "/bin/readeck", "healthcheck", "-config", "config.toml"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+
+volumes:
+  readeck-data:
+    external: true
+
+networks:
+  homepage-net:
+    external: true
+  proxy:
+    external: true

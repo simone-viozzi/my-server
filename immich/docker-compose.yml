@@ -37,9 +37,6 @@ services:
       homepage.name: Immich
       homepage.icon: immich.svg
       homepage.href: https://${IMMICH_DOMAIN}
-      homepage.widget.type: immich
-      homepage.widget.url: https://${IMMICH_DOMAIN} #http://immich_server:3001
-      homepage.widget.key: "${IMMICH_API_KEY}"
     restart: unless-stopped
 
   immich-machine-learning:

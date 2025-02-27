@@ -1,6 +1,6 @@
 services:
   stirling-pdf:
-    image: frooodle/s-pdf:latest
+    image: stirlingtools/stirling-pdf
     networks:
       - proxy
     volumes:

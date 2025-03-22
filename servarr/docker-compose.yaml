@@ -134,7 +134,7 @@ services:
     restart: unless-stopped
 
   radarr:
-    image: cr.hotio.dev/hotio/radarr
+    image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     environment:
       PGID: "1002"

@@ -8,6 +8,11 @@ services:
       - redisdata:/data
     networks:
       internal:
+    logging:
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "2"
 
   paperless_db:
     container_name: paperless_db
@@ -21,6 +26,11 @@ services:
       POSTGRES_PASSWORD: paperless
     networks:
       internal:
+    logging:
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "5"
 
   paperless_webserver:
     container_name: paperless-webserver
@@ -76,6 +86,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    logging:
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "10"
 
   paperless_gotenberg:
     container_name: paperless_gotenberg
@@ -90,6 +105,11 @@ services:
       - "--chromium-allow-list=file:///tmp/.*"
     networks:
       internal:
+    logging:
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "2"
 
   paperless_tika:
     container_name: paperless_tika
@@ -97,6 +117,11 @@ services:
     networks:
       - internal
     restart: unless-stopped
+    logging:
+        driver: "local"
+        options:
+          max-size: "50m"
+          max-file: "2"
 
 
   change-vol-ownership:
@@ -112,6 +137,11 @@ services:
       - paperless-media:/tmp/change-ownership/1
       - paperless-data:/tmp/change-ownership/2
     command: chown -R 1000:1000 /tmp/change-ownership
+    logging:
+      driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "2"
 
 networks:
   proxy:

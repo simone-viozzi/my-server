@@ -5,7 +5,7 @@ services:
     # release notes: https://tika.apache.org
     networks:
       ocis-net:
-    restart: always
+    restart: unless-stopped
     logging:
       driver: ${LOG_DRIVER:-local}
 

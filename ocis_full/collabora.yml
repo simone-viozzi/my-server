@@ -1,11 +1,6 @@
 ---
 services:
-  traefik:
-    networks:
-      ocis-net:
-        aliases:
-          - ${COLLABORA_DOMAIN:-collabora.owncloud.test}
-          - ${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+
   ocis:
     environment:
       # make collabora the secure view app

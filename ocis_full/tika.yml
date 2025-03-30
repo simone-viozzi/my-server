@@ -5,9 +5,15 @@ services:
     # release notes: https://tika.apache.org
     networks:
       ocis-net:
+    labels:
+      # set watchtower to monitor only and do not perform the update
+      com.centurylinklabs.watchtower.monitor-only: "true"
     restart: unless-stopped
     logging:
-      driver: ${LOG_DRIVER:-local}
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "2"
 
   ocis:
     environment:

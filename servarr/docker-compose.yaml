@@ -29,7 +29,10 @@ services:
       homepage.widget.username: ${QBITTORRENT_USERNAME}
       homepage.widget.password: ${QBITTORRENT_PASSWORD}
     logging:
-      driver: local
+      driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
   jackett:
@@ -59,6 +62,9 @@ services:
       homepage.widget.url: http://jackett:9117
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
   flaresolverr:
@@ -75,7 +81,10 @@ services:
     networks:
       media:
     logging:
-      driver: local
+      driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
   prowlarr:
@@ -103,6 +112,9 @@ services:
       homepage.widget.key: ${PROWLARR_API_KEY}
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
   sonarr:
@@ -131,6 +143,9 @@ services:
       homepage.widget.key: ${SONARR_API_KEY}
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
   radarr:
@@ -159,6 +174,9 @@ services:
       homepage.widget.key: ${RADARR_API_KEY}
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
   readarr:
@@ -187,6 +205,9 @@ services:
       homepage.widget.key: ${READARR_API_KEY}
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
   jellyseerr:
@@ -225,6 +246,9 @@ services:
       homepage.widget.key: ${JELLYSEERR_API_KEY}
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
 networks:

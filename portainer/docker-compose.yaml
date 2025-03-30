@@ -1,7 +1,4 @@
 
-# WARNING obsoleto da rivedere!
-
-version: "3"
 
 services:
   portainer:
@@ -17,6 +14,9 @@ services:
       - portainer-data:/data
     logging:
       driver: "local"
+      options:
+        max-size: "5m"
+        max-file: "3"
     labels:
       homepage.group: Network
       homepage.name: Portainer
@@ -40,6 +40,9 @@ services:
       - /var/lib/docker/volumes:/var/lib/docker/volumes
     logging:
       driver: "local"
+      options:
+        max-size: "5m"
+        max-file: "3"
     restart: unless-stopped
 
 volumes:

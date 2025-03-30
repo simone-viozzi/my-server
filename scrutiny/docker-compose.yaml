@@ -27,6 +27,9 @@ services:
     restart: unless-stopped
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
 networks:
   homepage-net:

@@ -38,6 +38,9 @@ services:
       - local
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "10"
 
   hoarder-chrome:
     image: gcr.io/zenika-hub/alpine-chrome:123
@@ -53,6 +56,9 @@ services:
       - local
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   hoarder-meilisearch:
     image: getmeili/meilisearch:v1.6
@@ -67,6 +73,9 @@ services:
       - local
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "20"
 
 volumes:
   hoarder-meilisearch:

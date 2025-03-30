@@ -35,6 +35,9 @@ services:
       homepage.widget.password: ${KAVITA_PASSWORD}
     logging:
       driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "10"
     restart: unless-stopped
 
 networks:

@@ -7,6 +7,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     logging:
       driver: "local"
+      options:
+        max-size: "20m"
+        max-file: "5"
     ports:
       - "3000:3000"
     extra_hosts:
@@ -30,6 +33,9 @@ services:
       - '7575:7575'
     logging:
       driver: "local"
+      options:
+        max-size: "20m"
+        max-file: "5"
     labels:
       traefik.enable: "true"
       traefik.http.routers.homepage.rule: "Host(`${PUBLIC_HOMEPAGE_DOMAIN}`)"

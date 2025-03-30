@@ -53,6 +53,11 @@ services:
     networks:
       - proxy
       - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "10"
 
   postgres:
     container_name: postgres
@@ -71,6 +76,11 @@ services:
       retries: 3
     networks:
       - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
 volumes:
   mealie-data:

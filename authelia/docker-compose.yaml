@@ -35,6 +35,11 @@ services:
       traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader: "true"
       traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders: Remote-User,Remote-Groups,Remote-Email,Remote-Name
     restart: unless-stopped
+    logging:
+      driver: "local"
+      options:
+        max-size: "30m"
+        max-file: "5"
 
 networks:
   proxy:

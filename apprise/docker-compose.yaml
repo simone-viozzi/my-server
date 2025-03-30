@@ -16,6 +16,9 @@ services:
       homepage.href: http://localhost:8005
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "5"
     restart: unless-stopped
 
 networks:

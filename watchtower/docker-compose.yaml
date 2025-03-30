@@ -22,6 +22,9 @@ services:
       homepage.widget.key: ${WATCHTOWER_HTTP_API_TOKEN}
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "2"
     restart: unless-stopped
 
 

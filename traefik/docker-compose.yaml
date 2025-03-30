@@ -99,6 +99,9 @@ services:
       homepage.href: https://${TRAEFIK_DOMAIN}
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "10"
     restart: unless-stopped
 
 volumes:

@@ -16,6 +16,9 @@ services:
       homepage.widget.url: http://myspeed:5216
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "2"
     networks:
       homepage-net:
 

@@ -59,6 +59,9 @@ services:
     restart: unless-stopped
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "5"
     #deploy:
     #  resources:
     #    limits:
@@ -97,11 +100,13 @@ services:
       start_interval: 30s
       start_period: 5m
     command: [ 'postgres', '-c', 'shared_preload_libraries=vectors.so', '-c', 'search_path="$$user", public, vectors', '-c', 'logging_collector=on', '-c', 'max_wal_size=2GB', '-c', 'shared_buffers=512MB', '-c', 'wal_compression=on' ]
-
     networks:
       immich:
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "5"
     labels:
       # set watchtower to monitor only and do not perform the update
       com.centurylinklabs.watchtower.monitor-only: "true"

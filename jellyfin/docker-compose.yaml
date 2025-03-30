@@ -85,6 +85,9 @@ services:
       homepage.widget.key: ${JELLYFIN_API_KEY}
     logging:
       driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "10"
 
 volumes:
   jellyfin-config:

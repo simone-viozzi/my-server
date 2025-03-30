@@ -34,6 +34,9 @@ services:
     restart: unless-stopped
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   db:
     image: postgres:16
@@ -53,6 +56,9 @@ services:
     restart: unless-stopped
     logging:
       driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "2"
 
 networks:
   proxy:

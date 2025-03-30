@@ -66,6 +66,11 @@ services:
       - worker
     networks:
       - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "5"
 
   space:
     image: ${DOCKERHUB_USER:-makeplane}/plane-space:${APP_RELEASE:-stable}
@@ -80,6 +85,11 @@ services:
       - web
     networks:
       - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "5"
 
   admin:
     image: ${DOCKERHUB_USER:-makeplane}/plane-admin:${APP_RELEASE:-stable}
@@ -93,6 +103,11 @@ services:
       - web
     networks:
       - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "5"
 
   live:
     image: ${DOCKERHUB_USER:-makeplane}/plane-live:${APP_RELEASE:-stable}
@@ -108,6 +123,11 @@ services:
       - web
     networks:
       - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "5"
 
   api:
     image: ${DOCKERHUB_USER:-makeplane}/plane-backend:${APP_RELEASE:-stable}
@@ -126,6 +146,11 @@ services:
       - plane-mq
     networks:
       - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "5"
 
 
   worker:
@@ -146,6 +171,11 @@ services:
       - plane-mq
     networks:
       - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "5"
 
   beat-worker:
     image: ${DOCKERHUB_USER:-makeplane}/plane-backend:${APP_RELEASE:-stable}
@@ -165,6 +195,11 @@ services:
       - plane-mq
     networks:
       - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
   migrator:
     image: ${DOCKERHUB_USER:-makeplane}/plane-backend:${APP_RELEASE:-stable}
@@ -182,6 +217,11 @@ services:
       - plane-redis
     networks:
       - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "2"
 
   # Comment this if you already have a database running
   plane-db:
@@ -197,6 +237,11 @@ services:
       - plane-db:/var/lib/postgresql/data
     networks:
       - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "50m"
+        max-file: "5"
 
   plane-redis:
     image: valkey/valkey:7.2.5-alpine
@@ -206,6 +251,11 @@ services:
         condition: on-failure
     volumes:
       - redisdata:/data
+    logging:
+      driver: "local"
+      options:
+        max-size: "5m"
+        max-file: "2"
 
   plane-mq:
     image: rabbitmq:3.13.6-management-alpine
@@ -217,6 +267,11 @@ services:
       <<: *mq-env
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    logging:
+      driver: "local"
+      options:
+        max-size: "5m"
+        max-file: "2"
 
   # Comment this if you using any external s3 compatible storage
   plane-minio:
@@ -232,6 +287,11 @@ services:
       - plane-uploads:/export
     networks:
       - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "5m"
+        max-file: "2"
 
   # Comment this if you already have a reverse proxy running
   proxy:
@@ -262,6 +322,11 @@ services:
       homepage.name: Plane
       homepage.icon: plane.svg
       homepage.href: https://${APP_BASE_URL_}
+    logging:
+      driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "5"
 
 volumes:
   plane-db:

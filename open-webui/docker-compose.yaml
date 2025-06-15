@@ -1,0 +1,56 @@
+
+services:
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    env_file:
+      - .env
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: proxy
+
+      traefik.http.routers.gpt.rule: Host(`${GPT_DOMAIN}`)
+      traefik.http.routers.gpt.entrypoints: websecure
+
+      traefik.http.routers.gpt.tls: "true"
+      traefik.http.routers.gpt.tls.certresolver: leresolver
+
+      traefik.http.routers.gpt.service: gpt-svc
+      traefik.http.services.gpt-svc.loadbalancer.server.port: "8080"
+
+      homepage.group: Other
+      homepage.name: ChatGpt
+      homepage.icon: chatgpt.png
+      homepage.href: https://${GPT_DOMAIN}
+    volumes:
+      - ./backend-data:/app/backend/data
+    networks:
+      - proxy
+      - homepage-net
+      - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - ./ollama:/root/.ollama
+
+    networks:
+      - local
+    logging:
+      driver: "local"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+
+
+networks:
+  homepage-net:
+    external: true
+  proxy:
+    external: true
+  local:

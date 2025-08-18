@@ -100,7 +100,7 @@
 - **Libvirt “nothing running” confirmation (expected none):**
   - `virsh list --all` and `virsh net-list --all` should both be empty for VMs/networks.
 
-# 2. **Host & Platform Overview**
+# 2. Host & Platform Overview
 ## 2.1 Hardware summary *(README note: current hardware differs from repo README; this section supersedes it)*
 - **Form factor:** Bare metal (not virtualized) — `systemd-detect-virt: none`.
 - **Motherboard/UEFI:** Gigabyte B450 AORUS M • UEFI F65b (2023-09-20).
@@ -129,13 +129,13 @@
 - **Swarm:** inactive.
 
 
-# 3. **Networking**
+# 3. Networking
 
 **Summary:** Traefik fronts all public traffic on `:443` (TLS-ALPN-01 for ACME). `:80` is configured in Traefik for HTTP→HTTPS redirection, but UFW currently does **not** allow 80/tcp inbound. Fail2ban enforces bans at the **host firewall** via iptables (INPUT and DOCKER-USER), covering SSH and several containerized apps. No libvirt guests are running (default libvirt network is present but unused).
 
 ---
 
-## 3.1 **Host firewall (UFW) & nftables**
+## 3.1 Host firewall (UFW) & nftables
 - **UFW:** Active, default **deny (incoming)** / allow (outgoing/routed). Explicit rules include `443/tcp (LIMIT)`, `29902/tcp (ALLOW)`, `32400/tcp (ALLOW)`, `14014/tcp,udp (ALLOW)`, `9090/tcp (ALLOW)`, `5012/tcp (ALLOW)`, `35643/tcp (ALLOW)`. **No rule for 80/tcp.**
 - **Listeners:** `:80` and `:443` are listening via Docker (Traefik) on v4 and v6.
 - **nftables:** Only **libvirt** tables/chains are present (guest_*), no custom rulesets beyond libvirt.
@@ -143,7 +143,7 @@
 
 > **Implication:** External HTTP→HTTPS redirects will be blocked at the host firewall unless 80/tcp is allowed in UFW. ACME is unaffected (TLS-ALPN-01 uses 443).
 
-## 3.2 **Docker networks inventory**
+## 3.2 Docker networks inventory
 Bridge networks present:
 - `apprise`, `bridge` (default), `hoarder_local`, `homepage-net`, `immich_immich`,
   `mealie_local`, `media`, `ocis_full_ocis-net`, `paperless_internal`, `plane-app_local`,
@@ -152,7 +152,7 @@ Bridge networks present:
 **Traefik attachment:** `proxy` (reverse-proxy front-door).
 **Other notable networks:** `homepage-net` (used to surface apps on the homepage).
 
-## 3.3 **Reverse proxy & certificates (Traefik)**
+## 3.3 Reverse proxy & certificates (Traefik)
 - **Deployment:** Docker, image tag **`traefik:latest`**, configured **via labels** (file provider not used). Logs volume at `./logs:/var/log`.
 - **Entrypoints:**
   - `web` → `:80` (HTTP)
@@ -163,12 +163,12 @@ Bridge networks present:
   - **Challenge:** **TLS-ALPN-01 = enabled**; **HTTP-01 = disabled**; DNS-01 = disabled
   - **Storage:** `/certs/acme.json` **inside a Docker named volume (`certs`)**; not host-bind-mounted (permissions managed in-container).
 
-## 3.4 **ACME challenges & HTTP→HTTPS behavior**
+## 3.4 ACME challenges & HTTP→HTTPS behavior
 - **Challenge path:** TLS-ALPN-01 on `:443` only (works without `:80`).
 - **HTTP→HTTPS:** Redirect is configured in Traefik, **but UFW does not currently allow 80/tcp**; external HTTP requests won’t reach Traefik to be redirected. If you want browser-level redirects from plain HTTP, add a UFW allow (or keep 80 blocked and rely on direct HTTPS/HSTS).
 - **IPv6:** No AAAA records for `*.simoserver.it`; public ACME/traffic is IPv4-only (Traefik still listens on v6 locally).
 
-## 3.5 **Fail2ban coverage & integration**
+## 3.5 Fail2ban coverage & integration
 - **Actions backend:** **iptables** (`iptables-multiport`, `iptables-allports`).
   - Hooks: `INPUT` (for `sshd`), **`DOCKER-USER`** (for containerized services) → bans are **global** across all container ports.
   - Reject mode: `REJECT --reject-with icmp(6)-port-unreachable`.
@@ -183,7 +183,7 @@ Bridge networks present:
 **External reachability (router forwards):** `29902/tcp` (SSH), `80/tcp`, `443/tcp`, *(qBittorrent `6881/tcp,udp` — legacy; can be removed while the stack is stopped).*
 
 
-# 4. **Identity & Access Control**
+# 4. Identity & Access Control
 
 ## 4.1 Authelia SSO: protected services & policies
 
@@ -248,7 +248,7 @@ _Notes_
 - Secrets are stored alongside each compose in `.env`/`secrets` and owned by **uid/gid 1000** (values redacted in this report).
 - If desired, we can enumerate each stack’s exact **env var names** from the compose files and list them here with values redacted.
 
-# 5. **Storage, Data & Backups**
+# 5. Storage, Data & Backups
 
 **Summary:**
 - SSD `/dev/sda` (Btrfs) hosts OS and `/var/*`; HDD `/dev/sdb` (Btrfs) hosts app data via dedicated subvolumes mounted under `/docker-volumes/*` and bound into Docker named volumes.
@@ -257,7 +257,7 @@ _Notes_
 
 ---
 
-### 5.1 Disk layout & mounts (Btrfs)
+## 5.1 Disk layout & mounts (Btrfs)
 - **Physical disks**
   - `sda` – 240 GB **Kingston SA400S37240G** (SSD) → `btrfs` root with subvolumes:
     - `/` → `subvol=@`, plus `/@home`, `/@cache`, `/@log`, `/@tmp`, `/@srv`, `/@swap`, `/@quemu-storage-pool`, and Snapper subvols under `/.snapshots`, `/home/.snapshots`.
@@ -271,7 +271,7 @@ _Notes_
 
 ---
 
-### 5.2 Docker volumes by stack (selected mapping)
+## 5.2 Docker volumes by stack (selected mapping)
 > All paths below resolve under `/var/lib/docker/volumes/<name>/_data` and are backed by `/docker-volumes/@<name>` (with `.<snapshots>` alongside) unless noted.
 
 - **Reverse proxy (Traefik)**
@@ -309,7 +309,7 @@ _Notes_
 
 ---
 
-### 5.3 Media library paths & permissions
+## 5.3 Media library paths & permissions
 - **Primary library**: `/home/simone/media-lib`
   - Owner: **torrents:torrents (UID/GID 1002)**; mode **0777** (broad by design).
   - Top-level dirs observed: `media/`, `torrents/`, `usenet/` (0777), and private `/.Trash-1002` (0700).
@@ -318,7 +318,7 @@ _Notes_
 
 ---
 
-### 5.4 Snapper configs & retention (managed by **btrfs2cloud-backup**)
+## 5.4 Snapper configs & retention (managed by btrfs2cloud-backup)
 - **Configs present** (non-exhaustive): `root`, `home`, `immich-{pgdata,upload}`, `paperless-{data,media,pgdata}`, `mealie-{data,pgdata}`, `ocis-{config,data}`, `kavita-config`, `jellyfin-config`, `silverbullet-space`, `plane-{db,uploads}`, `hoarder-data`, `spliit-db`, … *(all have matching `.<snapshots>` subvols).*
 - **Retention (examples):**
   - `root` / `home`
@@ -331,7 +331,7 @@ _Notes_
 
 ---
 
-### 5.5 Backup/restore notes & snapshot locations
+## 5.5 Backup/restore notes & snapshot locations
 - **Mechanism:** `btrfs2cloud-backup` (one unit per dataset)
   - Creates a **Snapper** snapshot (`type=single`, `config=<name>`), then streams via:
     - `btrfs send` → `zstd -<level>` → **OpenSSL AES-256** → `rclone rcat` to `${CLOUD_NAME}:${BUCKET_NAME}/${config_name}/`.
@@ -357,15 +357,15 @@ _Notes_
 **Out of scope / empty:** `/quemu-storage-pool` (present, currently empty).
 
 
-# 6. **Monitoring, Logging & Alerting**
+# 6. Monitoring, Logging & Alerting
 
-**6.1 Netdata, Watchtower, Fail2ban — notification targets (Telegram)**
+## 6.1 Netdata, Watchtower, Fail2ban — notification targets (Telegram)
 - **Netdata (containerized)**: runs with `pid: host` and `network_mode: host`; claimed to Netdata Cloud via `NETDATA_CLAIM_*`. Alerting uses **native `health_alarm_notify` → Telegram** (bot token & chat ID **redacted**). No custom silences/overrides—defaults in effect.
 - **Watchtower**: polls **hourly** (`WATCHTOWER_POLL_INTERVAL=3600`), exposes metrics/API (tokened) and sends **Telegram** notifications via **Shoutrrr URL**. No cron `--schedule`, no `--cleanup` flag (old images not auto-pruned), and **no label filtering** → monitors all running containers.
 - **Fail2ban**: jails = `authelia, immich, jellyfin, jellyseerr, paperless, sshd, traefik`. Actions are host-level **iptables** (INPUT / DOCKER-USER). Notifications use a **custom `action.d/apprise.conf`** to post to the **Apprise** container (Telegram target). No IPs currently banned.
 - **Apprise hub**: central notifier used by **btrfs2cloud** and **Fail2ban** (and available to others). Primary tag/topic: `admin`.
 
-**6.2 Logging backends**
+## 6.2 Logging backends
 - **Immich**: logs to **journald** (chosen so Fail2ban can match via `journalmatch` on the container unit).
 - **Traefik**: writes app/file logs under its bound `./logs` directory (used by Fail2ban).
 - **Other services**: standard Docker logging plus app-level file logs for Fail2ban. Docker’s global default is `json-file`; several services **override** to `logging.driver: local` and set size caps.
@@ -373,7 +373,7 @@ _Notes_
     - `netdata`: `driver=local`, `max-size=10m`, `max-file=3`
     - `watchtower`: `driver=local`, `max-size=10m`, `max-file=2`
 
-**6.3 Log rotation status (host & containers)**
+## 6.3 Log rotation status (host & containers)
 - **Host (journald)**: default retention (no custom `journald.conf`).
 - **Docker logs**: no global `log-opts` in `daemon.json`; **per-service** caps/rotation are set in many compose files (see examples above). Where not set, Docker log growth follows the driver’s defaults.
 - **App file logs**: Fail2ban-watched files (e.g., **Traefik `./logs`**, Paperless/Jellyfin/Jellyseerr paths) currently **have no external logrotate** configured.
@@ -448,7 +448,7 @@ _Notes_
 - **Networks:** `proxy`, `internal`, `homepage-net`
 - **Health:** web healthcheck `curl http://localhost:8000` (OK)
 
-### Mealie (**issue: unhealthy**)
+### Mealie (issue: unhealthy)
 - **Image:** `ghcr.io/mealie-recipes/mealie:latest`
 - **Ports:** behind Traefik (service port `9000`)
 - **Volumes:** `mealie-data:/app/data/`
@@ -487,7 +487,7 @@ _Notes_
 - **Networks:** `homepage-net`, Homarr also `proxy`
 - **Ingress:** Homarr via `${PUBLIC_HOMEPAGE_DOMAIN}` (TLS)
 
-### Plane (makeplane) — **broken**
+### Plane (makeplane) — broken
 - **Images:** `makeplane/plane-backend:stable` (api/worker/beat/migrator), `makeplane/plane-live:stable`, `plane-frontend`, `plane-space`, `plane-admin`, plus `postgres:15.7-alpine`, `valkey:7.2.5-alpine`, `rabbitmq:3.13`, `minio:latest`
 - **Ports:** proxied via Traefik by the `proxy` service (target `80`)
 - **Volumes:** `plane-db:/var/lib/postgresql/data`, `plane-uploads:/export`, `logs_*`, `redisdata`, `rabbitmq_data`
@@ -506,7 +506,7 @@ _Notes_
 - **Networks:** `proxy`, `local`, `homepage-net`
 - **Health:** DB healthcheck `pg_isready` OK
 
-### Jellyfin & Servarr suite (**stopped**)
+### Jellyfin & Servarr suite (stopped)
 - **Images (planned):** `jellyfin/jellyfin`, `linuxserver/*` (qbittorrent, jackett, prowlarr, sonarr, radarr, readarr), `flaresolverr`
 - **Ports (when running):** various host ports (e.g., 8078, 6881/tcp+udp, 9117, 9696, 8989, 7878, 8787)
 - **Volumes:** `jellyfin-config`, `jellyfin-cache`, `media-lib` (UID/GID 1002), plus per-app configs
@@ -524,7 +524,7 @@ _Notes_
 
 ---
 
-## 7.3 Exposed services & ingress routes (`*.simoserver.it` via Traefik)
+## 7.3 Exposed services & ingress routes (*.simoserver.it via Traefik)
 
 | Domain (env)                | Router / Target Port | Middleware | Notes |
 |----------------------------|----------------------|------------|-------|
@@ -584,10 +584,10 @@ _Notes_
 
 
 
-# 9. **Reverse Proxy & Certificates (Deep Dive)**
+# 8. Reverse Proxy & Certificates (Deep Dive)
 **Point-in-time:** 2025-08-16T18:58:39+02:00 (Europe/Rome)
 
-### 9.1 Traefik entrypoints, routers, middlewares
+## 8.1 Traefik entrypoints, routers, middlewares
 **Entrypoints**
 - `web` → `:80` (enabled)
   Redirects all HTTP to HTTPS via entrypoint redirection.
@@ -614,7 +614,7 @@ _Notes_
 
 ---
 
-### 9.2 ACME resolvers & challenge types
+## 8.2 ACME resolvers & challenge types
 **Resolver**
 - Name: `leresolver`
 - Email: `${EMAIL}`
@@ -636,7 +636,7 @@ _Notes_
 
 ---
 
-### 9.3 Access/error logging & security headers
+## 8.3 Access/error logging & security headers
 **Access logging (current)**
 - Enabled: `--accesslog=true`
 - Path: `/var/log/access.log` → host bind `./logs/access.log`
@@ -715,10 +715,10 @@ Then on routers (via labels) set `traefik.http.routers.<name>.tls.options=modern
   *(Leave disabled if you prefer to keep the surface minimal.)*
 * **\[Note] Forwarded header trust lists** remain off (no CDN/LB in front). If you add one later, configure `entryPoints.*.forwardedHeaders.trustedIPs` accordingly.
 
-# 10. **Notifications & Webhooks**
+# 9. Notifications & Webhooks
 **As of:** 2025-08-16T18:58:39+02:00 (Europe/Rome)
 
-## 10.1 **Apprise topics/targets in use**
+## 9.1 Apprise topics/targets in use
 - **Transports:** Telegram only (two chats).
   - **admin** → administrators’ Telegram chat.
   - **users** (implicit; used historically by Jellyfin + power events) → general user Telegram chat.
@@ -727,7 +727,7 @@ Then on routers (via labels) set `traefik.http.routers.<name>.tls.options=modern
   - **Fail2ban**: custom action `apprise.conf` (host) used by jails to send ban/unban to Apprise.
 - **Endpoint exposure:** Apprise HTTP API on **:8005** (LAN-only by design; not forwarded on the router).
 
-## 10.2 **Other app-specific notifications / webhooks**
+## 9.2 Other app-specific notifications / webhooks
 - **btrfs2cloud** (backup script): posts to Apprise REST (`/notify/apprise`) with tag **admin** (start/finish + cleanup details).
 - **Fail2ban**: uses **custom action.d → Apprise** to Telegram (ban/unban events).
 - **Power events**: **startup** and **poweroff** scripts send to Apprise (users channel).
@@ -742,7 +742,7 @@ Then on routers (via labels) set `traefik.http.routers.<name>.tls.options=modern
   - `sender: simoserver.it@gmail.com`
   - TLS `server_name: smtp.gmail.com`, `skip_verify: false`
 
-## 10.3 **Telegram channel routing**
+## 9.3 Telegram channel routing
 - **Netdata** → **admin** chat (alerts).
 - **Watchtower** → **admin** chat (update reports & summaries).
 - **Fail2ban** → **admin** chat (ban/unban).
@@ -754,7 +754,7 @@ Then on routers (via labels) set `traefik.http.routers.<name>.tls.options=modern
 - **Noise control:** no global throttling/rate-limit rules today; consider enabling selective severities (e.g., Netdata WARN/CRIT only) and Apprise message de-duplication if chatter increases.
 - **Security:** keep Apprise’s **:8005** HTTP strictly LAN-only; optional: add a small **fail2ban** jail for its access log or a simple Traefik-forward-auth if ever exposed.
 
-# 13. **OCIS (ownCloud Infinite Scale)**
+# 10. OCIS (ownCloud Infinite Scale)
 
 **Status @ 2025-08-16 18:58:39+02:00**
 - Public FQDN: **ocis.simoserver.it** (via Traefik).
@@ -762,7 +762,7 @@ Then on routers (via labels) set `traefik.http.routers.<name>.tls.options=modern
 - Health: `collabora` **healthy**; others **up** (no healthcheck).
 - Watchtower: `monitor-only` labels set (no auto-updates).
 
-### 13.1 Production setup overview
+## 10.1 Production setup overview
 - **Ingress & exposure**
   - Traefik router: `Host(ocis.simoserver.it)` → service port **9200**.
   - TLS terminated at Traefik (Let’s Encrypt **TLS-ALPN-01**). Backend leg plain HTTP (**PROXY_TLS=false**).
@@ -778,7 +778,7 @@ Then on routers (via labels) set `traefik.http.routers.<name>.tls.options=modern
 - **Notifications**
   - OCIS `notifications` service enabled; SMTP configured (Gmail). See 13.2.
 
-### 13.2 Storage, identity, and TLS integration
+## 10.2 Storage, identity, and TLS integration
 - **Storage**
   - Primary backend: **local filesystem** (no S3NG).
   - Named volumes: **`ocis-config`** (config) and **`ocis-data`** (user/content data).
@@ -800,9 +800,9 @@ Then on routers (via labels) set `traefik.http.routers.<name>.tls.options=modern
 - **OnlyOffice entries in app-registry:** Present for convenience, but **service not deployed**; keep Collabora as sole editor to avoid lock/interop issues.
 - **Hardening (optional):** consider Traefik `tls.options` (min TLS 1.2+, modern ciphers, SNI strict) and adding HTTP security headers middleware; HTTP/3 is **not** enabled by design.
 
-# 14. Access Patterns & Users
+# 11. Access Patterns & Users
 
-## 14.1 Usage profile (<10 users, internet-facing)
+## 11.1 Usage profile (<10 users, internet-facing)
 - **Audience/roles:** ~6–10 users total, **1 admin**.
 - **Auth mix today:** many services behind **Authelia SSO**, but **some apps still use local accounts** → **migration to SSO is pending**.
 - **2FA:** **not universally enforced**; varies by service.
@@ -818,7 +818,7 @@ Then on routers (via labels) set `traefik.http.routers.<name>.tls.options=modern
   - No VPN requirement; SSO is considered sufficient today.
 - **Traffic pattern:** no clear peak; usage evenly spread.
 
-## 14.2 Rate limits / protections (current state)
+## 11.2 Rate limits / protections (current state)
 - **Reverse proxy (Traefik):**
   - **No rate-limit middleware** configured (defaults only).
   - Global redirect HTTP→HTTPS; access log captures **4xx** (not 5xx).
@@ -844,9 +844,9 @@ Then on routers (via labels) set `traefik.http.routers.<name>.tls.options=modern
 7. **Close direct DB exposure**: remove host-level `:5432` for Spliit unless required, or firewall it narrowly.
 
 
-# 15. **Security & Hardening**
+# 12. Security & Hardening
 
-### 15.1 Host hardening summary
+## 12.1 Host hardening summary
 - **Base OS:** Arch Linux (kernel 6.15.3), headless. Time sync via `systemd-timesyncd` (active).
 - **Firewall (UFW):** Default **deny (incoming)** / allow (outgoing). Explicit rules include:
   - `443/tcp` (**LIMIT IN**), custom SSH `29902/tcp` (**ALLOW IN**), plus 32400, 14014/tcp+udp, 9090/tcp, 5012, 35643. One explicit **DENY** for `3.85.226.144`. v6 rules mirror many v4 allows.
@@ -863,7 +863,7 @@ Then on routers (via labels) set `traefik.http.routers.<name>.tls.options=modern
 
 ---
 
-### 15.2 Secrets at rest — locations & permissions (UID 1000)
+## 12.2 Secrets at rest — locations & permissions (UID 1000)
 - **`.env` files (per stack)** — examples under `*/.env`:
   - Current perms are mostly **`0644`** (world-readable). **Action:** set to **`0600`** and keep owner `simone:simone` (UID 1000).
   - Suggested one-liner to fix across the repo (run at repo root):
@@ -880,7 +880,7 @@ Then on routers (via labels) set `traefik.http.routers.<name>.tls.options=modern
 
 ---
 
-### 15.3 Recommendations & quick wins (impact vs effort)
+## 12.3 Recommendations & quick wins (impact vs effort)
 
 > Legend — **Impact:** 🟥 high / 🟧 medium / 🟨 low. **Effort:** ⬇ low / ⬆ medium / ⬆⬆ high.
 > Notes include **warnings & consequences** where applicable.

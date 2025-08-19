@@ -237,6 +237,8 @@ services:
       traefik.http.routers.jellyseerr.service: jellyseerr-svc
       traefik.http.services.jellyseerr-svc.loadbalancer.server.port: "5055"
 
+      traefik.http.routers.jellyseerr.middlewares: secure-headers@file
+
       homepage.group: Media
       homepage.name: Discover
       homepage.icon: jellyseerr.svg

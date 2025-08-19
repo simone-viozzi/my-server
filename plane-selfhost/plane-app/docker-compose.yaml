@@ -318,6 +318,8 @@ services:
       traefik.http.routers.plane.tls.certresolver: "leresolver"
       traefik.http.services.plane.loadbalancer.server.port: "80"
 
+      traefik.http.routers.plane.middlewares: secure-headers@file
+
       homepage.group: Other
       homepage.name: Plane
       homepage.icon: plane.svg

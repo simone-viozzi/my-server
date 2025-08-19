@@ -22,7 +22,7 @@ services:
       traefik.http.routers.silverbullet.service: silverbullet-svc
       traefik.http.services.silverbullet-svc.loadbalancer.server.port: "3000"
 
-      traefik.http.routers.silverbullet.middlewares: authelia@docker
+      traefik.http.routers.silverbullet.middlewares: authelia@docker,secure-headers@file
 
       homepage.group: Other
       homepage.name: Silverbullet

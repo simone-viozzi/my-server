@@ -40,8 +40,8 @@ services:
       - '--entryPoints.websecure=true'
       - '--entrypoints.websecure.address=:443'
 
-      - '--entryPoints.web.http.redirections.entryPoint.to=websecure'
-      - '--entryPoints.web.http.redirections.entryPoint.scheme=https'
+      - '--providers.file.directory=/etc/traefik/dynamic'
+      - '--ocsp=true'
 
       #- '--entryPoints.web.forwardedHeaders.insecure=false'
       #- '--entryPoints.web.proxyProtocol.insecure=false'
@@ -62,12 +62,12 @@ services:
       # - '--entryPoints.https.proxyProtocol.trustedIPs=10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,fc00::/7'
 
     ports:
-      - "80:80"
       - "443:443"
     volumes:
       - ./logs:/var/log
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - certs:/certs/
+      - ./dynamic:/etc/traefik/dynamic:ro
     labels:
       # Enable Traefik and specify network
       traefik.enable: "true"
@@ -82,16 +82,10 @@ services:
 
       traefik.http.routers.traefik.service: api@internal
 
-      # Attach Authentik authentication middleware to the Traefik router
-      traefik.http.routers.traefik.middlewares: authelia@docker
+      # Attach Authentik authentication middleware and secure headers to the Traefik router
+      traefik.http.routers.traefik.middlewares: authelia@docker,secure-headers@file
 
-      # global redirect to https
-      #traefik.http.routers.http-catchall.rule: hostregexp(`{host:.+}`)
-      #traefik.http.routers.http-catchall.entrypoints: web
-      #traefik.http.routers.http-catchall.middlewares: redirect-to-https
 
-      # middleware redirect
-      traefik.http.middlewares.redirect-to-https.redirectscheme.scheme: https
 
       homepage.group: Network
       homepage.name: Traefik

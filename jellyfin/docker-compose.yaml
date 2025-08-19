@@ -31,6 +31,8 @@ services:
       traefik.http.routers.jellyfin.tls: "true"
       traefik.http.routers.jellyfin.tls.certResolver: leresolver
 
+      traefik.http.routers.jellyfin.middlewares: secure-headers@file
+
       ### Middleware
       #- "traefik.http.routers.jellyfin.middlewares=jellyfin-mw"
       ##### The customResponseHeaders option lists the Header names and values to apply to the response.

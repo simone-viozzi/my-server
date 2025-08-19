@@ -17,7 +17,7 @@ services:
       traefik.http.routers.spliit-app.service: spliit-app-svc
       traefik.http.services.spliit-app-svc.loadbalancer.server.port: "3000"
 
-      traefik.http.routers.spliit-app.middlewares: authelia@docker
+      traefik.http.routers.spliit-app.middlewares: authelia@docker,secure-headers@file
 
       homepage.group: Other
       homepage.name: Spliit

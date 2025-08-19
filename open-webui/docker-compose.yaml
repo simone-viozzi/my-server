@@ -17,6 +17,8 @@ services:
       traefik.http.routers.gpt.service: gpt-svc
       traefik.http.services.gpt-svc.loadbalancer.server.port: "8080"
 
+      traefik.http.routers.gpt.middlewares: secure-headers@file
+
       homepage.group: Other
       homepage.name: ChatGpt
       homepage.icon: chatgpt.png

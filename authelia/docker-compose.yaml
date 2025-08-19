@@ -34,6 +34,9 @@ services:
       # - 'traefik.http.middlewares.authelia.forwardAuth.address=http://authelia:9091/api/authz/forward-auth?authelia_url=https%3A%2F%2Fauth.example.com%2F'
       traefik.http.middlewares.authelia.forwardAuth.trustForwardHeader: "true"
       traefik.http.middlewares.authelia.forwardAuth.authResponseHeaders: Remote-User,Remote-Groups,Remote-Email,Remote-Name
+
+      traefik.http.routers.authelia.middlewares: secure-headers@file
+
     restart: unless-stopped
     logging:
       driver: "local"

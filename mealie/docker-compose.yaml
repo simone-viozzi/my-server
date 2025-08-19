@@ -47,12 +47,24 @@ services:
 
       traefik.http.routers.mealie.service: mealie-svc
       traefik.http.services.mealie-svc.loadbalancer.server.port: "9000"
+
+      traefik.http.routers.mealie.middlewares: secure-headers@file
+
+      homepage.group: Other
+      homepage.name: mealie
+      homepage.icon: mealie.svg
+      homepage.widget.type: mealie
+      homepage.widget.url: http://mealie:9000
+      homepage.widget.key: ${MEALIE_HTTP_API_TOKEN}
+      homepage.widget.version: 2
+
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - proxy
       - local
+      - homepage-net
     logging:
       driver: "local"
       options:
@@ -92,3 +104,5 @@ networks:
   proxy:
     external: true
   local:
+  homepage-net:
+    external: true

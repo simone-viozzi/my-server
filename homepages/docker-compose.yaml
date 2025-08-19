@@ -25,6 +25,7 @@ services:
       proxy:
     environment:
       BASE_URL: ${PUBLIC_HOMEPAGE_DOMAIN}
+      # TODO move to .env (?)
       SECRET_ENCRYPTION_KEY: 03b507e0f8ece816e0bc72c90370341df0467c4303d754278f4786efddba23d0
     volumes:
       - ./homarr/configs:/app/data/configs
@@ -44,6 +45,8 @@ services:
       traefik.http.routers.homepage.tls.certresolver: leresolver
       traefik.http.routers.homepage.tls: "true"
       traefik.http.services.homepage.loadbalancer.server.port: "7575"
+      traefik.http.routers.homepage.middlewares: secure-headers@file
+
     restart: unless-stopped
 
 networks:

@@ -74,6 +74,8 @@ services:
       traefik.http.routers.paperless.service: paperless-svc
       traefik.http.services.paperless-svc.loadbalancer.server.port: "8000"
 
+      traefik.http.routers.paperless.middlewares: secure-headers@file
+
       homepage.group: Media
       homepage.name: Paperless-ngx
       homepage.icon: paperless-ngx.svg

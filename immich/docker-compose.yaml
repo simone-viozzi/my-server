@@ -33,6 +33,8 @@ services:
       # set watchtower to monitor only and do not perform the update
       com.centurylinklabs.watchtower.monitor-only: "true"
 
+      traefik.http.routers.media-immich-api.middlewares: secure-headers@file
+
       homepage.group: Media
       homepage.name: Immich
       homepage.icon: immich.svg

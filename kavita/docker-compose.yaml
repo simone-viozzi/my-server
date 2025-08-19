@@ -25,6 +25,8 @@ services:
       traefik.http.routers.kavita.service: kavita-svc
       traefik.http.services.kavita-svc.loadbalancer.server.port: "5000"
 
+      traefik.http.routers.kavita.middlewares: secure-headers@file
+
       homepage.group: Media
       homepage.name: Kavita
       homepage.icon: kavita.svg

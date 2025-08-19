@@ -28,6 +28,8 @@ services:
       traefik.http.routers.hoarder-web.service: hoarder-web-svc
       traefik.http.services.hoarder-web-svc.loadbalancer.server.port: "3000"
 
+      traefik.http.routers.hoarder-web.middlewares: secure-headers@file
+
       homepage.group: Other
       homepage.name: Hoarder
       homepage.icon: hoarder.png

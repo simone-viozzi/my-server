@@ -1,7 +1,7 @@
 ---
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
     - id: check-yaml
     - id: end-of-file-fixer
@@ -10,3 +10,9 @@ repos:
     rev: v3.0.1
     hooks:
     - id: docker-compose-check
+  - repo: https://github.com/simone-viozzi/rusty-todo-md-pre-commit
+    rev: v1.9.1  # Use the latest upstream tag (shim mirrors upstream)
+    hooks:
+      - id: rusty-todo-md
+        args: ["--auto-add", "--markers", "TODO", "FIXME", "HACK"]
+        language_version: python3.13

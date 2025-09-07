@@ -1,2 +1,0 @@
-- [ ] remove the arr stack
-- [ ] remove jellyfin

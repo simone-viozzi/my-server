@@ -210,49 +210,6 @@ services:
         max-file: "3"
     restart: unless-stopped
 
-  #TODO to be removed
-  jellyseerr:
-    image: fallenbagel/jellyseerr:latest
-    container_name: jellyseerr
-    environment:
-      LOG_LEVEL: debug
-      TZ: Europe/Rome
-    ports:
-      - 5055:5055
-    networks:
-      media:
-      proxy:
-      homepage-net:
-    volumes:
-      - ./jellyseerr_logs:/app/config/logs
-      - jellyseerr-config:/app/config
-    labels:
-      traefik.enable: "true"
-      traefik.docker.network: proxy
-
-      traefik.http.routers.jellyseerr.rule: "Host(`${JELLYSEERR_DOMAIN}`)"
-      traefik.http.routers.jellyseerr.entryPoints: websecure
-
-      traefik.http.routers.jellyseerr.tls.certresolver: leresolver
-      traefik.http.routers.jellyseerr.tls: "true"
-      traefik.http.routers.jellyseerr.service: jellyseerr-svc
-      traefik.http.services.jellyseerr-svc.loadbalancer.server.port: "5055"
-
-      traefik.http.routers.jellyseerr.middlewares: secure-headers@file
-
-      homepage.group: Media
-      homepage.name: Discover
-      homepage.icon: jellyseerr.svg
-      homepage.href: https://${JELLYSEERR_DOMAIN}
-      homepage.widget.type: jellyseerr
-      homepage.widget.url: http://jellyseerr:5055
-      homepage.widget.key: ${JELLYSEERR_API_KEY}
-    logging:
-      driver: "local"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    restart: unless-stopped
 
 networks:
   media:
@@ -279,8 +236,6 @@ volumes:
   radarr-config:
     external: true
   readarr-config:
-    external: true
-  jellyseerr-config:
     external: true
   media-lib:
     external: true

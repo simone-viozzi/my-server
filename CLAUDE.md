@@ -8,34 +8,41 @@ NixOS flake-based configuration for a home server (x86_64-linux, AMD CPU, btrfs 
 
 ## Build & Deploy
 
-The system is **not flake-based yet**. The flake only provides a devShell (claude-code + mcp-nixos). The NixOS config is applied traditionally:
-
 ```bash
-# Rebuild and switch (copies config to /etc/nixos/ first)
-sudo nixos-rebuild switch
+# Build the full system (validate changes compile)
+nix build .#nixosConfigurations.server.config.system.build.toplevel
 
-# Build without switching (dry run / test)
-sudo nixos-rebuild build
+# Rebuild and switch using nh (preferred)
+nh os switch .
 
-# Test (switch but don't add to bootloader)
-sudo nixos-rebuild test
+# Rebuild and switch using nixos-rebuild
+sudo nixos-rebuild switch --flake .
 
-# Format nix files (nixfmt-rfc-style is installed on the system)
+# Build without switching (dry run with diff)
+nh os build .
+
+# Format nix files
 nixfmt configuration.nix
 
 # Enter dev shell (has claude-code and mcp-nixos)
 nix develop
 ```
 
+**Important:** New `.nix` files must be `git add`ed before `nix build` — flakes only see tracked files.
+
 ## Architecture
 
-**Current state:** Early-stage traditional NixOS config — a single `configuration.nix` imports `hardware-configuration.nix`. Not yet flake-based for system builds.
+`flake.nix` defines `nixosConfigurations.server` and a devShell (claude-code + mcp-nixos).
 
-**Target architecture** (from `_reference/`): The config should evolve toward a modular NixOS flake with:
-- `flake.nix` defining `nixosConfigurations.<hostname>` (not just a devShell)
-- `configuration.nix` as a thin import list
-- `modules/` directory with focused modules (base, networking, users, docker, per-container)
-- `home-manager` for user-level config
+`configuration.nix` is a thin entry point that imports modules and sets host-specific config (hostname, user, stateVersion).
+
+`modules/` contains focused modules:
+- `base.nix` — boot, timezone, locale, nix settings, base packages, core services (SSH, direnv, nix-ld)
+- `nh.nix` — nh rebuild helper + automatic GC (15 days, 4 generations)
+
+**Target architecture** (from `_reference/`): The config should evolve toward:
+- More modules: networking, users, docker, per-container modules under `modules/containers/`
+- `home-manager` for user-level config (shell, git, tools)
 - `sops-nix` for secrets management
 
 ## Reference Configuration
@@ -53,8 +60,6 @@ The `_reference/` directory (gitignored) contains a working homelab NixOS config
 - External Docker networks: `proxy`, `homepage-net`, `dockerproxy`
 - Btrfs-backed volumes for persistent data, plain volumes for disposable data
 
-**nh** is used for NixOS rebuilds and GC (keeps 15 days, 4 generations).
-
 ## MCP Tools Available
 
 - **mcp-nixos**: Query NixOS options, packages, and Home Manager options. Use for looking up correct option names and types.
@@ -64,3 +69,4 @@ The `_reference/` directory (gitignored) contains a working homelab NixOS config
 
 - Use `nixfmt-rfc-style` formatting (the RFC 166 style)
 - Follow the module pattern from `_reference/`: each concern in its own file under `modules/`
+- New files must be `git add`ed before building (flake requirement)

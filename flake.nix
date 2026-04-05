@@ -6,6 +6,11 @@
     flake-utils.url = "github:numtide/flake-utils";
     claude-code.url = "github:sadjow/claude-code-nix";
     mcp-nixos.url = "github:utensils/mcp-nixos";
+
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -15,6 +20,7 @@
       flake-utils,
       claude-code,
       mcp-nixos,
+      home-manager,
       ...
     }:
     {
@@ -24,6 +30,13 @@
         modules = [
           ./configuration.nix
           ./hardware-configuration.nix
+
+          home-manager.nixosModules.home-manager
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.users.simone = import ./home/simone.nix;
+          }
         ];
       };
     }

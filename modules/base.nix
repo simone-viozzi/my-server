@@ -39,7 +39,7 @@
     vim
     wget
     git
-    nixfmt-rfc-style
+    nixfmt
   ];
 
   # Console

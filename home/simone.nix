@@ -113,7 +113,11 @@
           name = "simone-viozzi";
           email = "simoneviozzi97@gmail.com";
         };
-        core.editor = "vim";
+        core.editor = "code --wait";
+        diff.tool = "vscode";
+        difftool.vscode.cmd = "code --wait --diff $LOCAL $REMOTE";
+        merge.tool = "vscode";
+        mergetool.vscode.cmd = "code --wait $MERGED";
         color.ui = "auto";
         branch.sort = "-committerdate";
         tag.sort = "-v:refname";

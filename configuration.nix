@@ -1,8 +1,9 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   imports = [
     ./modules/base.nix
+    ./modules/networking.nix
     ./modules/nh.nix
   ];
 
@@ -20,6 +21,9 @@
     extraGroups = [
       "networkmanager"
       "wheel"
+    ];
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJu0KWT56ZtuFnWuQvGnuNZo/36n4XJ4d6cyxfgTFMBH simone@simoserver"
     ];
   };
 

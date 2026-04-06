@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   # Timezone & locale
@@ -17,9 +17,13 @@
   };
 
   # Boot loader (systemd-boot on EFI)
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.systemd-boot.configurationLimit = 10;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader = {
+    systemd-boot = {
+      enable = true;
+      configurationLimit = 10;
+    };
+    efi.canTouchEfiVariables = true;
+  };
 
   # Nix settings
   nix.settings = {
@@ -46,7 +50,6 @@
   console.keyMap = "us";
 
   # Core services
-  services.openssh.enable = true;
   programs.nix-ld.enable = true;
   programs.direnv.enable = true;
 }

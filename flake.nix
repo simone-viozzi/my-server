@@ -5,22 +5,24 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     claude-code.url = "github:sadjow/claude-code-nix";
-    mcp-nixos.url = "github:utensils/mcp-nixos";
-
     home-manager = {
       url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
   outputs =
     {
-      self,
       nixpkgs,
       flake-utils,
       claude-code,
-      mcp-nixos,
       home-manager,
+      git-hooks,
       ...
     }:
     {
@@ -33,9 +35,11 @@
 
           home-manager.nixosModules.home-manager
           {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.users.simone = import ./home/simone.nix;
+            home-manager = {
+              useGlobalPkgs = true;
+              useUserPackages = true;
+              users.simone = import ./home/simone.nix;
+            };
           }
         ];
       };
@@ -50,9 +54,24 @@
             config.allowUnfree = true;
             overlays = [ claude-code.overlays.default ];
           };
+
+          pre-commit-check = git-hooks.lib.${system}.run {
+            src = ./.;
+            hooks = {
+              nixfmt.enable = true;
+              deadnix.enable = true;
+              statix.enable = true;
+              flake-checker.enable = true;
+            };
+          };
         in
         {
+          checks = {
+            inherit pre-commit-check;
+          };
+
           devShells.default = pkgs.mkShell {
+            inherit (pre-commit-check) shellHook;
             packages = [
               pkgs.claude-code
               pkgs.mcp-nixos

@@ -114,31 +114,41 @@
           email = "simoneviozzi97@gmail.com";
         };
         core.editor = "code --wait";
-        diff.tool = "vscode";
+        color.ui = "auto";
+        init.defaultBranch = "main";
+        help.autocorrect = "prompt";
+        commit.verbose = true;
+        pull.rebase = true;
+        diff = {
+          tool = "vscode";
+          algorithm = "histogram";
+          colorMoved = "zebra";
+          mnemonicprefix = true;
+          renames = true;
+        };
         difftool.vscode.cmd = "code --wait --diff $LOCAL $REMOTE";
         merge.tool = "vscode";
         mergetool.vscode.cmd = "code --wait $MERGED";
-        color.ui = "auto";
         branch.sort = "-committerdate";
         tag.sort = "-v:refname";
-        init.defaultBranch = "main";
-        diff.algorithm = "histogram";
-        diff.colorMoved = "zebra";
-        diff.mnemonicprefix = true;
-        diff.renames = true;
-        push.autoSetupRemote = true;
-        push.followTags = true;
-        fetch.prune = true;
-        fetch.pruneTags = true;
-        fetch.all = true;
-        help.autocorrect = "prompt";
-        commit.verbose = true;
-        rerere.enabled = true;
-        rerere.autoupdate = true;
-        rebase.autosquash = true;
-        rebase.autoStash = true;
-        rebase.updateRefs = true;
-        pull.rebase = true;
+        push = {
+          autoSetupRemote = true;
+          followTags = true;
+        };
+        fetch = {
+          prune = true;
+          pruneTags = true;
+          all = true;
+        };
+        rerere = {
+          enabled = true;
+          autoupdate = true;
+        };
+        rebase = {
+          autosquash = true;
+          autoStash = true;
+          updateRefs = true;
+        };
 
         credential."https://github.com".helper = [
           ""

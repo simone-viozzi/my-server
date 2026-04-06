@@ -9,4 +9,5 @@ result
 
 # End of https://www.toptal.com/developers/gitignore/api/direnv
 .mcp.json
+.pre-commit-config.yaml
 _reference

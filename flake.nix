@@ -65,12 +65,12 @@
               };
               statix = {
                 enable = true;
-
                 entry = "${pkgs.statix}/bin/statix fix";
               };
               flake-checker.enable = true;
             };
           };
+
         in
         {
           checks = {

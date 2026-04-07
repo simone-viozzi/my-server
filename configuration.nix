@@ -7,8 +7,10 @@
     ./modules/nh.nix
   ];
 
-  networking.hostName = "simoserver";
-  networking.networkmanager.enable = true;
+  networking = {
+    hostName = "simoserver";
+    networkmanager.enable = true;
+  };
 
   # Enable zsh system-wide (required when it's a user's login shell)
   programs.zsh.enable = true;

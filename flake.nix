@@ -59,8 +59,15 @@
             src = ./.;
             hooks = {
               nixfmt.enable = true;
-              deadnix.enable = true;
-              statix.enable = true;
+              deadnix = {
+                enable = true;
+                args = [ "--edit" ];
+              };
+              statix = {
+                enable = true;
+
+                entry = "${pkgs.statix}/bin/statix fix";
+              };
               flake-checker.enable = true;
             };
           };
@@ -75,6 +82,7 @@
             packages = [
               pkgs.claude-code
               pkgs.mcp-nixos
+              pkgs.nixd
             ];
           };
         }

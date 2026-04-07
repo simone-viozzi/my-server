@@ -173,4 +173,8 @@
 
     home-manager.enable = true;
   };
+
+  home.packages = [
+    pkgs.gh
+  ];
 }

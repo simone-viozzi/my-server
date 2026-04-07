@@ -1,0 +1,20 @@
+{
+    "nixEnvSelector.nixFile": "${workspaceFolder}/flake.nix",
+    "nix.enableLanguageServer": true,                                                                                                                                                          
+    "nix.serverPath": "nixd",                                                                                                                                                                  
+    "nix.serverSettings": {                                                                                                                                                                  
+      "nixd": {                                                                                                                                                                                
+        "formatting": {
+          "command": ["nixfmt"]                                                                                                                                                                
+        },                                                                                                                                                                                   
+        "options": {                                                                                                                                                                         
+          "nixos": {
+            "expr": "(builtins.getFlake \"/home/simone/nixos\").nixosConfigurations.simoserver.options"
+          },                                                                                                                                                                                   
+          "home-manager": {
+            "expr": "(builtins.getFlake \"/home/simone/nixos\").homeConfigurations.simone.options"                                                                                             
+          }                                                                                                                                                                                    
+        }                                                                                                                                                                                    
+      }                                                                                                                                                                                        
+    }
+}

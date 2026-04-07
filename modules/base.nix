@@ -50,6 +50,7 @@
   console.keyMap = "us";
 
   # Core services
+  programs.zsh.enable = true;
   programs.nix-ld.enable = true;
   programs.direnv.enable = true;
 }

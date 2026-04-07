@@ -10,6 +10,8 @@ _:
     options = [
       "subvol=@data"
       "noatime"
+      "compress=zstd"
+      "nofail"
     ];
   };
 
@@ -25,8 +27,9 @@ _:
     device = "/dev/disk/by-uuid/3d2df933-a2fb-4042-8cf3-b61e157dddb0";
     fsType = "btrfs";
     options = [
+      "subvol=@"
       "ro"
-      "noatime"
+      "nofail"
     ];
   };
 }

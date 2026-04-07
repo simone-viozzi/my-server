@@ -38,6 +38,7 @@
         tree = "eza -F --icons --tree";
         df = "duf";
         diff = "delta";
+        pod-logs = "for svc in $(systemctl list-units --type=service --all 'podman-*.service' --no-legend | awk '{print $1}'); do echo \"=== $svc ===\"; systemctl status \"$svc\" --no-pager -n3 2>&1; echo; done";
       };
       history = {
         size = 50000;
@@ -102,6 +103,23 @@
 
         (lib.mkAfter ''
           [[ ! -f "${config.xdg.configHome}/zsh/.p10k.zsh" ]] || source "${config.xdg.configHome}/zsh/.p10k.zsh"
+
+          # Show last logs for a podman container service: pod-log traefik
+          pod-log() {
+            local svc="podman-''${1}.service"
+            journalctl "_SYSTEMD_INVOCATION_ID=$(systemctl show -p InvocationID --value "$svc")" --no-pager
+          }
+
+          # Edit a binary sops file with proper decryption/re-encryption
+          sops-edit() {
+            local f="''${1}"
+            local tmp
+            tmp=$(mktemp --suffix=.yml)
+            sops -d --input-type binary --output-type binary "$f" > "$tmp" || { rm "$tmp"; return 1; }
+            eval "''${EDITOR:-vim} \"$tmp\""
+            sops -e -i --input-type binary --output-type binary --filename-override "$f" "$tmp" || { rm "$tmp"; return 1; }
+            mv "$tmp" "$f"
+          }
         '')
       ];
     };
@@ -176,5 +194,6 @@
 
   home.packages = [
     pkgs.gh
+    pkgs.sops
   ];
 }

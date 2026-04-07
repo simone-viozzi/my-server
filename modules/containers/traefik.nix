@@ -1,0 +1,119 @@
+{ config, ... }:
+
+{
+  # ── Sops secrets (needed for placeholder access in templates) ─────────
+  sops.secrets.base_domain = { };
+  sops.secrets.acme_email = { };
+
+  # ── Sops templates ────────────────────────────────────────────────────
+
+  # ACME email via env var (Traefik reads TRAEFIK_* env vars for static config)
+  sops.templates."traefik.env" = {
+    content = ''
+      TRAEFIK_CERTIFICATESRESOLVERS_LERESOLVER_ACME_EMAIL=${config.sops.placeholder.acme_email}
+    '';
+  };
+
+  # Dynamic config: non-secret middleware/TLS (no placeholders, but co-located
+  # with routing files so Traefik reads one directory)
+  sops.templates."traefik-headers.yaml".content =
+    builtins.readFile ../../files/traefik-dynamic/headers.yaml;
+  sops.templates."traefik-tls.yaml".content = builtins.readFile ../../files/traefik-dynamic/tls.yaml;
+  sops.templates."traefik-authelia-mw.yaml".content =
+    builtins.readFile ../../files/traefik-dynamic/authelia.yaml;
+
+  # Dynamic config: traefik dashboard routing (domain from sops)
+  sops.templates."traefik-routing.yaml".content = ''
+    http:
+      routers:
+        traefik:
+          rule: "Host(`traefik.${config.sops.placeholder.base_domain}`)"
+          entryPoints:
+            - websecure
+          tls:
+            certResolver: leresolver
+          middlewares:
+            - authelia
+            - secure-headers
+          service: api@internal
+  '';
+
+  # ── Container ─────────────────────────────────────────────────────────
+
+  virtualisation.oci-containers.containers.traefik = {
+    image = "traefik:v3.6.11@sha256:acfc80650104f0194a15f73dc1648f517561bc1645391a15705332a064cfc33c";
+
+    environmentFiles = [
+      config.sops.templates."traefik.env".path
+    ];
+
+    cmd = [
+      "--api=true"
+      "--global.sendAnonymousUsage=false"
+      "--global.checkNewVersion=false"
+      "--log=true"
+      "--log.level=INFO"
+      "--certificatesresolvers.leresolver.acme.storage=/certs/acme.json"
+      "--certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web"
+      "--certificatesresolvers.leresolver.acme.tlschallenge=false"
+      "--certificatesresolvers.leresolver.acme.httpchallenge=true"
+      "--accesslog=true"
+      "--accessLog.filters.statusCodes=400-499"
+      "--entryPoints.web=true"
+      "--entryPoints.web.address=:80"
+      "--entryPoints.web.http.redirections.entryPoint.to=websecure"
+      "--entryPoints.web.http.redirections.entryPoint.scheme=https"
+      "--entryPoints.websecure=true"
+      "--entryPoints.websecure.address=:443"
+      "--providers.file.directory=/etc/traefik/dynamic"
+      "--ocsp=true"
+    ];
+
+    ports = [
+      "80:80"
+      "443:443"
+    ];
+
+    volumes = [
+      "traefik-certs:/certs"
+      "${config.sops.templates."traefik-headers.yaml".path}:/etc/traefik/dynamic/headers.yaml:ro"
+      "${config.sops.templates."traefik-tls.yaml".path}:/etc/traefik/dynamic/tls.yaml:ro"
+      "${config.sops.templates."traefik-authelia-mw.yaml".path}:/etc/traefik/dynamic/authelia-mw.yaml:ro"
+      "${config.sops.templates."traefik-routing.yaml".path}:/etc/traefik/dynamic/traefik.yaml:ro"
+    ];
+
+    labels = {
+      "homepage.group" = "Network";
+      "homepage.name" = "Traefik";
+      "homepage.icon" = "traefik.svg";
+    };
+
+    log-driver = "journald";
+
+    extraOptions = [
+      "--network=proxy"
+      "--network=homepage-net"
+    ];
+  };
+
+  # ── Systemd ordering ─────────────────────────────────────────────────
+
+  systemd.services.podman-traefik = {
+    after = [
+      "podman-network-proxy.service"
+      "podman-network-homepage-net.service"
+      "podman-volume-traefik-certs.service"
+    ];
+    requires = [
+      "podman-network-proxy.service"
+      "podman-network-homepage-net.service"
+      "podman-volume-traefik-certs.service"
+    ];
+  };
+
+  # Podman doesn't bypass iptables like Docker — open HTTP/HTTPS ports
+  networking.firewall.allowedTCPPorts = [
+    80
+    443
+  ];
+}

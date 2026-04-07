@@ -1,11 +1,14 @@
 _:
 
+let
+  constants = import ../lib/constants.nix;
+in
 {
   # ── HDD (WD Red 4TB, btrfs) ──────────────────────────────────────────
   # Bulk storage disk with btrfs subvolumes for container data.
   # @data subvolume used as staging/scratch area.
   fileSystems."/home/simone/data" = {
-    device = "/dev/disk/by-uuid/f0a2893d-bb2f-4b41-ba46-2089fc40266a";
+    device = "/dev/disk/by-uuid/${constants.hddUUID}";
     fsType = "btrfs";
     options = [
       "subvol=@data"

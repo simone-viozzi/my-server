@@ -1,0 +1,16 @@
+http:
+  middlewares:
+    secure-headers:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true
+        frameDeny: true
+        contentTypeNosniff: true
+        referrerPolicy: "strict-origin-when-cross-origin"
+        permissionsPolicy: >-
+          accelerometer=(), ambient-light-sensor=(),
+          autoplay=(), camera=(), clipboard-read=(), clipboard-write=(),
+          display-capture=(), geolocation=(), gyroscope=(),
+          magnetometer=(), microphone=(), midi=(), payment=(), usb=()

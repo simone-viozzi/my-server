@@ -74,7 +74,7 @@
     log-driver = "journald";
 
     extraOptions = [
-      "--network=proxy"
+      "--network=podman"
     ];
   };
 
@@ -82,11 +82,9 @@
 
   systemd.services.podman-authelia = {
     after = [
-      "podman-network-proxy.service"
       "podman-volume-authelia-data.service"
     ];
     requires = [
-      "podman-network-proxy.service"
       "podman-volume-authelia-data.service"
     ];
   };

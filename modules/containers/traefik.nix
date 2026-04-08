@@ -91,8 +91,7 @@
     log-driver = "journald";
 
     extraOptions = [
-      "--network=proxy"
-      "--network=homepage-net"
+      "--network=podman"
     ];
   };
 
@@ -100,13 +99,9 @@
 
   systemd.services.podman-traefik = {
     after = [
-      "podman-network-proxy.service"
-      "podman-network-homepage-net.service"
       "podman-volume-traefik-certs.service"
     ];
     requires = [
-      "podman-network-proxy.service"
-      "podman-network-homepage-net.service"
       "podman-volume-traefik-certs.service"
     ];
   };

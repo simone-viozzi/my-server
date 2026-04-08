@@ -8,18 +8,23 @@ in
 {
   # Create a systemd oneshot that ensures a Podman network exists
   # Lifecycle: unused networks/volumes get cleaned up by Podman's weekly autoPrune
-  mkNetworkService = name: {
-    description = "Ensure Podman network: ${name}";
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = pkgs.writeShellScript "podman-network-${name}" ''
-        ${pkgs.podman}/bin/podman network inspect ${name} >/dev/null 2>&1 || \
-          ${pkgs.podman}/bin/podman network create ${name}
-      '';
+  mkNetworkService =
+    name:
+    {
+      internal ? false,
+    }:
+    {
+      description = "Ensure Podman network: ${name}";
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = pkgs.writeShellScript "podman-network-${name}" ''
+          ${pkgs.podman}/bin/podman network inspect ${name} >/dev/null 2>&1 || \
+            ${pkgs.podman}/bin/podman network create ${if internal then "--internal " else ""}${name}
+        '';
+      };
     };
-  };
 
   # Create a systemd oneshot that ensures a plain Podman volume exists
   # (for disposable/regenerable data like certs, caches)

@@ -7,8 +7,6 @@ _:
     enable = true;
     allowedTCPPorts = [
       29902 # SSH
-      80
-      443
     ];
   };
 

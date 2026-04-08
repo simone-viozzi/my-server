@@ -75,6 +75,9 @@
 
     extraOptions = [
       "--network=podman"
+      "--cap-drop=ALL"
+      "--security-opt=no-new-privileges:true"
+      "--tmpfs=/tmp"
     ];
   };
 

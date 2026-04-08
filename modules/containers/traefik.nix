@@ -58,7 +58,6 @@
       "--certificatesresolvers.leresolver.acme.tlschallenge=false"
       "--certificatesresolvers.leresolver.acme.httpchallenge=true"
       "--accesslog=true"
-      "--accessLog.filters.statusCodes=400-499"
       "--entryPoints.web=true"
       "--entryPoints.web.address=:80"
       "--entryPoints.web.http.redirections.entryPoint.to=websecure"
@@ -92,6 +91,10 @@
 
     extraOptions = [
       "--network=podman"
+      "--cap-drop=ALL"
+      "--cap-add=NET_BIND_SERVICE"
+      "--security-opt=no-new-privileges:true"
+      "--read-only"
     ];
   };
 

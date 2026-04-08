@@ -21,7 +21,6 @@ in
       # Note: stopped containers are NOT removed by system prune
       flags = [
         "--all"
-        "--volumes"
       ];
     };
   };

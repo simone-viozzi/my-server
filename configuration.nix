@@ -10,6 +10,8 @@
     ./modules/podman.nix
     ./modules/containers/traefik.nix
     ./modules/containers/authelia.nix
+    ./modules/containers/apprise.nix
+    ./modules/notifications.nix
   ];
 
   networking = {

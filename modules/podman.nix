@@ -36,5 +36,6 @@ in
     podman-volume-traefik-certs = mkVolumeService "traefik-certs";
     # Btrfs-backed volumes (persistent data on HDD)
     podman-volume-authelia-data = mkBtrfsVolumeService "authelia-data" "authelia-data";
+    podman-volume-apprise-config = mkBtrfsVolumeService "apprise-config" "apprise-config";
   };
 }

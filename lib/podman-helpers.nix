@@ -24,10 +24,12 @@ in
             ${pkgs.podman}/bin/podman network create ${if internal then "--internal " else ""}${name}
         '';
       };
+      onFailure = [ "notify-failure@%n.service" ];
     };
 
   # Create a systemd oneshot that ensures a plain Podman volume exists
   # (for disposable/regenerable data like certs, caches)
+  # TODO add the option to select what disk to use
   mkVolumeService = name: {
     description = "Ensure Podman volume: ${name}";
     wantedBy = [ "multi-user.target" ];
@@ -39,6 +41,7 @@ in
           ${pkgs.podman}/bin/podman volume create ${name}
       '';
     };
+    onFailure = [ "notify-failure@%n.service" ];
   };
 
   # Create a systemd oneshot that ensures a Podman volume backed by
@@ -59,5 +62,6 @@ in
       RemainAfterExit = true;
       ExecStart = "${pkgs.bash}/bin/bash ${ensureBtrfsVolume} ${volumeName} ${subvolName} ${hddUUID}";
     };
+    onFailure = [ "notify-failure@%n.service" ];
   };
 }

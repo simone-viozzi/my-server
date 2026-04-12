@@ -15,6 +15,7 @@
     ];
   };
 
+  # TODO mhh to be removed... you can't run stuff with sudo
   # Passwordless sudo for single-user homelab
   security.sudo.wheelNeedsPassword = false;
 }

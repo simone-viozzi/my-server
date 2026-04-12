@@ -10,27 +10,26 @@ let
 
   cfg = config.services.homepage;
 
-  # ── YAML generator ──────────────────────────────────────────────────
-  # Converts homepage entries into Homepage's services.yaml format.
-
-  renderEntry =
-    e:
-    "    - ${e.name}:\n"
-    + "        icon: ${e.icon}\n"
-    + "        href: ${e.href}\n"
-    + lib.optionalString (
-      e.container != ""
-    ) "        server: docker\n        container: ${e.container}\n"
-    + lib.optionalString (e.description != "") "        description: ${e.description}\n";
-
-  renderGroup = name: entries: "- ${name}:\n" + lib.concatMapStrings renderEntry entries;
+  # ── Services YAML generator ──────────────────────────────────────────
+  # Builds Homepage's services.yaml from entry options.
+  # JSON is valid YAML — Homepage's js-yaml parser accepts it.
 
   mkServicesYaml =
     entries:
     let
       grouped = builtins.groupBy (e: e.group) entries;
+      mkEntry = e: {
+        ${e.name} = {
+          inherit (e) icon href;
+        }
+        // lib.optionalAttrs (e.container != "") {
+          server = "docker";
+          inherit (e) container;
+        }
+        // lib.optionalAttrs (e.description != "") { inherit (e) description; };
+      };
     in
-    "---\n" + lib.concatStringsSep "\n" (lib.mapAttrsToList renderGroup grouped) + "\n";
+    builtins.toJSON (lib.mapAttrsToList (name: es: { ${name} = map mkEntry es; }) grouped);
 
   # ── Config files ────────────────────────────────────────────────────
 

@@ -1,8 +1,7 @@
 { pkgs, ... }:
 
 let
-  notifyFailure = ../scripts/notify-failure.sh;
-  appriseUrl = "http://localhost:8000/notify/apprise";
+  inherit (import ../lib/notify.nix { inherit pkgs; }) notify;
 in
 {
   systemd.services = {
@@ -12,14 +11,27 @@ in
       description = "Failure notification for %i";
       serviceConfig = {
         Type = "oneshot";
-        ExecStart = "${pkgs.bash}/bin/bash ${notifyFailure} %i";
+        ExecStart = pkgs.writeShellScript "notify-failure" ''
+          UNIT="$1"
+          JOURNAL=$(${pkgs.systemd}/bin/journalctl -u "''${UNIT}" -n 20 --no-pager 2>/dev/null || echo "(could not read journal)")
+
+          ${notify} "''${UNIT} failed on $(${pkgs.hostname}/bin/hostname). Check: journalctl -u ''${UNIT}"
+
+          ${pkgs.util-linux}/bin/wall <<EOF
+          === SYSTEMD UNIT FAILED ===
+          Unit: ''${UNIT}
+          Time: $(date)
+
+          Check logs:
+            journalctl -u ''${UNIT}
+            systemctl status ''${UNIT}
+
+          Last journal lines:
+          ''${JOURNAL}
+          EOF
+        '';
       };
-      path = [
-        pkgs.curl
-        pkgs.systemd
-        pkgs.util-linux
-        pkgs.hostname
-      ];
+      scriptArgs = "%i";
     };
 
     # ── Boot notification ─────────────────────────────────────────────
@@ -34,17 +46,12 @@ in
         "podman-apprise.service"
       ];
       wantedBy = [ "multi-user.target" ];
+      # TODO if the service is declared this way each time i do nh os switch it gets triggered
       serviceConfig = {
         Type = "oneshot";
         # Give apprise a moment to start accepting requests
         ExecStartPre = "${pkgs.coreutils}/bin/sleep 5";
-        ExecStart = pkgs.writeShellScript "boot-notify" ''
-          ${pkgs.curl}/bin/curl -sf -X POST "${appriseUrl}" \
-            -H "Content-Type: application/json" \
-            -d '{"body": "simoserver is online!"}' \
-            --connect-timeout 5 \
-            --max-time 10 || true
-        '';
+        ExecStart = ''${notify} "simoserver is online!"'';
       };
     };
 
@@ -54,14 +61,8 @@ in
       serviceConfig = {
         Type = "oneshot";
         ExecStart = pkgs.writeShellScript "safe-poweroff" ''
-          # Notify: shutting down
-          ${pkgs.curl}/bin/curl -sf -X POST "${appriseUrl}" \
-            -H "Content-Type: application/json" \
-            -d '{"body": "simoserver shutting down in 10 minutes"}' \
-            --connect-timeout 5 \
-            --max-time 10 || true
+          ${notify} "simoserver shutting down in 10 minutes"
 
-          # Wait 10 minutes
           sleep 600
 
           # Wait for btrfs2cloud backup lock (if running)
@@ -71,22 +72,11 @@ in
             ${pkgs.util-linux}/bin/flock "$LOCK_FILE" true
           fi
 
-          # Final notification
-          ${pkgs.curl}/bin/curl -sf -X POST "${appriseUrl}" \
-            -H "Content-Type: application/json" \
-            -d '{"body": "simoserver powering off now"}' \
-            --connect-timeout 5 \
-            --max-time 10 || true
+          ${notify} "simoserver powering off now"
 
           ${pkgs.systemd}/bin/systemctl poweroff
         '';
       };
-      path = [
-        pkgs.curl
-        pkgs.coreutils
-        pkgs.util-linux
-        pkgs.systemd
-      ];
     };
   };
 }

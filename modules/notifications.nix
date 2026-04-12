@@ -10,7 +10,7 @@ in
       description = "Failure notification for %i";
       serviceConfig = {
         Type = "oneshot";
-        ExecStart = pkgs.writeShellScript "notify-failure" ''
+        ExecStart = "${pkgs.writeShellScript "notify-failure" ''
           UNIT="$1"
           JOURNAL=$(${pkgs.systemd}/bin/journalctl -u "''${UNIT}" -n 20 --no-pager 2>/dev/null || echo "(could not read journal)")
 
@@ -28,9 +28,8 @@ in
           Last journal lines:
           ''${JOURNAL}
           EOF
-        '';
+        ''} %i";
       };
-      scriptArgs = "%i";
     };
 
     # ── Boot notification ─────────────────────────────────────────────

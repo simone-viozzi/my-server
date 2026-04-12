@@ -1,8 +1,6 @@
 { pkgs }:
 
 let
-  constants = import ./constants.nix;
-  inherit (constants) hddUUID;
   ensureBtrfsVolume = ../scripts/ensure-btrfs-volume.sh;
 in
 {
@@ -45,10 +43,10 @@ in
   };
 
   # Create a systemd oneshot that ensures a Podman volume backed by
-  # a btrfs subvolume on the HDD exists.
-  # Usage: mkBtrfsVolumeService "immich-upload" "immich-upload"
+  # a btrfs subvolume exists.
+  # Usage: mkBtrfsVolumeService "immich-upload" "immich-upload" hddUUID
   #   -> podman volume "immich-upload" backed by subvol docker-volumes/@immich-upload
-  mkBtrfsVolumeService = volumeName: subvolName: {
+  mkBtrfsVolumeService = volumeName: subvolName: deviceUUID: {
     description = "Ensure Podman btrfs volume: ${volumeName}";
     wantedBy = [ "multi-user.target" ];
     path = [
@@ -60,7 +58,7 @@ in
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
-      ExecStart = "${pkgs.bash}/bin/bash ${ensureBtrfsVolume} ${volumeName} ${subvolName} ${hddUUID}";
+      ExecStart = "${pkgs.bash}/bin/bash ${ensureBtrfsVolume} ${volumeName} ${subvolName} ${deviceUUID}";
     };
     onFailure = [ "notify-failure@%n.service" ];
   };

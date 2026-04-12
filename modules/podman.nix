@@ -8,6 +8,8 @@
 let
   helpers = import ../lib/podman-helpers.nix { inherit pkgs; };
   inherit (helpers) mkNetworkService mkVolumeService mkBtrfsVolumeService;
+  constants = import ../lib/constants.nix;
+  inherit (constants) hddUUID;
 
 in
 {
@@ -58,7 +60,7 @@ in
       podman-volume-homepage-config-private = mkVolumeService "homepage-config-private";
 
       # Btrfs-backed volumes (persistent data on HDD)
-      podman-volume-authelia-data = mkBtrfsVolumeService "authelia-data" "authelia-data";
-      podman-volume-apprise-config = mkBtrfsVolumeService "apprise-config" "apprise-config";
+      podman-volume-authelia-data = mkBtrfsVolumeService "authelia-data" "authelia-data" hddUUID;
+      podman-volume-apprise-config = mkBtrfsVolumeService "apprise-config" "apprise-config" hddUUID;
     };
 }

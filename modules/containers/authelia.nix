@@ -65,12 +65,6 @@
       TZ = "Europe/Rome";
     };
 
-    labels = {
-      "homepage.group" = "Network";
-      "homepage.name" = "Authelia";
-      "homepage.icon" = "authelia.svg";
-    };
-
     log-driver = "journald";
 
     extraOptions = [
@@ -91,4 +85,16 @@
       "podman-volume-authelia-data.service"
     ];
   };
+
+  # ── Homepage entry ──────────────────────────────────────────────────
+
+  services.homepage.entries = [
+    {
+      group = "Network";
+      name = "Authelia";
+      icon = "authelia.svg";
+      href = "https://authelia.${config.sops.placeholder.base_domain}";
+      container = "authelia";
+    }
+  ];
 }

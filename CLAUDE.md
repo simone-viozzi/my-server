@@ -10,7 +10,7 @@ NixOS flake-based configuration for a home server (x86_64-linux, AMD CPU, btrfs 
 
 ```bash
 # Build the full system (validate changes compile)
-nix build .#nixosConfigurations.server.config.system.build.toplevel
+nix build .#nixosConfigurations.simoserver.config.system.build.toplevel
 
 # Rebuild and switch using nh (preferred)
 nh os switch .
@@ -32,7 +32,7 @@ nix develop
 
 ## Architecture
 
-`flake.nix` defines `nixosConfigurations.server` and a devShell (claude-code + mcp-nixos).
+`flake.nix` defines `nixosConfigurations.simoserver` and a devShell (claude-code + mcp-nixos).
 
 `configuration.nix` is a thin entry point that imports modules and sets host-specific config (hostname, user, stateVersion).
 

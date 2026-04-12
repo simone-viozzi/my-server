@@ -51,12 +51,6 @@
       TZ = "Europe/Rome";
     };
 
-    labels = {
-      "homepage.group" = "Update & Monitor";
-      "homepage.name" = "Apprise";
-      "homepage.icon" = "apprise.svg";
-    };
-
     log-driver = "journald";
 
     extraOptions = [
@@ -77,4 +71,16 @@
       "podman-volume-apprise-config.service"
     ];
   };
+
+  # ── Homepage entry ──────────────────────────────────────────────────
+
+  services.homepage.entries = [
+    {
+      group = "Update & Monitor";
+      name = "Apprise";
+      icon = "apprise.svg";
+      href = "https://apprise.${config.sops.placeholder.base_domain}";
+      container = "apprise";
+    }
+  ];
 }

@@ -11,6 +11,8 @@
     ./modules/containers/traefik.nix
     ./modules/containers/authelia.nix
     ./modules/containers/apprise.nix
+    ./modules/containers/dockerproxy.nix
+    ./modules/containers/homepage.nix
     ./modules/notifications.nix
   ];
 

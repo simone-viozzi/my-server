@@ -81,12 +81,6 @@
       "${config.sops.templates."traefik-routing.yaml".path}:/etc/traefik/dynamic/traefik.yaml:ro"
     ];
 
-    labels = {
-      "homepage.group" = "Network";
-      "homepage.name" = "Traefik";
-      "homepage.icon" = "traefik.svg";
-    };
-
     log-driver = "journald";
 
     extraOptions = [
@@ -113,5 +107,17 @@
   networking.firewall.allowedTCPPorts = [
     80
     443
+  ];
+
+  # ── Homepage entry ──────────────────────────────────────────────────
+
+  services.homepage.entries = [
+    {
+      group = "Network";
+      name = "Traefik";
+      icon = "traefik.svg";
+      href = "https://traefik.${config.sops.placeholder.base_domain}";
+      container = "traefik";
+    }
   ];
 }

@@ -2,7 +2,7 @@
 
 let
   helpers = import ../lib/podman-helpers.nix { inherit pkgs; };
-  inherit (helpers) mkVolumeService mkBtrfsVolumeService;
+  inherit (helpers) mkNetworkService mkVolumeService mkBtrfsVolumeService;
 
 in
 {
@@ -27,13 +27,23 @@ in
 
   virtualisation.oci-containers.backend = "podman";
 
+  # ── Networks ──────────────────────────────────────────────────────────
+  # Default "podman" network: all containers, DNS-enabled.
+  # "isolated" internal network: no external access, for sensitive services
+  # (dockerproxy, databases). Containers needing both Traefik routing AND
+  # isolated access join both networks (safe — multi-network bug only
+  # affects port-publishing containers, i.e. Traefik).
+
   # ── Volumes ───────────────────────────────────────────────────────────
-  # All containers use the default "podman" network (no custom networks needed).
-  # If we later need isolation for sensitive containers, add an internal network:
-  #   podman-network-isolated = mkNetworkService "isolated" { internal = true; };
   systemd.services = {
+    # Networks
+    podman-network-isolated = mkNetworkService "isolated" { internal = true; };
+
     # Plain volumes (disposable/regenerable data)
     podman-volume-traefik-certs = mkVolumeService "traefik-certs";
+    podman-volume-homepage-config-public = mkVolumeService "homepage-config-public";
+    podman-volume-homepage-config-private = mkVolumeService "homepage-config-private";
+
     # Btrfs-backed volumes (persistent data on HDD)
     podman-volume-authelia-data = mkBtrfsVolumeService "authelia-data" "authelia-data";
     podman-volume-apprise-config = mkBtrfsVolumeService "apprise-config" "apprise-config";

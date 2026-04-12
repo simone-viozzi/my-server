@@ -27,6 +27,9 @@ _:
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
       "--read-only"
+      "--sdnotify=healthy"
+      "--health-cmd=wget -qO- http://localhost:2375/version || exit 1"
+      "--health-interval=5s"
       "--health-start-period=30s"
     ];
   };
@@ -40,6 +43,8 @@ _:
     requires = [
       "podman-network-isolated.service"
     ];
+    serviceConfig.Type = "notify";
+    serviceConfig.NotifyAccess = "all";
     onFailure = [ "notify-failure@%n.service" ];
   };
 }

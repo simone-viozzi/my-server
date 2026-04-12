@@ -196,5 +196,6 @@
     pkgs.gh
     pkgs.sops
     pkgs.htop
+    pkgs.jq
   ];
 }

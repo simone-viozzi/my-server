@@ -65,6 +65,11 @@ in
       podman-volume-authelia-data = mkBtrfsVolumeService "authelia-data" "authelia-data" hddUUID;
       podman-volume-apprise-config = mkBtrfsVolumeService "apprise-config" "apprise-config" hddUUID;
 
+      # SilverBullet volumes
+      podman-volume-silverbullet-space =
+        mkBtrfsVolumeService "silverbullet-space" "silverbullet-space"
+          hddUUID;
+
       # Immich volumes
       podman-volume-immich-upload = mkBtrfsVolumeService "immich-upload" "immich-upload" hddUUID;
       podman-volume-immich-pgdata = mkBtrfsVolumeService "immich-pgdata" "immich-pgdata" nvmeUUID;

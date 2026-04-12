@@ -14,6 +14,7 @@
     ./modules/containers/dockerproxy.nix
     ./modules/containers/homepage.nix
     ./modules/containers/immich.nix
+    ./modules/containers/silverbullet.nix
     ./modules/notifications.nix
   ];
 

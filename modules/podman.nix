@@ -1,4 +1,9 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
 
 let
   helpers = import ../lib/podman-helpers.nix { inherit pkgs; };
@@ -27,25 +32,33 @@ in
 
   virtualisation.oci-containers.backend = "podman";
 
-  # ── Networks ──────────────────────────────────────────────────────────
-  # Default "podman" network: all containers, DNS-enabled.
-  # "isolated" internal network: no external access, for sensitive services
-  # (dockerproxy, databases). Containers needing both Traefik routing AND
-  # isolated access join both networks (safe — multi-network bug only
-  # affects port-publishing containers, i.e. Traefik).
+  # ── Auto-apply onFailure to all containers ────────────────────────────
+  # NixOS's immutable /etc prevents global systemd drop-ins, so we apply
+  # onFailure per-container here instead.
+  systemd.services =
+    (lib.mapAttrs' (
+      name: _:
+      lib.nameValuePair "podman-${name}" {
+        onFailure = [ "notify-failure@%n.service" ];
+      }
+    ) config.virtualisation.oci-containers.containers)
+    // {
+      # ── Networks ──────────────────────────────────────────────────────
+      # Default "podman" network: all containers, DNS-enabled.
+      # "isolated" internal network: no external access, for sensitive services
+      # (dockerproxy, databases). Containers needing both Traefik routing AND
+      # isolated access join both networks (safe — multi-network bug only
+      # affects port-publishing containers, i.e. Traefik).
+      podman-network-isolated = mkNetworkService "isolated" { internal = true; };
 
-  # ── Volumes ───────────────────────────────────────────────────────────
-  systemd.services = {
-    # Networks
-    podman-network-isolated = mkNetworkService "isolated" { internal = true; };
+      # ── Volumes ───────────────────────────────────────────────────────
+      # Plain volumes (disposable/regenerable data)
+      podman-volume-traefik-certs = mkVolumeService "traefik-certs";
+      podman-volume-homepage-config-public = mkVolumeService "homepage-config-public";
+      podman-volume-homepage-config-private = mkVolumeService "homepage-config-private";
 
-    # Plain volumes (disposable/regenerable data)
-    podman-volume-traefik-certs = mkVolumeService "traefik-certs";
-    podman-volume-homepage-config-public = mkVolumeService "homepage-config-public";
-    podman-volume-homepage-config-private = mkVolumeService "homepage-config-private";
-
-    # Btrfs-backed volumes (persistent data on HDD)
-    podman-volume-authelia-data = mkBtrfsVolumeService "authelia-data" "authelia-data";
-    podman-volume-apprise-config = mkBtrfsVolumeService "apprise-config" "apprise-config";
-  };
+      # Btrfs-backed volumes (persistent data on HDD)
+      podman-volume-authelia-data = mkBtrfsVolumeService "authelia-data" "authelia-data";
+      podman-volume-apprise-config = mkBtrfsVolumeService "apprise-config" "apprise-config";
+    };
 }

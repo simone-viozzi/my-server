@@ -6,7 +6,6 @@ in
 {
   systemd.services = {
     # ── Failure notification template ─────────────────────────────────
-    # Any unit can use: onFailure = [ "notify-failure@%n.service" ];
     "notify-failure@" = {
       description = "Failure notification for %i";
       serviceConfig = {

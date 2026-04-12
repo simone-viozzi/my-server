@@ -204,7 +204,6 @@ in
         "--cap-drop=ALL"
         "--security-opt=no-new-privileges:true"
         "--tmpfs=/tmp"
-        "--health-start-period=30s"
       ];
     };
 
@@ -238,7 +237,6 @@ in
         "--cap-drop=ALL"
         "--security-opt=no-new-privileges:true"
         "--tmpfs=/tmp"
-        "--health-start-period=30s"
       ];
     };
 
@@ -259,7 +257,6 @@ in
         config.sops.templates."homepage-services-public.yaml".content
         config.sops.templates."homepage-public.env".content
       ];
-      onFailure = [ "notify-failure@%n.service" ];
     };
 
     systemd.services.podman-homepage-private = {
@@ -277,20 +274,6 @@ in
         config.sops.templates."homepage-services-private.yaml".content
         config.sops.templates."homepage-private.env".content
       ];
-      onFailure = [ "notify-failure@%n.service" ];
     };
-
-    # ── Homepage entry ──────────────────────────────────────────────────
-
-    services.homepage.entries = [
-      {
-        group = "Network";
-        name = "Homepage";
-        icon = "homepage.svg";
-        href = "https://homepage-private.${config.sops.placeholder.base_domain}";
-        container = "homepage-private";
-        public = true;
-      }
-    ];
   };
 }

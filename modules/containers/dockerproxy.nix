@@ -45,6 +45,5 @@ _:
     ];
     serviceConfig.Type = "notify";
     serviceConfig.NotifyAccess = "all";
-    onFailure = [ "notify-failure@%n.service" ];
   };
 }

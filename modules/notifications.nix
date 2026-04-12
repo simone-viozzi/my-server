@@ -46,9 +46,9 @@ in
         "podman-apprise.service"
       ];
       wantedBy = [ "multi-user.target" ];
-      # TODO if the service is declared this way each time i do nh os switch it gets triggered
       serviceConfig = {
         Type = "oneshot";
+        RemainAfterExit = true;
         # Give apprise a moment to start accepting requests
         ExecStartPre = "${pkgs.coreutils}/bin/sleep 5";
         ExecStart = ''${notify} "simoserver is online!"'';

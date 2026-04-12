@@ -13,6 +13,7 @@
     ./modules/containers/apprise.nix
     ./modules/containers/dockerproxy.nix
     ./modules/containers/homepage.nix
+    ./modules/containers/immich.nix
     ./modules/notifications.nix
   ];
 

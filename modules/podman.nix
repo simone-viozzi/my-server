@@ -9,7 +9,7 @@ let
   helpers = import ../lib/podman-helpers.nix { inherit pkgs; };
   inherit (helpers) mkNetworkService mkVolumeService mkBtrfsVolumeService;
   constants = import ../lib/constants.nix;
-  inherit (constants) hddUUID;
+  inherit (constants) hddUUID nvmeUUID;
 
 in
 {
@@ -42,6 +42,8 @@ in
       name: _:
       lib.nameValuePair "podman-${name}" {
         onFailure = [ "notify-failure@%n.service" ];
+        # SIGTERM (143) is normal for container stops — don't treat as failure
+        serviceConfig.SuccessExitStatus = "143";
       }
     ) config.virtualisation.oci-containers.containers)
     // {
@@ -62,5 +64,10 @@ in
       # Btrfs-backed volumes (persistent data on HDD)
       podman-volume-authelia-data = mkBtrfsVolumeService "authelia-data" "authelia-data" hddUUID;
       podman-volume-apprise-config = mkBtrfsVolumeService "apprise-config" "apprise-config" hddUUID;
+
+      # Immich volumes
+      podman-volume-immich-upload = mkBtrfsVolumeService "immich-upload" "immich-upload" hddUUID;
+      podman-volume-immich-pgdata = mkBtrfsVolumeService "immich-pgdata" "immich-pgdata" nvmeUUID;
+      podman-volume-immich-model-cache = mkVolumeService "immich-model-cache";
     };
 }

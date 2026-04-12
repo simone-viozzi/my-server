@@ -19,7 +19,9 @@ in
         RemainAfterExit = true;
         ExecStart = pkgs.writeShellScript "podman-network-${name}" ''
           ${pkgs.podman}/bin/podman network inspect ${name} >/dev/null 2>&1 || \
-            ${pkgs.podman}/bin/podman network create ${if internal then "--internal " else ""}${name}
+            ${pkgs.podman}/bin/podman network create ${
+              if internal then "--internal -o no_default_route=1 " else ""
+            }${name}
         '';
       };
       onFailure = [ "notify-failure@%n.service" ];

@@ -54,6 +54,7 @@ The `_reference/` directory (gitignored) contains a working homelab NixOS config
 - Pin images with `image:tag@sha256:digest`
 - Add `systemd.services.docker-<name>` overlays for ordering (after/requires network + volume services)
 - Use `environmentFiles` pointing to sops-nix decrypted paths for secrets
+- Add `restartTriggers` to systemd services for any mounted sops templates/secrets, so containers restart on config change during `nh os switch`
 
 **Docker infrastructure** (`_reference/containers/nixos/modules/docker.nix`):
 - Helper functions `mkNetworkService`, `mkVolumeService`, `mkBtrfsVolumeService` for systemd oneshots

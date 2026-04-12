@@ -84,6 +84,10 @@
     requires = [
       "podman-volume-authelia-data.service"
     ];
+    restartTriggers = [
+      config.sops.secrets.authelia_configuration.sopsFile
+      config.sops.secrets.authelia_users_database.sopsFile
+    ];
   };
 
   # ── Homepage entry ──────────────────────────────────────────────────

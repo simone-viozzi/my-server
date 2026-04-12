@@ -101,6 +101,9 @@
     requires = [
       "podman-volume-traefik-certs.service"
     ];
+    restartTriggers = [
+      config.sops.templates."traefik.env".content
+    ];
   };
 
   # Podman doesn't bypass iptables like Docker — open HTTP/HTTPS ports

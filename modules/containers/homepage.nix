@@ -255,6 +255,10 @@ in
         "podman-volume-homepage-config-public.service"
         "podman-dockerproxy.service"
       ];
+      restartTriggers = [
+        config.sops.templates."homepage-services-public.yaml".content
+        config.sops.templates."homepage-public.env".content
+      ];
       onFailure = [ "notify-failure@%n.service" ];
     };
 
@@ -269,7 +273,24 @@ in
         "podman-volume-homepage-config-private.service"
         "podman-dockerproxy.service"
       ];
+      restartTriggers = [
+        config.sops.templates."homepage-services-private.yaml".content
+        config.sops.templates."homepage-private.env".content
+      ];
       onFailure = [ "notify-failure@%n.service" ];
     };
+
+    # ── Homepage entry ──────────────────────────────────────────────────
+
+    services.homepage.entries = [
+      {
+        group = "Network";
+        name = "Homepage";
+        icon = "homepage.svg";
+        href = "https://homepage-private.${config.sops.placeholder.base_domain}";
+        container = "homepage-private";
+        public = true;
+      }
+    ];
   };
 }

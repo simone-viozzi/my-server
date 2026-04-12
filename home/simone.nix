@@ -195,5 +195,6 @@
   home.packages = [
     pkgs.gh
     pkgs.sops
+    pkgs.htop
   ];
 }

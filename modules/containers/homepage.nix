@@ -96,6 +96,11 @@ in
             default = false;
             description = "Also show on the public homepage";
           };
+          private = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Show on the private homepage (set false for self-referencing entries)";
+          };
         };
       }
     );
@@ -109,7 +114,9 @@ in
 
     # ── Services YAML (assembled from all module entries via sops) ─────
 
-    sops.templates."homepage-services-private.yaml".content = mkServicesYaml cfg.entries;
+    sops.templates."homepage-services-private.yaml".content = mkServicesYaml (
+      builtins.filter (e: e.private) cfg.entries
+    );
 
     sops.templates."homepage-services-public.yaml".content = mkServicesYaml (
       builtins.filter (e: e.public) cfg.entries
@@ -275,5 +282,19 @@ in
         config.sops.templates."homepage-private.env".content
       ];
     };
+
+    # ── Homepage entry ───────────────────────────────────────────────
+    # Show homepage-private on the public dashboard (not on private — that's self-referencing)
+    services.homepage.entries = [
+      {
+        group = "Network";
+        name = "Homepage (internal)";
+        icon = "homepage.svg";
+        href = "https://homepage-private.${config.sops.placeholder.base_domain}";
+        container = "homepage-private";
+        public = true;
+        private = false;
+      }
+    ];
   };
 }

@@ -79,9 +79,9 @@ let
         ) svcVolumes
       );
 
-      retainDaily = toString (serviceCfg.retention.daily or cfg.defaults.retention.daily);
-      retainWeekly = toString (serviceCfg.retention.weekly or cfg.defaults.retention.weekly);
-      retainMonthly = toString (serviceCfg.retention.monthly or cfg.defaults.retention.monthly);
+      retainDaily = toString serviceCfg.retention.daily;
+      retainWeekly = toString serviceCfg.retention.weekly;
+      retainMonthly = toString serviceCfg.retention.monthly;
 
       restic = "${pkgs.restic}/bin/restic -r \${RESTIC_REPO_BASE}/${serviceName} --password-file ${
         config.sops.secrets."restic_password_${serviceName}".path
@@ -153,6 +153,21 @@ let
 
       ${notify} "Backup OK: $SERVICE ($DURATION_FMT)"
       echo "=== Backup complete: $SERVICE ($DURATION_FMT) ==="
+    '';
+
+  # Build the restic check script for a given service
+  mkCheckScript =
+    serviceName:
+    let
+      restic = "${pkgs.restic}/bin/restic -r \${RESTIC_REPO_BASE}/${serviceName} --password-file ${
+        config.sops.secrets."restic_password_${serviceName}".path
+      }";
+    in
+    pkgs.writeShellScript "restic-check-${serviceName}" ''
+      set -euo pipefail
+      echo "=== Restic integrity check: ${serviceName} ==="
+      ${restic} check
+      echo "=== Check OK: ${serviceName} ==="
     '';
 
   # Generate the backup-config diagnostic script
@@ -364,49 +379,83 @@ in
     );
 
     # ── Per-service backup systemd units ──────────────────────────────
-    systemd.services = builtins.listToAttrs (
-      lib.mapAttrsToList (serviceName: serviceCfg: {
-        name = "backup-${serviceName}";
-        value = {
-          description = "Backup: ${serviceName}";
-          after = [ "network-online.target" ];
-          wants = [ "network-online.target" ];
-          path = [
-            pkgs.btrbk
-            pkgs.btrfs-progs
-            pkgs.restic
-            pkgs.util-linux
-            pkgs.coreutils
-            pkgs.hostname
-            pkgs.systemd
-          ];
-          serviceConfig = {
-            Type = "oneshot";
-            ExecStart = "${mkBackupScript serviceName serviceCfg}";
-            TimeoutStartSec = serviceCfg.timeout;
-            # Inherit restic env from sops
-            EnvironmentFile = config.sops.templates."restic-b2.env".path;
+    systemd.services =
+      builtins.listToAttrs (
+        lib.mapAttrsToList (serviceName: serviceCfg: {
+          name = "backup-${serviceName}";
+          value = {
+            description = "Backup: ${serviceName}";
+            after = [ "network-online.target" ];
+            wants = [ "network-online.target" ];
+            path = [
+              pkgs.btrbk
+              pkgs.btrfs-progs
+              pkgs.restic
+              pkgs.util-linux
+              pkgs.coreutils
+              pkgs.hostname
+              pkgs.systemd
+            ];
+            serviceConfig = {
+              Type = "oneshot";
+              ExecStart = "${mkBackupScript serviceName serviceCfg}";
+              TimeoutStartSec = serviceCfg.timeout;
+              # Inherit restic env from sops
+              EnvironmentFile = config.sops.templates."restic-b2.env".path;
+            };
+            onFailure = [ "notify-failure@%n.service" ];
           };
-          onFailure = [ "notify-failure@%n.service" ];
-        };
-      }) cfg.services
-    );
+        }) cfg.services
+      )
+      # ── Per-service restic check units ──────────────────────────────
+      // builtins.listToAttrs (
+        lib.mapAttrsToList (serviceName: _: {
+          name = "restic-check-${serviceName}";
+          value = {
+            description = "Restic integrity check: ${serviceName}";
+            after = [ "network-online.target" ];
+            wants = [ "network-online.target" ];
+            serviceConfig = {
+              Type = "oneshot";
+              ExecStart = "${mkCheckScript serviceName}";
+              TimeoutStartSec = "1h";
+              EnvironmentFile = config.sops.templates."restic-b2.env".path;
+            };
+            onFailure = [ "notify-failure@%n.service" ];
+          };
+        }) cfg.services
+      );
 
     # ── Per-service backup timers ─────────────────────────────────────
-    systemd.timers = builtins.listToAttrs (
-      lib.mapAttrsToList (serviceName: serviceCfg: {
-        name = "backup-${serviceName}";
-        value = {
-          description = "Timer: backup ${serviceName}";
-          wantedBy = [ "timers.target" ];
-          timerConfig = {
-            OnCalendar = serviceCfg.schedule;
-            Persistent = true;
-            RandomizedDelaySec = "15m";
+    systemd.timers =
+      builtins.listToAttrs (
+        lib.mapAttrsToList (serviceName: serviceCfg: {
+          name = "backup-${serviceName}";
+          value = {
+            description = "Timer: backup ${serviceName}";
+            wantedBy = [ "timers.target" ];
+            timerConfig = {
+              OnCalendar = serviceCfg.schedule;
+              Persistent = true;
+              RandomizedDelaySec = "15m";
+            };
           };
-        };
-      }) cfg.services
-    );
+        }) cfg.services
+      )
+      // builtins.listToAttrs (
+        lib.mapAttrsToList (serviceName: _: {
+          name = "restic-check-${serviceName}";
+          value = {
+            description = "Timer: restic integrity check ${serviceName}";
+            wantedBy = [ "timers.target" ];
+            timerConfig = {
+              OnCalendar = "weekly";
+              Persistent = true;
+              RandomizedDelaySec = "1h";
+            };
+          };
+        }) cfg.services
+      );
 
     # ── Diagnostic script ─────────────────────────────────────────────
     environment.systemPackages = [ mkDiagnosticScript ];

@@ -30,10 +30,11 @@ Each backup service has a systemd timer that triggers a script which:
 
 ### What gets backed up
 
-| Service   | Volumes                              | Schedule | Timeout |
-|-----------|--------------------------------------|----------|---------|
-| authelia  | authelia-data (HDD, SQLite)          | 02:30    | 30m     |
-| immich    | immich-upload (HDD), immich-pgdata (NVMe) | 02:00 | 6h   |
+| Service      | Volumes                                    | Schedule | Timeout |
+|--------------|------------------------------------------  |----------|---------|
+| immich       | immich-upload (HDD), immich-pgdata (NVMe)  | 02:00    | 6h      |
+| authelia     | authelia-data (HDD, SQLite)                | 02:30    | 30m     |
+| silverbullet | silverbullet-space (HDD)                   | 03:00    | 30m     |
 
 Volume definitions live in `lib/volumes.nix`. Backup annotations live in each container module.
 
@@ -43,6 +44,48 @@ Volume definitions live in `lib/volumes.nix`. Backup annotations live in each co
 |-----------------|-------|--------|---------|
 | Local snapshots | 2     | 1      | -       |
 | Offsite (B2)    | 4     | 2      | 2       |
+
+### Integrity checks
+
+A weekly `restic check` timer runs for each service to verify B2 repo integrity.
+Failures trigger notifications via the same `notify-failure@` template.
+
+```bash
+# Check status
+systemctl list-timers 'restic-check-*'
+
+# Run manually
+sudo systemctl start restic-check-authelia
+```
+
+If a check fails:
+
+1. **Read the logs** — most failures are transient (network, B2 rate limit):
+   ```bash
+   journalctl -u restic-check-<service> -n 50
+   ```
+   If transient, just re-run: `sudo systemctl start restic-check-<service>`
+
+2. **Deep check** — verify actual data blobs, not just metadata:
+   ```bash
+   sudo bash -c 'set -a; source /run/secrets/rendered/restic-b2.env
+   restic -r ${RESTIC_REPO_BASE}/<service> \
+     --password-file /run/secrets/restic_password_<service> check --read-data'
+   ```
+
+3. **Repair index** — if the index is inconsistent but data is intact:
+   ```bash
+   restic ... repair index
+   restic ... repair snapshots
+   restic ... check
+   ```
+
+4. **Last resort: re-initialize** — only if the repo is unrecoverably corrupt.
+   **This destroys all historical backups for this service.**
+   Before doing this, make sure you still have local btrfs snapshots or a
+   current copy of the live data. Delete the repo contents from B2 (web
+   console or b2 CLI), then the next scheduled backup will auto-initialize
+   a fresh repo via `restic init`.
 
 ### Secrets
 

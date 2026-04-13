@@ -83,6 +83,10 @@ let
       retainWeekly = toString (serviceCfg.retention.weekly or cfg.defaults.retention.weekly);
       retainMonthly = toString (serviceCfg.retention.monthly or cfg.defaults.retention.monthly);
 
+      restic = "${pkgs.restic}/bin/restic -r \${RESTIC_REPO_BASE}/${serviceName} --password-file ${
+        config.sops.secrets."restic_password_${serviceName}".path
+      }";
+
     in
     pkgs.writeShellScript "backup-${serviceName}" ''
       set -euo pipefail
@@ -125,13 +129,14 @@ let
       # 4. Find latest snapshot paths
       ${collectSnapshotPaths}
 
-      # 5. Restic backup from snapshots
+      # 5. Initialize restic repo if needed, then backup
       echo "--- Restic backup to B2 ---"
-      restic-backups-${serviceName} backup ${resticPaths}
+      ${restic} cat config >/dev/null 2>&1 || ${restic} init
+      ${restic} backup ${resticPaths}
 
       # 6. Prune old restic snapshots
       echo "--- Restic prune ---"
-      restic-backups-${serviceName} forget \
+      ${restic} forget \
         --prune \
         --keep-daily ${retainDaily} \
         --keep-weekly ${retainWeekly} \
@@ -174,7 +179,7 @@ let
           echo "  Volumes:"
           ${volumeLines}
           echo "  Retention (offsite): ${toString serviceCfg.retention.daily}d / ${toString serviceCfg.retention.weekly}w / ${toString serviceCfg.retention.monthly}m"
-          echo "  Restic repo: ${serviceCfg.resticRepository}"
+          echo "  Restic repo: \''${RESTIC_REPO_BASE}/${serviceName} (from sops)"
           echo ""
         '';
       serviceBlocks = lib.concatStringsSep "\n" (lib.mapAttrsToList mkServiceBlock cfg.services);
@@ -229,52 +234,39 @@ in
         default = "6h";
         description = "Default systemd timeout for backup units";
       };
-      resticBase = lib.mkOption {
-        type = lib.types.str;
-        description = "Base restic repository URL. Per-service repos are \${resticBase}/\${serviceName}";
-        example = "s3:s3.us-west-004.backblazeb2.com/my-bucket";
-      };
     };
 
     services = lib.mkOption {
       type = lib.types.attrsOf (
-        lib.types.submodule (
-          { name, ... }:
-          {
-            options = {
-              enable = lib.mkEnableOption "backup for this service";
-              schedule = lib.mkOption {
-                type = lib.types.str;
-                default = "daily";
-                description = "systemd OnCalendar schedule";
+        lib.types.submodule (_: {
+          options = {
+            enable = lib.mkEnableOption "backup for this service";
+            schedule = lib.mkOption {
+              type = lib.types.str;
+              default = "daily";
+              description = "systemd OnCalendar schedule";
+            };
+            timeout = lib.mkOption {
+              type = lib.types.str;
+              default = cfg.defaults.timeout;
+              description = "Systemd timeout for this backup";
+            };
+            retention = {
+              daily = lib.mkOption {
+                type = lib.types.int;
+                default = cfg.defaults.retention.daily;
               };
-              timeout = lib.mkOption {
-                type = lib.types.str;
-                default = cfg.defaults.timeout;
-                description = "Systemd timeout for this backup";
+              weekly = lib.mkOption {
+                type = lib.types.int;
+                default = cfg.defaults.retention.weekly;
               };
-              resticRepository = lib.mkOption {
-                type = lib.types.str;
-                default = "${cfg.defaults.resticBase}/${name}";
-                description = "Restic repository URL. Defaults to {resticBase}/{serviceName}";
-              };
-              retention = {
-                daily = lib.mkOption {
-                  type = lib.types.int;
-                  default = cfg.defaults.retention.daily;
-                };
-                weekly = lib.mkOption {
-                  type = lib.types.int;
-                  default = cfg.defaults.retention.weekly;
-                };
-                monthly = lib.mkOption {
-                  type = lib.types.int;
-                  default = cfg.defaults.retention.monthly;
-                };
+              monthly = lib.mkOption {
+                type = lib.types.int;
+                default = cfg.defaults.retention.monthly;
               };
             };
-          }
-        )
+          };
+        })
       );
       default = { };
       description = "Backup service definitions. Volumes are auto-discovered from lib/volumes.nix.";
@@ -307,6 +299,7 @@ in
     sops.secrets = {
       b2_key_id = { };
       b2_application_key = { };
+      restic_repo_base = { };
     }
     // builtins.listToAttrs (
       lib.mapAttrsToList (serviceName: _: {
@@ -318,6 +311,7 @@ in
     sops.templates."restic-b2.env".content = ''
       AWS_ACCESS_KEY_ID=${config.sops.placeholder.b2_key_id}
       AWS_SECRET_ACCESS_KEY=${config.sops.placeholder.b2_application_key}
+      RESTIC_REPO_BASE=${config.sops.placeholder.restic_repo_base}
     '';
 
     # ── btrbk instances (one per service, no timer — triggered by our script) ─
@@ -358,6 +352,7 @@ in
           value = {
             onCalendar = null; # No auto-timer — our systemd unit triggers snapshots
             settings = {
+              backend = "btrfs-progs";
               snapshot_preserve_min = "${dailyRetain}d";
               snapshot_preserve = "${dailyRetain}d ${weeklyRetain}w";
               timestamp_format = "long";
@@ -366,22 +361,6 @@ in
           };
         }
       ) cfg.services
-    );
-
-    # ── Restic wrappers (for manual restore/list + used by backup script) ─
-    services.restic.backups = builtins.listToAttrs (
-      lib.mapAttrsToList (serviceName: serviceCfg: {
-        name = serviceName;
-        value = {
-          repository = serviceCfg.resticRepository;
-          passwordFile = config.sops.secrets."restic_password_${serviceName}".path;
-          environmentFile = config.sops.templates."restic-b2.env".path;
-          initialize = true;
-          createWrapper = true;
-          timerConfig = null; # No auto-timer — our script handles scheduling
-          paths = [ ]; # Paths are passed dynamically by our script
-        };
-      }) cfg.services
     );
 
     # ── Per-service backup systemd units ──────────────────────────────

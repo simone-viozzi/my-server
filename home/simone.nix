@@ -197,5 +197,6 @@
     pkgs.sops
     pkgs.htop
     pkgs.jq
+    pkgs.openssl
   ];
 }

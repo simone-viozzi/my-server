@@ -210,6 +210,14 @@ in
     ];
   };
 
+  # ── Backup ────────────────────────────────────────────────────────────
+
+  backup.services.immich = {
+    enable = true;
+    schedule = "02:00";
+    timeout = "6h";
+  };
+
   # ── Homepage entry ──────────────────────────────────────────────────
 
   services.homepage.entries = [

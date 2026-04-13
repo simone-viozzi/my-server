@@ -90,6 +90,14 @@
     ];
   };
 
+  # ── Backup ────────────────────────────────────────────────────────────
+
+  backup.services.authelia = {
+    enable = true;
+    schedule = "02:30";
+    timeout = "30m";
+  };
+
   # ── Homepage entry ──────────────────────────────────────────────────
 
   services.homepage.entries = [

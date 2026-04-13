@@ -15,6 +15,7 @@
     ./modules/containers/homepage.nix
     ./modules/containers/immich.nix
     ./modules/containers/silverbullet.nix
+    ./modules/backup.nix
     ./modules/notifications.nix
   ];
 
@@ -28,6 +29,10 @@
     defaultSopsFile = ./secrets/secrets.yaml;
     age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
   };
+
+  # ── Backup defaults ────────────────────────────────────────────────
+  # TODO: Set B2 endpoint + bucket name after creating the bucket
+  backup.defaults.resticBase = "s3:s3.us-west-004.backblazeb2.com/simoserver-backups";
 
   # Set to the NixOS version at install time, never change afterward
   system.stateVersion = "25.11";

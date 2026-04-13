@@ -63,8 +63,8 @@ in
 
           sleep 600
 
-          # Wait for btrfs2cloud backup lock (if running)
-          LOCK_FILE="/var/lock/btrfs2cloud.lock"
+          # Wait for backup lock (if a backup is running)
+          LOCK_FILE="/var/lock/backup.lock"
           if [ -f "$LOCK_FILE" ]; then
             echo "Waiting for backup lock to release..."
             ${pkgs.util-linux}/bin/flock "$LOCK_FILE" true

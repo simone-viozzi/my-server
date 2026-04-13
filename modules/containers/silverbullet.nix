@@ -73,6 +73,14 @@
     ];
   };
 
+  # ── Backup ────────────────────────────────────────────────────────────
+
+  backup.services.silverbullet = {
+    enable = true;
+    schedule = "03:00";
+    timeout = "30m";
+  };
+
   # ── Homepage entry ──────────────────────────────────────────────────
 
   services.homepage.entries = [

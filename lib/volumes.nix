@@ -51,7 +51,7 @@ in
     silverbullet-space = {
       device = "hdd";
       type = "data";
-      backupService = null;
+      backupService = "silverbullet";
     };
   };
 

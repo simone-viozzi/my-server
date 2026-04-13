@@ -36,7 +36,7 @@
   # ── Container ─────────────────────────────────────────────────────────
 
   virtualisation.oci-containers.containers.silverbullet = {
-    image = "docker.io/zefhemel/silverbullet:latest";
+    image = "docker.io/zefhemel/silverbullet:latest@sha256:6c36ff15f2230dbe3bca7e5d0c85a59c7dc831ce694517850ed5797775824d71";
 
     volumes = [
       "silverbullet-space:/space"

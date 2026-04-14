@@ -4,6 +4,18 @@ let
   immichVersion = "v2.6.3";
 in
 {
+  # ── Volumes ───────────────────────────────────────────────────────────
+
+  podman.volumes.immich-upload = {
+    storage = "btrfs-hdd";
+  };
+  podman.volumes.immich-pgdata = {
+    storage = "btrfs-nvme";
+  };
+  podman.volumes.immich-model-cache = {
+    storage = "plain";
+  };
+
   # ── Sops secrets ──────────────────────────────────────────────────────
 
   sops.secrets.base_domain = { };
@@ -216,6 +228,10 @@ in
     enable = true;
     schedule = "02:00";
     timeout = "6h";
+    volumes = [
+      "immich-upload"
+      "immich-pgdata"
+    ];
   };
 
   # ── Homepage entry ──────────────────────────────────────────────────

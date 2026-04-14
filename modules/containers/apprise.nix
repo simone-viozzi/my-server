@@ -1,6 +1,12 @@
 { config, ... }:
 
 {
+  # ── Volumes ───────────────────────────────────────────────────────────
+
+  podman.volumes.apprise-config = {
+    storage = "btrfs-hdd";
+  };
+
   sops.secrets.base_domain = { };
 
   # ── Traefik routing (domain from sops) ────────────────────────────────

@@ -1,6 +1,12 @@
 { config, ... }:
 
 {
+  # ── Volumes ───────────────────────────────────────────────────────────
+
+  podman.volumes.silverbullet-space = {
+    storage = "btrfs-hdd";
+  };
+
   # ── Sops secrets ──────────────────────────────────────────────────────
 
   sops.secrets.base_domain = { };
@@ -79,6 +85,7 @@
     enable = true;
     schedule = "03:00";
     timeout = "30m";
+    volumes = [ "silverbullet-space" ];
   };
 
   # ── Homepage entry ──────────────────────────────────────────────────

@@ -8,7 +8,7 @@ in
   # Bulk storage disk with btrfs subvolumes for container data.
   # @data subvolume used as staging/scratch area.
   fileSystems."/home/simone/data" = {
-    device = "/dev/disk/by-uuid/${constants.hddUUID}";
+    device = "/dev/disk/by-uuid/${constants.storageDevices."btrfs-hdd".uuid}";
     fsType = "btrfs";
     options = [
       "subvol=@data"

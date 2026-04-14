@@ -110,6 +110,15 @@ in
   # ── Config ────────────────────────────────────────────────────────────
 
   config = {
+    # ── Volumes ─────────────────────────────────────────────────────────
+
+    podman.volumes.homepage-config-public = {
+      storage = "plain";
+    };
+    podman.volumes.homepage-config-private = {
+      storage = "plain";
+    };
+
     sops.secrets.base_domain = { };
 
     # ── Services YAML (assembled from all module entries via sops) ─────

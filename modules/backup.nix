@@ -6,18 +6,41 @@
 }:
 
 let
-  volumes = import ../lib/volumes.nix;
   inherit (import ../lib/notify.nix { inherit pkgs; }) notify;
+  constants = import ../lib/constants.nix;
+  inherit (constants) storageDevices;
 
   cfg = config.backup;
+  allVolumes = config.podman.volumes;
 
-  # Collect btrfs volumes that belong to each backup service
+  # Helpers to extract device info from storage type
+  deviceName = storage: storageDevices.${storage}.name;
+
+  # Reverse map: device name → UUID (for fstab, where we iterate by device name)
+  deviceToUUID = builtins.listToAttrs (
+    lib.mapAttrsToList (_: sd: {
+      inherit (sd) name;
+      value = sd.uuid;
+    }) storageDevices
+  );
+
+  # Look up volume info from podman.volumes for a backup service's volume list
   volumesForService =
-    serviceName: lib.filterAttrs (_: vol: vol.backupService == serviceName) volumes.btrfs;
+    serviceName:
+    let
+      svcCfg = cfg.services.${serviceName};
+    in
+    lib.listToAttrs (
+      map (volName: {
+        name = volName;
+        value = allVolumes.${volName};
+      }) svcCfg.volumes
+    );
 
   # Determine which btrfs devices a service's volumes span
   devicesForService =
-    serviceName: lib.unique (lib.mapAttrsToList (_: vol: vol.device) (volumesForService serviceName));
+    serviceName:
+    lib.unique (lib.mapAttrsToList (_: vol: deviceName vol.storage) (volumesForService serviceName));
 
   # All devices used by any backup service (for top-level mounts)
   allBackupDevices = lib.unique (lib.concatMap devicesForService (builtins.attrNames cfg.services));
@@ -25,10 +48,13 @@ let
   # Mount point for a device's top-level btrfs
   btrbkMountPoint = device: "/mnt/btrbk/${device}";
 
-  # Path to a subvolume on a device
-
   # Path to snapshot directory on a device
   snapshotDir = device: "${btrbkMountPoint device}/docker-volumes/.snapshots";
+
+  # Stable path dir: holds one `@<vol>` CoW snapshot per volume, replaced each
+  # run. Gives restic an identical source path across runs (parent lookup +
+  # per-file reuse work). Independent of btrbk retention.
+  currentDir = device: "${btrbkMountPoint device}/docker-volumes/.current";
 
   lockFile = "/var/lock/backup.lock";
 
@@ -59,23 +85,35 @@ let
         ) svcVolumes
       );
 
-      # Collect latest snapshot paths for restic
-      # btrbk names snapshots: <subvol>.<timestamp>
-      collectSnapshotPaths = lib.concatStringsSep "\n" (
+      # For each volume: find the freshest btrbk snapshot, then replace the
+      # stable `.current/@<vol>` CoW snapshot with a fresh one. The stable
+      # path is what restic consumes, so its stored paths don't change
+      # between runs. Idempotent under crash: step is delete-if-exists then
+      # snapshot, so any interrupted run converges on the next invocation.
+      refreshStableSnapshots = lib.concatStringsSep "\n" (
         lib.mapAttrsToList (
           volName: vol:
           let
-            sdir = snapshotDir vol.device;
+            sdir = snapshotDir (deviceName vol.storage);
+            cdir = currentDir (deviceName vol.storage);
+            stable = "${cdir}/@${volName}";
           in
-          "  SNAP_${
-              lib.replaceStrings [ "-" ] [ "_" ] volName
-            }=$(ls -1d ${sdir}/@${volName}.* 2>/dev/null | sort | tail -1)"
+          ''
+            NEWEST=$(ls -1d ${sdir}/@${volName}.* 2>/dev/null | sort | tail -1)
+            if [ -z "$NEWEST" ]; then
+              echo "ERROR: no snapshot found for ${volName}" >&2
+              exit 1
+            fi
+            if [ -e "${stable}" ]; then
+              btrfs subvolume delete "${stable}"
+            fi
+            btrfs subvolume snapshot -r "$NEWEST" "${stable}"''
         ) svcVolumes
       );
 
       resticPaths = lib.concatStringsSep " " (
         lib.mapAttrsToList (
-          volName: _: "\"$SNAP_${lib.replaceStrings [ "-" ] [ "_" ] volName}\""
+          volName: vol: "\"${currentDir (deviceName vol.storage)}/@${volName}\""
         ) svcVolumes
       );
 
@@ -126,8 +164,9 @@ let
       echo "--- Starting containers ---"
       ${startCmds}
 
-      # 4. Find latest snapshot paths
-      ${collectSnapshotPaths}
+      # 4. Refresh stable `.current/@<vol>` CoW snapshots (stable path for restic)
+      echo "--- Refreshing stable snapshots ---"
+      ${refreshStableSnapshots}
 
       # 5. Initialize restic repo if needed, then backup
       echo "--- Restic backup to B2 ---"
@@ -181,9 +220,7 @@ let
             name: lib.hasPrefix "${serviceName}-" name || name == serviceName
           ) (builtins.attrNames config.virtualisation.oci-containers.containers);
           volumeLines = lib.concatStringsSep "\n" (
-            lib.mapAttrsToList (
-              volName: vol: "echo '    ${volName} (${vol.device}, type: ${vol.type})'"
-            ) svcVolumes
+            lib.mapAttrsToList (volName: vol: "echo '    ${volName} (${vol.storage})'") svcVolumes
           );
         in
         ''
@@ -266,6 +303,10 @@ in
               default = cfg.defaults.timeout;
               description = "Systemd timeout for this backup";
             };
+            volumes = lib.mkOption {
+              type = lib.types.listOf lib.types.str;
+              description = "List of podman.volumes names to back up for this service";
+            };
             retention = {
               daily = lib.mkOption {
                 type = lib.types.int;
@@ -284,7 +325,7 @@ in
         })
       );
       default = { };
-      description = "Backup service definitions. Volumes are auto-discovered from lib/volumes.nix.";
+      description = "Backup service definitions. Volumes reference names from podman.volumes.";
     };
   };
 
@@ -296,7 +337,7 @@ in
       map (device: {
         name = btrbkMountPoint device;
         value = {
-          device = "/dev/disk/by-uuid/${volumes.devices.${device}}";
+          device = "/dev/disk/by-uuid/${deviceToUUID.${device}}";
           fsType = "btrfs";
           options = [
             "subvolid=5"
@@ -307,8 +348,11 @@ in
       }) allBackupDevices
     );
 
-    # ── Ensure snapshot directories exist ─────────────────────────────
-    systemd.tmpfiles.rules = map (device: "d ${snapshotDir device} 0755 root root -") allBackupDevices;
+    # ── Ensure snapshot directories + restic cache exist ──────────────
+    systemd.tmpfiles.rules =
+      map (device: "d ${snapshotDir device} 0755 root root -") allBackupDevices
+      ++ map (device: "d ${currentDir device} 0755 root root -") allBackupDevices
+      ++ [ "d /var/cache/restic 0700 root root -" ];
 
     # ── Sops secrets for B2 + per-service restic passwords ──────────────
     sops.secrets = {
@@ -345,7 +389,9 @@ in
             map (
               device:
               let
-                volsOnDevice = builtins.attrNames (lib.filterAttrs (_: vol: vol.device == device) svcVolumes);
+                volsOnDevice = builtins.attrNames (
+                  lib.filterAttrs (_: vol: deviceName vol.storage == device) svcVolumes
+                );
               in
               {
                 name = btrbkMountPoint device;
@@ -402,6 +448,7 @@ in
               TimeoutStartSec = serviceCfg.timeout;
               # Inherit restic env from sops
               EnvironmentFile = config.sops.templates."restic-b2.env".path;
+              Environment = "XDG_CACHE_HOME=/var/cache/restic";
             };
             onFailure = [ "notify-failure@%n.service" ];
           };
@@ -420,6 +467,7 @@ in
               ExecStart = "${mkCheckScript serviceName}";
               TimeoutStartSec = "1h";
               EnvironmentFile = config.sops.templates."restic-b2.env".path;
+              Environment = "XDG_CACHE_HOME=/var/cache/restic";
             };
             onFailure = [ "notify-failure@%n.service" ];
           };

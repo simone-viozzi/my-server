@@ -36,7 +36,7 @@ Each backup service has a systemd timer that triggers a script which:
 | authelia     | authelia-data (HDD, SQLite)                | 02:30    | 30m     |
 | silverbullet | silverbullet-space (HDD)                   | 03:00    | 30m     |
 
-Volume definitions live in `lib/volumes.nix`. Backup annotations live in each container module.
+Volume definitions and backup annotations live in each container module (via `podman.volumes` and `backup.services`).
 
 ### Retention
 
@@ -278,34 +278,36 @@ this server** (e.g., password manager, printed, safe deposit box).
 
 ## Adding a new service
 
-1. Add volumes to `lib/volumes.nix`:
+1. In the container module, declare the volumes and the backup config together:
 
 ```nix
-my-service-data = {
-  device = "hdd";
-  type = "data";
-  backupService = "my-service";
+# ── Volumes ──
+podman.volumes.my-service-data = {
+  storage = "btrfs-hdd";  # plain | btrfs-hdd | btrfs-nvme
 };
-```
 
-2. Add backup annotation to the container module:
-
-```nix
+# ── Backup ──
 backup.services.my-service = {
   enable = true;
   schedule = "03:00";
   timeout = "1h";
+  volumes = [ "my-service-data" ];
 };
 ```
 
-3. Add a restic password to sops:
+Volume systemd services (`podman-volume-<name>.service`) are auto-generated from
+`podman.volumes`. btrfs-backed storage types create a btrfs subvolume under the
+matching disk; `plain` just creates a podman-managed volume. Only volumes listed
+in `backup.services.<name>.volumes` are snapshotted and pushed to B2.
+
+2. Add a restic password to sops:
 
 ```bash
 sops secrets/secrets.yaml
 # Add: restic_password_my-service: <generate-a-strong-password>
 ```
 
-4. Rebuild and test:
+3. Rebuild and test:
 
 ```bash
 nh os switch .

@@ -1,6 +1,12 @@
 { config, ... }:
 
 {
+  # ── Volumes ───────────────────────────────────────────────────────────
+
+  podman.volumes.traefik-certs = {
+    storage = "plain";
+  };
+
   # ── Sops secrets (needed for placeholder access in templates) ─────────
   sops.secrets.base_domain = { };
   sops.secrets.acme_email = { };

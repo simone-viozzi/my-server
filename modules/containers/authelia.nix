@@ -1,6 +1,12 @@
 { config, ... }:
 
 {
+  # ── Volumes ───────────────────────────────────────────────────────────
+
+  podman.volumes.authelia-data = {
+    storage = "btrfs-hdd";
+  };
+
   # ── Sops secrets ──────────────────────────────────────────────────────
 
   # Full config files (encrypted as binary blobs in sops)
@@ -96,6 +102,7 @@
     enable = true;
     schedule = "02:30";
     timeout = "30m";
+    volumes = [ "authelia-data" ];
   };
 
   # ── Homepage entry ──────────────────────────────────────────────────

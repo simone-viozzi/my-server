@@ -6,17 +6,15 @@
 }:
 
 let
-  inherit (import ../lib/notify.nix { inherit pkgs; }) notify;
+  inherit (import ../lib/notify.nix { inherit pkgs; }) notifyMd;
   constants = import ../lib/constants.nix;
   inherit (constants) storageDevices;
 
   cfg = config.backup;
   allVolumes = config.podman.volumes;
 
-  # Helpers to extract device info from storage type
   deviceName = storage: storageDevices.${storage}.name;
 
-  # Reverse map: device name → UUID (for fstab, where we iterate by device name)
   deviceToUUID = builtins.listToAttrs (
     lib.mapAttrsToList (_: sd: {
       inherit (sd) name;
@@ -24,7 +22,6 @@ let
     }) storageDevices
   );
 
-  # Look up volume info from podman.volumes for a backup service's volume list
   volumesForService =
     serviceName:
     let
@@ -37,188 +34,83 @@ let
       }) svcCfg.volumes
     );
 
-  # Determine which btrfs devices a service's volumes span
   devicesForService =
     serviceName:
     lib.unique (lib.mapAttrsToList (_: vol: deviceName vol.storage) (volumesForService serviceName));
 
-  # All devices used by any backup service (for top-level mounts)
   allBackupDevices = lib.unique (lib.concatMap devicesForService (builtins.attrNames cfg.services));
 
-  # Mount point for a device's top-level btrfs
   btrbkMountPoint = device: "/mnt/btrbk/${device}";
-
-  # Path to snapshot directory on a device
   snapshotDir = device: "${btrbkMountPoint device}/docker-volumes/.snapshots";
-
-  # Stable path dir: holds one `@<vol>` CoW snapshot per volume, replaced each
-  # run. Gives restic an identical source path across runs (parent lookup +
-  # per-file reuse work). Independent of btrbk retention.
+  # Stable path dir: one `@<vol>` CoW snapshot per volume, replaced each run.
+  # Restic sees an identical source path across runs → parent lookup + per-file
+  # reuse work. Independent of btrbk retention.
   currentDir = device: "${btrbkMountPoint device}/docker-volumes/.current";
 
   lockFile = "/var/lock/backup.lock";
 
-  # Build the backup script for a given service
-  mkBackupScript =
+  containersForService =
+    serviceName:
+    builtins.filter (name: lib.hasPrefix "${serviceName}-" name || name == serviceName) (
+      builtins.attrNames config.virtualisation.oci-containers.containers
+    );
+
+  # Per-service JSON config consumed by backup.sh
+  mkBackupConfig =
     serviceName: serviceCfg:
-    let
-      svcVolumes = volumesForService serviceName;
-
-      # Find containers matching the service name prefix
-      containerNames = builtins.filter (
-        name: lib.hasPrefix "${serviceName}-" name || name == serviceName
-      ) (builtins.attrNames config.virtualisation.oci-containers.containers);
-
-      stopCmds = lib.concatMapStringsSep "\n" (
-        c: "  echo \"Stopping ${c}...\"; systemctl stop podman-${c}.service || true"
-      ) containerNames;
-
-      startCmds = lib.concatMapStringsSep "\n" (
-        c: "  echo \"Starting ${c}...\"; systemctl start podman-${c}.service || true"
-      ) containerNames;
-
-      # btrbk snapshot commands per volume
-      snapshotCmds = lib.concatStringsSep "\n" (
-        lib.mapAttrsToList (
-          volName: _vol:
-          "  echo \"Snapshotting ${volName}...\"; btrbk -c /etc/btrbk/${serviceName}.conf snapshot docker-volumes/@${volName}"
-        ) svcVolumes
-      );
-
-      # For each volume: find the freshest btrbk snapshot, then replace the
-      # stable `.current/@<vol>` CoW snapshot with a fresh one. The stable
-      # path is what restic consumes, so its stored paths don't change
-      # between runs. Idempotent under crash: step is delete-if-exists then
-      # snapshot, so any interrupted run converges on the next invocation.
-      refreshStableSnapshots = lib.concatStringsSep "\n" (
-        lib.mapAttrsToList (
-          volName: vol:
-          let
-            sdir = snapshotDir (deviceName vol.storage);
-            cdir = currentDir (deviceName vol.storage);
-            stable = "${cdir}/@${volName}";
-          in
-          ''
-            NEWEST=$(ls -1d ${sdir}/@${volName}.* 2>/dev/null | sort | tail -1)
-            if [ -z "$NEWEST" ]; then
-              echo "ERROR: no snapshot found for ${volName}" >&2
-              exit 1
-            fi
-            if [ -e "${stable}" ]; then
-              btrfs subvolume delete "${stable}"
-            fi
-            btrfs subvolume snapshot -r "$NEWEST" "${stable}"''
-        ) svcVolumes
-      );
-
-      resticPaths = lib.concatStringsSep " " (
-        lib.mapAttrsToList (
-          volName: vol: "\"${currentDir (deviceName vol.storage)}/@${volName}\""
-        ) svcVolumes
-      );
-
-      retainDaily = toString serviceCfg.retention.daily;
-      retainWeekly = toString serviceCfg.retention.weekly;
-      retainMonthly = toString serviceCfg.retention.monthly;
-
-      restic = "${pkgs.restic}/bin/restic -r \${RESTIC_REPO_BASE}/${serviceName} --password-file ${
-        config.sops.secrets."restic_password_${serviceName}".path
-      }";
-
-    in
-    pkgs.writeShellScript "backup-${serviceName}" ''
-      set -euo pipefail
-
-      SERVICE="${serviceName}"
-      START_TIME=$(date +%s)
-
-      # Acquire global backup lock (blocking wait)
-      exec 9>"${lockFile}"
-      echo "Waiting for backup lock..."
-      flock 9
-      echo "Lock acquired for $SERVICE"
-
-      cleanup() {
-        local exit_code=$?
-        # Always try to restart containers on failure
-        if [ $exit_code -ne 0 ]; then
-          echo "Backup failed (exit $exit_code), ensuring containers are running..."
-      ${startCmds}
-          ${notify} "BACKUP FAILED: $SERVICE on $(hostname) (exit $exit_code)"
-        fi
-        exec 9>&-
+    pkgs.writeText "backup-${serviceName}.json" (
+      builtins.toJSON {
+        service = serviceName;
+        containers = containersForService serviceName;
+        inherit lockFile;
+        btrbkConfig = "/etc/btrbk/${serviceName}.conf";
+        retention = {
+          inherit (serviceCfg.retention) daily weekly monthly;
+        };
+        volumes = lib.mapAttrsToList (volName: vol: {
+          name = volName;
+          snapshotDir = snapshotDir (deviceName vol.storage);
+          currentDir = currentDir (deviceName vol.storage);
+        }) (volumesForService serviceName);
       }
-      trap cleanup EXIT
+    );
 
-      echo "=== Backup starting: $SERVICE ==="
+  # Shared static runner. Shellcheck runs at build time.
+  backupRunner = pkgs.writeShellApplication {
+    name = "backup-runner";
+    runtimeInputs = with pkgs; [
+      btrbk
+      btrfs-progs
+      restic
+      util-linux
+      coreutils
+      hostname
+      systemd
+      jq
+      gnugrep
+    ];
+    text = builtins.readFile ./backup/backup.sh;
+  };
 
-      # 1. Stop containers for consistency
-      echo "--- Stopping containers ---"
-      ${stopCmds}
-
-      # 2. Take btrfs snapshots
-      echo "--- Creating snapshots ---"
-      ${snapshotCmds}
-
-      # 3. Restart containers (snapshots are immutable, safe to resume)
-      echo "--- Starting containers ---"
-      ${startCmds}
-
-      # 4. Refresh stable `.current/@<vol>` CoW snapshots (stable path for restic)
-      echo "--- Refreshing stable snapshots ---"
-      ${refreshStableSnapshots}
-
-      # 5. Initialize restic repo if needed, then backup
-      echo "--- Restic backup to B2 ---"
-      ${restic} cat config >/dev/null 2>&1 || ${restic} init
-      ${restic} backup ${resticPaths}
-
-      # 6. Prune old restic snapshots
-      echo "--- Restic prune ---"
-      ${restic} forget \
-        --prune \
-        --keep-daily ${retainDaily} \
-        --keep-weekly ${retainWeekly} \
-        --keep-monthly ${retainMonthly}
-
-      # 7. Success notification
-      END_TIME=$(date +%s)
-      DURATION=$(( END_TIME - START_TIME ))
-      DURATION_FMT="$(( DURATION / 60 ))m$(( DURATION % 60 ))s"
-
-      # Override trap for success
-      trap - EXIT
-      exec 9>&-
-
-      ${notify} "Backup OK: $SERVICE ($DURATION_FMT)"
-      echo "=== Backup complete: $SERVICE ($DURATION_FMT) ==="
-    '';
-
-  # Build the restic check script for a given service
   mkCheckScript =
     serviceName:
-    let
-      restic = "${pkgs.restic}/bin/restic -r \${RESTIC_REPO_BASE}/${serviceName} --password-file ${
-        config.sops.secrets."restic_password_${serviceName}".path
-      }";
-    in
     pkgs.writeShellScript "restic-check-${serviceName}" ''
       set -euo pipefail
       echo "=== Restic integrity check: ${serviceName} ==="
-      ${restic} check
+      ${pkgs.restic}/bin/restic \
+        -r "''${RESTIC_REPO_BASE}/${serviceName}" \
+        --password-file ${config.sops.secrets."restic_password_${serviceName}".path} \
+        check
       echo "=== Check OK: ${serviceName} ==="
     '';
 
-  # Generate the backup-config diagnostic script
   mkDiagnosticScript =
     let
       mkServiceBlock =
         serviceName: serviceCfg:
         let
           svcVolumes = volumesForService serviceName;
-          containerNames = builtins.filter (
-            name: lib.hasPrefix "${serviceName}-" name || name == serviceName
-          ) (builtins.attrNames config.virtualisation.oci-containers.containers);
+          containers = containersForService serviceName;
           volumeLines = lib.concatStringsSep "\n" (
             lib.mapAttrsToList (volName: vol: "echo '    ${volName} (${vol.storage})'") svcVolumes
           );
@@ -227,7 +119,7 @@ let
           echo "Service: ${serviceName}"
           echo "  Schedule: ${serviceCfg.schedule}"
           echo "  Timeout: ${serviceCfg.timeout}"
-          echo "  Containers: ${lib.concatStringsSep ", " containerNames}"
+          echo "  Containers: ${lib.concatStringsSep ", " containers}"
           echo "  Volumes:"
           ${volumeLines}
           echo "  Retention (offsite): ${toString serviceCfg.retention.daily}d / ${toString serviceCfg.retention.weekly}w / ${toString serviceCfg.retention.monthly}m"
@@ -384,7 +276,6 @@ in
           dailyRetain = toString cfg.defaults.btrbk.snapshotRetain.daily;
           weeklyRetain = toString cfg.defaults.btrbk.snapshotRetain.weekly;
 
-          # Group volumes by device, then list subvolumes under each
           volumeSettings = builtins.listToAttrs (
             map (
               device:
@@ -411,7 +302,7 @@ in
         {
           name = serviceName;
           value = {
-            onCalendar = null; # No auto-timer — our systemd unit triggers snapshots
+            onCalendar = null;
             settings = {
               backend = "btrfs-progs";
               snapshot_preserve_min = "${dailyRetain}d";
@@ -433,22 +324,18 @@ in
             description = "Backup: ${serviceName}";
             after = [ "network-online.target" ];
             wants = [ "network-online.target" ];
-            path = [
-              pkgs.btrbk
-              pkgs.btrfs-progs
-              pkgs.restic
-              pkgs.util-linux
-              pkgs.coreutils
-              pkgs.hostname
-              pkgs.systemd
-            ];
             serviceConfig = {
               Type = "oneshot";
-              ExecStart = "${mkBackupScript serviceName serviceCfg}";
+              ExecStart = "${backupRunner}/bin/backup-runner";
               TimeoutStartSec = serviceCfg.timeout;
-              # Inherit restic env from sops
               EnvironmentFile = config.sops.templates."restic-b2.env".path;
-              Environment = "XDG_CACHE_HOME=/var/cache/restic";
+              Environment = [
+                "XDG_CACHE_HOME=/var/cache/restic"
+                "SERVICE=${serviceName}"
+                "BACKUP_CONFIG=${mkBackupConfig serviceName serviceCfg}"
+                "RESTIC_PASSWORD_FILE=${config.sops.secrets."restic_password_${serviceName}".path}"
+                "NOTIFY_BIN=${notifyMd}"
+              ];
             };
             onFailure = [ "notify-failure@%n.service" ];
           };

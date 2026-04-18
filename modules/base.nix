@@ -44,6 +44,7 @@
     wget
     git
     nixfmt
+    skopeo
   ];
 
   # Console

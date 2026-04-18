@@ -16,6 +16,7 @@
     ./modules/containers/immich.nix
     ./modules/containers/silverbullet.nix
     ./modules/containers/reactive-resume.nix
+    ./modules/containers/paperless.nix
     ./modules/backup.nix
     ./modules/notifications.nix
   ];

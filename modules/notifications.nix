@@ -1,7 +1,7 @@
 { pkgs, ... }:
 
 let
-  inherit (import ../lib/notify.nix { inherit pkgs; }) notify;
+  inherit (import ../lib/notify.nix { inherit pkgs; }) notify notifyMd;
 in
 {
   systemd.services = {
@@ -12,9 +12,12 @@ in
         Type = "oneshot";
         ExecStart = "${pkgs.writeShellScript "notify-failure" ''
           UNIT="$1"
-          JOURNAL=$(${pkgs.systemd}/bin/journalctl -u "''${UNIT}" -n 20 --no-pager 2>/dev/null || echo "(could not read journal)")
+          HOST=$(${pkgs.hostname}/bin/hostname)
+          JOURNAL=$(${pkgs.systemd}/bin/journalctl -u "''${UNIT}" -n 15 --no-pager 2>/dev/null || echo "(could not read journal)")
 
-          ${notify} "''${UNIT} failed on $(${pkgs.hostname}/bin/hostname). Check: journalctl -u ''${UNIT}"
+          ${notifyMd} \
+            "⚠ ''${UNIT} failed on ''${HOST}" \
+            "$(printf '```\n%s\n```' "''${JOURNAL}")"
 
           ${pkgs.util-linux}/bin/wall <<EOF
           === SYSTEMD UNIT FAILED ===

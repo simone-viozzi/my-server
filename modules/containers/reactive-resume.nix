@@ -49,7 +49,7 @@
     OAUTH_CLIENT_SECRET=${config.sops.placeholder.resume_oauth_client_secret}
     OAUTH_DISCOVERY_URL=https://auth.${config.sops.placeholder.base_domain}/.well-known/openid-configuration
     FLAG_DISABLE_EMAIL_AUTH=true
-    FLAG_DISABLE_SIGNUPS=true
+    FLAG_DISABLE_SIGNUPS=false
   '';
 
   sops.templates."resume-s3.env".content = ''
@@ -73,8 +73,15 @@
           tls:
             certResolver: leresolver
           middlewares:
+            - resume-landing-redirect
             - secure-headers
           service: resume
+      middlewares:
+        resume-landing-redirect:
+          redirectRegex:
+            regex: "^https://resume\\.${config.sops.placeholder.base_domain}/?$"
+            replacement: "https://resume.${config.sops.placeholder.base_domain}/auth/login"
+            permanent: false
       services:
         resume:
           loadBalancer:

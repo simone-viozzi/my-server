@@ -24,6 +24,7 @@ _:
 
     extraOptions = [
       "--network=isolated"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
       "--read-only"

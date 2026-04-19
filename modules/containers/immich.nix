@@ -89,6 +89,7 @@ in
     extraOptions = [
       "--network=podman"
       "--network=isolated"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
     ];
@@ -109,6 +110,7 @@ in
 
     extraOptions = [
       "--network=isolated"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
     ];
@@ -121,6 +123,7 @@ in
 
     extraOptions = [
       "--network=isolated"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--cap-add=SETUID"
       "--cap-add=SETGID"
@@ -151,6 +154,7 @@ in
 
     extraOptions = [
       "--network=isolated"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--cap-add=SETUID"
       "--cap-add=SETGID"

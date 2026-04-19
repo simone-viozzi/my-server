@@ -91,6 +91,7 @@
 
     extraOptions = [
       "--network=podman"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--cap-add=NET_BIND_SERVICE"
       "--security-opt=no-new-privileges:true"

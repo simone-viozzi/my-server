@@ -217,6 +217,7 @@ in
       extraOptions = [
         "--network=podman"
         "--network=isolated"
+        "--stop-timeout=30"
         "--cap-drop=ALL"
         "--security-opt=no-new-privileges:true"
         "--tmpfs=/tmp"
@@ -250,6 +251,7 @@ in
       extraOptions = [
         "--network=podman"
         "--network=isolated"
+        "--stop-timeout=30"
         "--cap-drop=ALL"
         "--security-opt=no-new-privileges:true"
         "--tmpfs=/tmp"

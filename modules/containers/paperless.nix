@@ -98,6 +98,7 @@
     extraOptions = [
       "--network=podman"
       "--network=isolated"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
       # s6-overlay needs /run owned by the container user
@@ -124,6 +125,7 @@
 
     extraOptions = [
       "--network=isolated"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--cap-add=SETUID"
       "--cap-add=SETGID"
@@ -149,6 +151,7 @@
 
     extraOptions = [
       "--network=isolated"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--cap-add=SETUID"
       "--cap-add=SETGID"
@@ -173,6 +176,7 @@
 
     extraOptions = [
       "--network=isolated"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
     ];
@@ -185,6 +189,7 @@
 
     extraOptions = [
       "--network=isolated"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
     ];

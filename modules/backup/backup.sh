@@ -82,6 +82,10 @@ flock 9
 log "Lock acquired"
 
 # --- Stop containers ---
+# TODO: dependency-aware stop/start — currently iterates alphabetically with || true.
+#       Should stop only the main service and let systemd cascade via Requires=,
+#       then start only the main service and let systemd pull dependencies.
+#       The JSON config would need a "main" field to identify the entry-point container.
 STEP="stopping-containers"
 while IFS= read -r c; do
   log "Stopping $c..."

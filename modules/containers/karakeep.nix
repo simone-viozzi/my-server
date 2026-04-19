@@ -89,6 +89,7 @@
     extraOptions = [
       "--network=podman"
       "--network=isolated"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
     ];
@@ -110,6 +111,7 @@
 
     extraOptions = [
       "--network=isolated"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
     ];
@@ -130,6 +132,7 @@
 
     extraOptions = [
       "--network=isolated"
+      "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
       "--health-cmd=curl -sf http://localhost:7700/health || exit 1"

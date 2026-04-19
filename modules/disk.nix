@@ -19,19 +19,26 @@ in
   };
 
   # ── Old SSD (Kingston SA400 240GB, btrfs) ─────────────────────────────
-  # Former Arch Linux OS disk — kept intact as rollback safety net.
-  # Mounted read-only until migration is fully validated.
-  #
-  # TODO (post-migration, once rollback is no longer needed):
-  #   1. Repartition: ~40GB swap + rest for /var/lib/containers
-  #   2. Replace this mount with swap + containers storage
-  #   3. This offloads image layers from NVMe (disposable, churn-heavy)
-  fileSystems."/mnt/old-ssd" = {
-    device = "/dev/disk/by-uuid/3d2df933-a2fb-4042-8cf3-b61e157dddb0";
+  # Post-migration: swap file + podman graphroot (container images/layers).
+  # Arch root subvolumes (@, @home, @cache, @log, @tmp) are left on the disk
+  # but not mounted here — still accessible via `mount -o subvolid=5` if needed.
+  fileSystems."/mnt/old-ssd/swap" = {
+    device = "/dev/disk/by-uuid/${constants.storageDevices."btrfs-old-ssd".uuid}";
     fsType = "btrfs";
     options = [
-      "subvol=@"
-      "ro"
+      "subvol=@swap"
+      "noatime"
+      "nofail"
+    ];
+  };
+
+  fileSystems."/mnt/old-ssd/containers" = {
+    device = "/dev/disk/by-uuid/${constants.storageDevices."btrfs-old-ssd".uuid}";
+    fsType = "btrfs";
+    options = [
+      "subvol=@container-storage"
+      "noatime"
+      "compress=zstd"
       "nofail"
     ];
   };

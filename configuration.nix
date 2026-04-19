@@ -4,6 +4,7 @@
   imports = [
     ./modules/base.nix
     ./modules/disk.nix
+    ./modules/swap.nix
     ./modules/networking.nix
     ./modules/users.nix
     ./modules/nh.nix

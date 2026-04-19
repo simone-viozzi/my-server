@@ -45,6 +45,7 @@
     git
     nixfmt
     skopeo
+    duf
   ];
 
   # Console

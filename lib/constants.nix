@@ -9,5 +9,9 @@
       uuid = "9b18d2f7-f6ab-4a38-ab23-8953e2814bd5"; # WD Red SN700 1TB NVMe
       name = "nvme";
     };
+    "btrfs-old-ssd" = {
+      uuid = "3d2df933-a2fb-4042-8cf3-b61e157dddb0"; # Kingston SA400 240GB (former Arch disk)
+      name = "old-ssd";
+    };
   };
 }

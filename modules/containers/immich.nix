@@ -109,6 +109,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
+      "--network=podman"
       "--network=isolated"
       "--stop-timeout=30"
       "--cap-drop=ALL"

@@ -1,0 +1,72 @@
+{ config, ... }:
+
+{
+  # ── Sops secrets ──────────────────────────────────────────────────────
+
+  sops.secrets.base_domain = { };
+
+  # ── Traefik routing ───────────────────────────────────────────────────
+
+  sops.templates."bentopdf-routing.yaml".content = ''
+    http:
+      routers:
+        bentopdf:
+          rule: "Host(`pdf.${config.sops.placeholder.base_domain}`)"
+          entryPoints:
+            - websecure
+          tls:
+            certResolver: leresolver
+          middlewares:
+            - authelia
+            - secure-headers
+          service: bentopdf
+      services:
+        bentopdf:
+          loadBalancer:
+            servers:
+              - url: "http://bentopdf:8080"
+  '';
+
+  virtualisation.oci-containers.containers.traefik.volumes = [
+    "${config.sops.templates."bentopdf-routing.yaml".path}:/etc/traefik/dynamic/bentopdf.yaml:ro"
+  ];
+
+  # ── Container ─────────────────────────────────────────────────────────
+
+  virtualisation.oci-containers.containers.bentopdf = {
+    image = "ghcr.io/alam00000/bentopdf-simple:latest@sha256:02cfa04e24619eff21bf511c4ae1aad172f6a8a50bbb1bca37f77c1887b7a31e";
+
+    environment = {
+      TZ = "Europe/Rome";
+    };
+
+    log-driver = "journald";
+
+    extraOptions = [
+      "--network=podman"
+      "--stop-timeout=30"
+      "--cap-drop=ALL"
+      "--security-opt=no-new-privileges:true"
+    ];
+  };
+
+  # ── Systemd ordering ─────────────────────────────────────────────────
+
+  systemd.services.podman-bentopdf = {
+    restartTriggers = [
+      config.sops.templates."bentopdf-routing.yaml".content
+    ];
+  };
+
+  # ── Homepage entry ──────────────────────────────────────────────────
+
+  services.homepage.entries = [
+    {
+      group = "Other";
+      name = "BentoPDF";
+      icon = "bentopdf.svg";
+      href = "https://pdf.${config.sops.placeholder.base_domain}";
+      container = "bentopdf";
+    }
+  ];
+}

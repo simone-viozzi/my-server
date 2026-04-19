@@ -18,6 +18,7 @@
     ./modules/containers/reactive-resume.nix
     ./modules/containers/paperless.nix
     ./modules/containers/karakeep.nix
+    ./modules/containers/bentopdf.nix
     ./modules/backup.nix
     ./modules/notifications.nix
   ];

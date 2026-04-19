@@ -46,6 +46,7 @@
     nixfmt
     skopeo
     duf
+    inxi
   ];
 
   # Console

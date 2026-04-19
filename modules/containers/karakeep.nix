@@ -203,6 +203,12 @@
       icon = "hoarder.png";
       href = "https://karakeep.${config.sops.placeholder.base_domain}";
       container = "karakeep";
+      public = true;
+      privateWidget = {
+        type = "karakeep";
+        url = "http://karakeep:3000";
+        key = "{{HOMEPAGE_VAR_WIDGET_KARAKEEP_KEY}}";
+      };
     }
   ];
 }

@@ -248,6 +248,13 @@ in
       icon = "immich.svg";
       href = "https://immich.${config.sops.placeholder.base_domain}";
       container = "immich-server";
+      public = true;
+      privateWidget = {
+        type = "immich";
+        url = "http://immich-server:2283";
+        key = "{{HOMEPAGE_VAR_WIDGET_IMMICH_KEY}}";
+        version = "2";
+      };
     }
   ];
 }

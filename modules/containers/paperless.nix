@@ -287,6 +287,12 @@
       icon = "paperless-ngx.svg";
       href = "https://paperless.${config.sops.placeholder.base_domain}";
       container = "paperless";
+      public = true;
+      privateWidget = {
+        type = "paperlessngx";
+        url = "http://paperless:8000";
+        key = "{{HOMEPAGE_VAR_WIDGET_PAPERLESS_KEY}}";
+      };
     }
   ];
 }

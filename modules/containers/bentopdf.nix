@@ -67,6 +67,7 @@
       icon = "bentopdf.svg";
       href = "https://pdf.${config.sops.placeholder.base_domain}";
       container = "bentopdf";
+      public = true;
     }
   ];
 }

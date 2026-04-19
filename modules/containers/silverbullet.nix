@@ -98,6 +98,7 @@
       icon = "silverbullet.png";
       href = "https://silverbullet.${config.sops.placeholder.base_domain}";
       container = "silverbullet";
+      public = true;
     }
   ];
 }

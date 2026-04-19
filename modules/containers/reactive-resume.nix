@@ -332,6 +332,7 @@
       icon = "reactive-resume.svg";
       href = "https://resume.${config.sops.placeholder.base_domain}";
       container = "resume";
+      public = true;
     }
   ];
 }

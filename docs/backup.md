@@ -21,9 +21,9 @@ restic forget --prune (retention policy)
 
 Each backup service has a systemd timer that triggers a script which:
 - Acquires a global lock (`/var/lock/backup.lock`) to prevent concurrent backups
-- Stops all containers in the service for consistency
+- Stops all containers in the service in a single `systemctl stop` call (systemd resolves dependency order — dependents stop before their dependencies, like `docker-compose down`)
 - Takes btrfs snapshots of all volumes belonging to the service
-- Restarts containers immediately (snapshots are immutable)
+- Restarts all containers in a single `systemctl start` call (systemd starts dependencies before dependents)
 - Pushes snapshots to B2 via restic
 - Prunes old restic snapshots per retention policy
 - Sends success/failure notifications via Apprise
@@ -315,4 +315,6 @@ sudo systemctl start backup-my-service
 journalctl -u backup-my-service -f
 ```
 
-Containers are discovered automatically by name prefix (`my-service-*`).
+Containers are discovered automatically by name prefix (`my-service-*`) and stopped/started
+as a group via `systemctl stop`/`start` — systemd uses the `After=`/`Requires=` dependencies
+from the container module to determine the correct order.

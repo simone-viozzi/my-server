@@ -47,10 +47,12 @@ cleanup() {
     local prev_step="$STEP"
     STEP="recovery-restart"
     if [ -n "${BACKUP_CONFIG:-}" ] && [ -r "$BACKUP_CONFIG" ]; then
-      while IFS= read -r c; do
-        log "Restarting $c..."
-        systemctl start "podman-$c.service" || true
-      done < <(jq -r '.containers[]' "$BACKUP_CONFIG")
+      local -a rec_containers rec_units
+      mapfile -t rec_containers < <(jq -r '.containers[]' "$BACKUP_CONFIG")
+      rec_units=("${rec_containers[@]/#/podman-}")
+      rec_units=("${rec_units[@]/%/.service}")
+      log "Restarting ${#rec_containers[@]} container(s): ${rec_containers[*]}"
+      systemctl start "${rec_units[@]}" || true
     fi
     "$NOTIFY_BIN" \
       "BACKUP FAILED: $SERVICE" \
@@ -81,16 +83,13 @@ exec 9>"$LOCK_FILE"
 flock 9
 log "Lock acquired"
 
-# --- Stop containers ---
-# TODO: dependency-aware stop/start — currently iterates alphabetically with || true.
-#       Should stop only the main service and let systemd cascade via Requires=,
-#       then start only the main service and let systemd pull dependencies.
-#       The JSON config would need a "main" field to identify the entry-point container.
+# --- Stop containers (single call — systemd resolves dependency order) ---
 STEP="stopping-containers"
-while IFS= read -r c; do
-  log "Stopping $c..."
-  systemctl stop "podman-$c.service" || true
-done < <(jq -r '.containers[]' "$CFG")
+mapfile -t CONTAINERS < <(jq -r '.containers[]' "$CFG")
+UNITS=("${CONTAINERS[@]/#/podman-}")
+UNITS=("${UNITS[@]/%/.service}")
+log "Stopping ${#CONTAINERS[@]} container(s): ${CONTAINERS[*]}"
+systemctl stop "${UNITS[@]}"
 
 # --- btrbk snapshots ---
 STEP="creating-snapshots"
@@ -99,12 +98,10 @@ while IFS= read -r vol; do
   btrbk -c "$BTRBK_CONF" snapshot "docker-volumes/@$vol"
 done < <(jq -r '.volumes[].name' "$CFG")
 
-# --- Restart containers ---
+# --- Restart containers (single call — systemd resolves dependency order) ---
 STEP="starting-containers"
-while IFS= read -r c; do
-  log "Starting $c..."
-  systemctl start "podman-$c.service" || true
-done < <(jq -r '.containers[]' "$CFG")
+log "Starting ${#CONTAINERS[@]} container(s): ${CONTAINERS[*]}"
+systemctl start "${UNITS[@]}"
 
 # --- Refresh stable .current/@<vol> CoW snapshots ---
 # Gives restic an identical source path across runs so parent lookup and

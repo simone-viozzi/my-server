@@ -47,6 +47,8 @@ in
         "podman-apprise.service"
       ];
       wantedBy = [ "multi-user.target" ];
+      # Only run on actual boots, not on nh os switch
+      restartIfChanged = false;
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;

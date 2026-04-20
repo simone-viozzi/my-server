@@ -116,6 +116,9 @@
       "--network=podman"
       "--network=isolated"
       "--stop-timeout=30"
+      # Node runs as PID 1 with no SIGTERM handler, so the kernel drops it
+      # and podman SIGKILLs after timeout. Node exits cleanly on SIGINT.
+      "--stop-signal=SIGINT"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
     ];

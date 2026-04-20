@@ -18,12 +18,11 @@ in
     ];
   };
 
-  # ── Old SSD (Kingston SA400 240GB, btrfs) ─────────────────────────────
-  # Post-migration: swap file + podman graphroot (container images/layers).
-  # Arch root subvolumes (@, @home, @cache, @log, @tmp) are left on the disk
-  # but not mounted here — still accessible via `mount -o subvolid=5` if needed.
-  fileSystems."/mnt/old-ssd/swap" = {
-    device = "/dev/disk/by-uuid/${constants.storageDevices."btrfs-old-ssd".uuid}";
+  # ── Scratch SSD (Kingston SA400 240GB, btrfs) ─────────────────────────
+  # Holds swap file + podman graphroot (container images/layers) — all
+  # re-creatable workloads offloaded from NVMe.
+  fileSystems."/mnt/scratch-ssd/swap" = {
+    device = "/dev/disk/by-uuid/${constants.storageDevices."btrfs-scratch-ssd".uuid}";
     fsType = "btrfs";
     options = [
       "subvol=@swap"
@@ -32,8 +31,8 @@ in
     ];
   };
 
-  fileSystems."/mnt/old-ssd/containers" = {
-    device = "/dev/disk/by-uuid/${constants.storageDevices."btrfs-old-ssd".uuid}";
+  fileSystems."/mnt/scratch-ssd/containers" = {
+    device = "/dev/disk/by-uuid/${constants.storageDevices."btrfs-scratch-ssd".uuid}";
     fsType = "btrfs";
     options = [
       "subvol=@container-storage"

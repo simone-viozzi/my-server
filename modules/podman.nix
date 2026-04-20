@@ -74,11 +74,11 @@ in
 
     virtualisation.oci-containers.backend = "podman";
 
-    # Image layers and metadata live on the old SSD (offloaded from NVMe).
-    # The /mnt/old-ssd/containers subvol is mounted via modules/disk.nix.
+    # Image layers and metadata live on the scratch SSD (offloaded from NVMe).
+    # The /mnt/scratch-ssd/containers subvol is mounted via modules/disk.nix.
     virtualisation.containers.storage.settings.storage = {
       driver = "overlay";
-      graphroot = "/mnt/old-ssd/containers";
+      graphroot = "/mnt/scratch-ssd/containers";
       runroot = "/run/containers/storage";
     };
 

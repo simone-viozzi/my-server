@@ -11,12 +11,12 @@ _:
   };
 
   # ── Disk swap ────────────────────────────────────────────────────────
-  # 32 GiB swap file on old SSD @swap subvolume, created manually via
+  # 32 GiB swap file on scratch SSD @swap subvolume, created manually via
   # `btrfs filesystem mkswapfile` so nodatacow is set correctly for btrfs.
   # Low priority so zram is used first; disk swap is overflow only.
   swapDevices = [
     {
-      device = "/mnt/old-ssd/swap/swapfile";
+      device = "/mnt/scratch-ssd/swap/swapfile";
       priority = -2;
     }
   ];

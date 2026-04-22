@@ -20,6 +20,7 @@
     ./modules/containers/paperless.nix
     ./modules/containers/karakeep.nix
     ./modules/containers/bentopdf.nix
+    ./modules/containers/ocis.nix
     ./modules/backup.nix
     ./modules/notifications.nix
   ];

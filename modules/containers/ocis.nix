@@ -13,7 +13,7 @@
   # ── Sops secrets ──────────────────────────────────────────────────────
 
   sops.secrets.base_domain = { };
-  sops.secrets.ocis_admin_password = { };
+  sops.secrets.ocis_oidc_client_id = { };
 
   # ── Sops templates ────────────────────────────────────────────────────
 
@@ -26,13 +26,68 @@
     OCIS_INSECURE=false
     PROXY_ENABLE_BASIC_AUTH=false
     GATEWAY_GRPC_ADDR=0.0.0.0:9142
-    IDM_ADMIN_PASSWORD=${config.sops.placeholder.ocis_admin_password}
-    IDM_CREATE_DEMO_USERS=false
     MICRO_REGISTRY_ADDRESS=127.0.0.1:9233
     NATS_NATS_HOST=0.0.0.0
     NATS_NATS_PORT=9233
     PROXY_CSP_CONFIG_FILE_LOCATION=/etc/ocis/csp.yaml
     OCIS_PASSWORD_POLICY_BANNED_PASSWORDS_LIST=banned-password-list.txt
+
+    # ── External OIDC (Authelia) ──
+    OCIS_EXCLUDE_RUN_SERVICES=idp
+    OCIS_OIDC_ISSUER=https://auth.${config.sops.placeholder.base_domain}
+    OCIS_OIDC_CLIENT_ID=${config.sops.placeholder.ocis_oidc_client_id}
+    PROXY_OIDC_REWRITE_WELLKNOWN=true
+    PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD=none
+    PROXY_OIDC_SKIP_USER_INFO=false
+    PROXY_AUTOPROVISION_ACCOUNTS=true
+    PROXY_AUTOPROVISION_CLAIM_USERNAME=preferred_username
+    PROXY_AUTOPROVISION_CLAIM_EMAIL=email
+    PROXY_AUTOPROVISION_CLAIM_DISPLAYNAME=name
+    PROXY_AUTOPROVISION_CLAIM_GROUPS=groups
+    WEB_OIDC_CLIENT_ID=${config.sops.placeholder.ocis_oidc_client_id}
+    WEB_OIDC_SCOPE=openid profile email groups offline_access
+    GRAPH_USERNAME_MATCH=none
+    GRAPH_LDAP_SERVER_WRITE_ENABLED=true
+  '';
+
+  sops.templates."ocis-csp.yaml".mode = "0444";
+  sops.templates."ocis-csp.yaml".content = ''
+    directives:
+      child-src:
+        - "'self'"
+      connect-src:
+        - "'self'"
+        - 'blob:'
+        - 'https://auth.${config.sops.placeholder.base_domain}/'
+      default-src:
+        - "'none'"
+      font-src:
+        - "'self'"
+        - 'data:'
+      frame-ancestors:
+        - "'self'"
+      frame-src:
+        - "'self'"
+        - 'blob:'
+        - 'https://auth.${config.sops.placeholder.base_domain}/'
+      img-src:
+        - "'self'"
+        - 'data:'
+        - 'blob:'
+      manifest-src:
+        - "'self'"
+      media-src:
+        - "'self'"
+      object-src:
+        - "'self'"
+        - 'blob:'
+      script-src:
+        - "'self'"
+        - "'unsafe-inline'"
+        - "'unsafe-eval'"
+      style-src:
+        - "'self'"
+        - "'unsafe-inline'"
   '';
 
   # ── Traefik routing ───────────────────────────────────────────────────
@@ -75,7 +130,7 @@
       "ocis-config:/etc/ocis"
       "ocis-data:/var/lib/ocis"
       "${./ocis/app-registry.yaml}:/etc/ocis/app-registry.yaml:ro"
-      "${./ocis/csp.yaml}:/etc/ocis/csp.yaml:ro"
+      "${config.sops.templates."ocis-csp.yaml".path}:/etc/ocis/csp.yaml:ro"
       "${./ocis/banned-password-list.txt}:/etc/ocis/banned-password-list.txt:ro"
     ];
 
@@ -110,6 +165,7 @@
     restartTriggers = [
       config.sops.templates."ocis.env".content
       config.sops.templates."ocis-routing.yaml".content
+      config.sops.templates."ocis-csp.yaml".content
     ];
   };
 

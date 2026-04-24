@@ -14,6 +14,7 @@
 
   sops.secrets.base_domain = { };
   sops.secrets.ocis_oidc_client_id = { };
+  sops.secrets.ocis_admin_user_id = { };
 
   # ── Sops templates ────────────────────────────────────────────────────
 
@@ -48,6 +49,7 @@
     WEB_OIDC_SCOPE=openid profile email groups offline_access
     GRAPH_USERNAME_MATCH=none
     GRAPH_LDAP_SERVER_WRITE_ENABLED=true
+    OCIS_ADMIN_USER_ID=${config.sops.placeholder.ocis_admin_user_id}
   '';
 
   sops.templates."ocis-csp.yaml".mode = "0444";

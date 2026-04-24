@@ -18,6 +18,7 @@
   sops.secrets.base_domain = { };
   sops.secrets.ocis_oidc_client_id = { };
   sops.secrets.ocis_admin_user_id = { };
+  sops.secrets.collabora_admin_password = { };
 
   # ── Sops templates ────────────────────────────────────────────────────
 
@@ -53,6 +54,36 @@
     GRAPH_USERNAME_MATCH=none
     GRAPH_LDAP_SERVER_WRITE_ENABLED=true
     OCIS_ADMIN_USER_ID=${config.sops.placeholder.ocis_admin_user_id}
+
+    # ── Collaboration (WOPI) secure-view app ──
+    FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR=com.owncloud.api.collaboration.CollaboraOnline
+    GRAPH_AVAILABLE_ROLES=b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6
+  '';
+
+  sops.templates."ocis-collaboration.env".content = ''
+    OCIS_URL=https://ocis.${config.sops.placeholder.base_domain}
+    OCIS_LOG_LEVEL=info
+    OCIS_LOG_COLOR=false
+    OCIS_LOG_PRETTY=false
+    MICRO_REGISTRY=nats-js-kv
+    MICRO_REGISTRY_ADDRESS=ocis:9233
+    COLLABORATION_GRPC_ADDR=0.0.0.0:9301
+    COLLABORATION_HTTP_ADDR=0.0.0.0:9300
+    COLLABORATION_WOPI_SRC=https://collaboration.${config.sops.placeholder.base_domain}
+    COLLABORATION_APP_NAME=CollaboraOnline
+    COLLABORATION_APP_PRODUCT=Collabora
+    COLLABORATION_APP_ADDR=https://collabora.${config.sops.placeholder.base_domain}
+    COLLABORATION_APP_ICON=https://collabora.${config.sops.placeholder.base_domain}/favicon.ico
+    COLLABORATION_APP_INSECURE=false
+    COLLABORATION_CS3API_DATAGATEWAY_INSECURE=true
+  '';
+
+  sops.templates."collabora.env".content = ''
+    DONT_GEN_SSL_CERT=YES
+    username=admin
+    password=${config.sops.placeholder.collabora_admin_password}
+    extra_params=--o:ssl.enable=false --o:ssl.termination=true --o:welcome.enable=false --o:net.frame_ancestors=ocis.${config.sops.placeholder.base_domain}
+    aliasgroup1=https://collaboration.${config.sops.placeholder.base_domain}:443
   '';
 
   sops.templates."ocis-csp.yaml".mode = "0444";
@@ -64,6 +95,8 @@
         - "'self'"
         - 'blob:'
         - 'https://auth.${config.sops.placeholder.base_domain}/'
+        - 'https://collabora.${config.sops.placeholder.base_domain}/'
+        - 'https://collaboration.${config.sops.placeholder.base_domain}/'
       default-src:
         - "'none'"
       font-src:
@@ -75,6 +108,7 @@
         - "'self'"
         - 'blob:'
         - 'https://auth.${config.sops.placeholder.base_domain}/'
+        - 'https://collabora.${config.sops.placeholder.base_domain}/'
       img-src:
         - "'self'"
         - 'data:'
@@ -109,15 +143,43 @@
           middlewares:
             - secure-headers
           service: ocis
+        collabora:
+          rule: "Host(`collabora.${config.sops.placeholder.base_domain}`)"
+          entryPoints:
+            - websecure
+          tls:
+            certResolver: leresolver
+          service: collabora
+        collaboration:
+          rule: "Host(`collaboration.${config.sops.placeholder.base_domain}`)"
+          entryPoints:
+            - websecure
+          tls:
+            certResolver: leresolver
+          middlewares:
+            - secure-headers
+          service: collaboration
       services:
         ocis:
           loadBalancer:
             servers:
               - url: "http://ocis:9200"
+        collabora:
+          loadBalancer:
+            servers:
+              - url: "http://collabora:9980"
+        collaboration:
+          loadBalancer:
+            servers:
+              - url: "http://collaboration:9300"
   '';
 
   virtualisation.oci-containers.containers.traefik.volumes = [
     "${config.sops.templates."ocis-routing.yaml".path}:/etc/traefik/dynamic/ocis.yaml:ro"
+  ];
+
+  systemd.services.podman-traefik.restartTriggers = [
+    config.sops.templates."ocis-routing.yaml".content
   ];
 
   # ── Containers ────────────────────────────────────────────────────────
@@ -154,6 +216,55 @@
     ];
   };
 
+  virtualisation.oci-containers.containers.collabora = {
+    image = "docker.io/collabora/code:25.04.9.4.1@sha256:8301eadc855c8e9ca90a5540ce30cf179dd248748d61c96ea82e0d28a379b0e4";
+
+    entrypoint = "/bin/bash";
+    cmd = [
+      "-c"
+      "coolconfig generate-proof-key && /start-collabora-online.sh"
+    ];
+
+    environmentFiles = [
+      config.sops.templates."collabora.env".path
+    ];
+
+    log-driver = "journald";
+
+    extraOptions = [
+      "--network=podman"
+      "--stop-timeout=30"
+      "--cap-add=MKNOD"
+      "--security-opt=no-new-privileges:true"
+    ];
+  };
+
+  virtualisation.oci-containers.containers.collaboration = {
+    image = "docker.io/owncloud/ocis:8.0.1@sha256:b35c557ff56bbddc1dd74d4142d81a8a2cac9ff7e5e774516281a691e42bb153";
+
+    cmd = [
+      "collaboration"
+      "server"
+    ];
+
+    volumes = [
+      "ocis-config:/etc/ocis"
+    ];
+
+    environmentFiles = [
+      config.sops.templates."ocis-collaboration.env".path
+    ];
+
+    log-driver = "journald";
+
+    extraOptions = [
+      "--network=podman"
+      "--stop-timeout=30"
+      "--cap-drop=ALL"
+      "--security-opt=no-new-privileges:true"
+    ];
+  };
+
   # ── Systemd ordering ─────────────────────────────────────────────────
 
   systemd.services.podman-ocis = {
@@ -171,6 +282,26 @@
       config.sops.templates."ocis.env".content
       config.sops.templates."ocis-routing.yaml".content
       config.sops.templates."ocis-csp.yaml".content
+    ];
+  };
+
+  systemd.services.podman-collabora = {
+    restartTriggers = [
+      config.sops.templates."collabora.env".content
+    ];
+  };
+
+  systemd.services.podman-collaboration = {
+    after = [
+      "podman-ocis.service"
+      "podman-collabora.service"
+      "podman-volume-ocis-config.service"
+    ];
+    requires = [
+      "podman-volume-ocis-config.service"
+    ];
+    restartTriggers = [
+      config.sops.templates."ocis-collaboration.env".content
     ];
   };
 

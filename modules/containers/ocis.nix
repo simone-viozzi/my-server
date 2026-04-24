@@ -1,5 +1,8 @@
 { config, ... }:
 
+# Integration nuances (Android app token_endpoint_auth_method, etc.):
+# see docs/nuances.md.
+
 {
   # ── Volumes ───────────────────────────────────────────────────────────
 

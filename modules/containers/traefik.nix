@@ -1,5 +1,8 @@
 { config, ... }:
 
+let
+  images = import ../images.nix;
+in
 {
   # ── Volumes ───────────────────────────────────────────────────────────
 
@@ -47,7 +50,7 @@
   # ── Container ─────────────────────────────────────────────────────────
 
   virtualisation.oci-containers.containers.traefik = {
-    image = "traefik:v3.6.11@sha256:acfc80650104f0194a15f73dc1648f517561bc1645391a15705332a064cfc33c";
+    image = images.traefik;
 
     environmentFiles = [
       config.sops.templates."traefik.env".path

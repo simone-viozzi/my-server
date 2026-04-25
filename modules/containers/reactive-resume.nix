@@ -1,5 +1,8 @@
 { config, ... }:
 
+let
+  images = import ../images.nix;
+in
 {
   # ── Volumes ───────────────────────────────────────────────────────────
 
@@ -96,7 +99,7 @@
   # ── Containers ────────────────────────────────────────────────────────
 
   virtualisation.oci-containers.containers.resume = {
-    image = "docker.io/amruthpillai/reactive-resume:latest@sha256:adaa9e95ea80c91d2a1ddc6cf1d5924268f6f5d610910eae29126b152395aab4";
+    image = images.resume;
 
     volumes = [
       "resume-data:/app/data"
@@ -125,7 +128,7 @@
   };
 
   virtualisation.oci-containers.containers.resume-postgres = {
-    image = "docker.io/postgres:18@sha256:52e6ffd11fddd081ae63880b635b2a61c14008c17fc98cdc7ce5472265516dd0";
+    image = images.postgres18;
 
     volumes = [
       "resume-pgdata:/var/lib/postgresql"
@@ -159,7 +162,7 @@
   };
 
   virtualisation.oci-containers.containers.resume-browserless = {
-    image = "ghcr.io/browserless/chromium:latest@sha256:35deff208e30b3d8681f21f43f337e475e5bee21ad8b22d41359028e677210b6";
+    image = images.resumeBrowser;
 
     environmentFiles = [
       config.sops.templates."resume-browserless.env".path
@@ -183,7 +186,7 @@
   };
 
   virtualisation.oci-containers.containers.resume-seaweedfs = {
-    image = "docker.io/chrislusf/seaweedfs:latest@sha256:854479eebcbc0060d803edb27b3bd88a0552e23fde08a26a6482e59aff887a77";
+    image = images.resumeStorage;
 
     cmd = [
       "server"
@@ -221,7 +224,7 @@
   };
 
   virtualisation.oci-containers.containers.resume-seaweedfs-init = {
-    image = "quay.io/minio/mc:latest@sha256:a7fe349ef4bd8521fb8497f55c6042871b2ae640607cf99d9bede5e9bdf11727";
+    image = images.resumeMc;
 
     entrypoint = "/bin/sh";
     cmd = [

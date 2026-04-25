@@ -1,7 +1,7 @@
 { config, ... }:
 
 let
-  immichVersion = "v2.6.3";
+  images = import ../images.nix;
 in
 {
   # ── Volumes ───────────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ in
   # ── Containers ────────────────────────────────────────────────────────
 
   virtualisation.oci-containers.containers.immich-server = {
-    image = "ghcr.io/immich-app/immich-server:${immichVersion}@sha256:0cc1f82953d9598eb9e9dd11cbde1f50fe54f9c46c4506b089e8ad7bfc9d1f0c";
+    image = images.immichServer;
 
     volumes = [
       "immich-upload:/usr/src/app/upload"
@@ -96,7 +96,7 @@ in
   };
 
   virtualisation.oci-containers.containers.immich-machine-learning = {
-    image = "ghcr.io/immich-app/immich-machine-learning:${immichVersion}@sha256:33b17015c3d14f2565e9b8cd36b48a70027b14b5cd20da7fbfff21a370b0309c";
+    image = images.immichMl;
 
     volumes = [
       "immich-model-cache:/cache"
@@ -118,7 +118,7 @@ in
   };
 
   virtualisation.oci-containers.containers.immich-redis = {
-    image = "docker.io/valkey/valkey:9@sha256:3b55fbaa0cd93cf0d9d961f405e4dfcc70efe325e2d84da207a0a8e6d8fde4f9";
+    image = images.immichValkey;
 
     log-driver = "journald";
 
@@ -136,7 +136,7 @@ in
   };
 
   virtualisation.oci-containers.containers.immich-postgres = {
-    image = "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23";
+    image = images.immichPostgres;
 
     volumes = [
       "immich-pgdata:/var/lib/postgresql/data"

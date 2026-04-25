@@ -6,7 +6,7 @@
 }:
 
 let
-  homepageImage = "ghcr.io/gethomepage/homepage:v1.12.3@sha256:cc84f2f5eb3c7734353701ccbaa24ed02dacb0d119114e50e4251e2005f3990a";
+  images = import ../images.nix;
 
   cfg = config.services.homepage;
 
@@ -216,7 +216,7 @@ in
     # ── Public Homepage ─────────────────────────────────────────────────
 
     virtualisation.oci-containers.containers.homepage-public = {
-      image = homepageImage;
+      image = images.homepage;
 
       volumes = [
         "homepage-config-public:/app/config"
@@ -249,7 +249,7 @@ in
     # ── Private Homepage ────────────────────────────────────────────────
 
     virtualisation.oci-containers.containers.homepage-private = {
-      image = homepageImage;
+      image = images.homepage;
 
       volumes = [
         "homepage-config-private:/app/config"

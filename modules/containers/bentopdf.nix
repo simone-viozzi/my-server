@@ -1,5 +1,8 @@
 { config, ... }:
 
+let
+  images = import ../images.nix;
+in
 {
   # ── Sops secrets ──────────────────────────────────────────────────────
 
@@ -34,7 +37,7 @@
   # ── Container ─────────────────────────────────────────────────────────
 
   virtualisation.oci-containers.containers.bentopdf = {
-    image = "ghcr.io/alam00000/bentopdf-simple:latest@sha256:02cfa04e24619eff21bf511c4ae1aad172f6a8a50bbb1bca37f77c1887b7a31e";
+    image = images.bentopdf;
 
     environment = {
       TZ = "Europe/Rome";

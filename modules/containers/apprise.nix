@@ -1,5 +1,8 @@
 { config, ... }:
 
+let
+  images = import ../images.nix;
+in
 {
   # ── Volumes ───────────────────────────────────────────────────────────
 
@@ -39,7 +42,7 @@
   # ── Container ─────────────────────────────────────────────────────────
 
   virtualisation.oci-containers.containers.apprise = {
-    image = "caronc/apprise:v1.3.3@sha256:4bfeac268ba87b8e08e308c9aa0182fe99e9501ec464027afc333d1634e65977";
+    image = images.apprise;
 
     user = "1000:1000";
 

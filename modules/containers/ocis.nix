@@ -3,6 +3,9 @@
 # Integration nuances (Android app token_endpoint_auth_method, etc.):
 # see docs/nuances.md.
 
+let
+  images = import ../images.nix;
+in
 {
   # ── Volumes ───────────────────────────────────────────────────────────
 
@@ -185,7 +188,7 @@
   # ── Containers ────────────────────────────────────────────────────────
 
   virtualisation.oci-containers.containers.ocis = {
-    image = "docker.io/owncloud/ocis:8.0.1@sha256:b35c557ff56bbddc1dd74d4142d81a8a2cac9ff7e5e774516281a691e42bb153";
+    image = images.ocis;
 
     entrypoint = "/bin/sh";
     cmd = [
@@ -217,7 +220,7 @@
   };
 
   virtualisation.oci-containers.containers.collabora = {
-    image = "docker.io/collabora/code:25.04.9.4.1@sha256:8301eadc855c8e9ca90a5540ce30cf179dd248748d61c96ea82e0d28a379b0e4";
+    image = images.collabora;
 
     entrypoint = "/bin/bash";
     cmd = [
@@ -240,7 +243,7 @@
   };
 
   virtualisation.oci-containers.containers.collaboration = {
-    image = "docker.io/owncloud/ocis:8.0.1@sha256:b35c557ff56bbddc1dd74d4142d81a8a2cac9ff7e5e774516281a691e42bb153";
+    image = images.ocis;
 
     cmd = [
       "collaboration"

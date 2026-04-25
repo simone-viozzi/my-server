@@ -1,5 +1,8 @@
 { config, ... }:
 
+let
+  images = import ../images.nix;
+in
 {
   # ── Volumes ───────────────────────────────────────────────────────────
 
@@ -68,7 +71,7 @@
   # ── Containers ────────────────────────────────────────────────────────
 
   virtualisation.oci-containers.containers.karakeep = {
-    image = "ghcr.io/karakeep-app/karakeep:release@sha256:efd9682b69401288c6caa26d76b1c723e4252fe7a962bb78eb00a6cd5227aaca";
+    image = images.karakeep;
 
     volumes = [
       "karakeep-data:/data"
@@ -96,7 +99,7 @@
   };
 
   virtualisation.oci-containers.containers.karakeep-chrome = {
-    image = "gcr.io/zenika-hub/alpine-chrome:124@sha256:58155bc929e3453820bd54c806c73d3abfc07df6454182d87a44df75ea5a1d3a";
+    image = images.karakeepBrowser;
 
     cmd = [
       "--no-sandbox"
@@ -118,7 +121,7 @@
   };
 
   virtualisation.oci-containers.containers.karakeep-meilisearch = {
-    image = "docker.io/getmeili/meilisearch:v1.13.3@sha256:c4d6ab59c18d7b3636e82af862c31861ccf8afb3e9c14dddf9d3e868840667cd";
+    image = images.karakeepMeili;
 
     volumes = [
       "karakeep-meilisearch:/meili_data"

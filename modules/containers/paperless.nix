@@ -1,5 +1,8 @@
 { config, ... }:
 
+let
+  images = import ../images.nix;
+in
 {
   # ── Volumes ───────────────────────────────────────────────────────────
 
@@ -80,7 +83,7 @@
   # ── Containers ────────────────────────────────────────────────────────
 
   virtualisation.oci-containers.containers.paperless = {
-    image = "ghcr.io/paperless-ngx/paperless-ngx:latest@sha256:aacd57f01877d6838deb259f4258975982c1850395cb1bd58e1fb05360b40ca4";
+    image = images.paperless;
 
     user = "1000:1000";
 
@@ -107,7 +110,7 @@
   };
 
   virtualisation.oci-containers.containers.paperless-postgres = {
-    image = "docker.io/library/postgres:18@sha256:fbcb3dece453834980f7c89e1adad0d8854ff49032430753beec237a9ff069e0";
+    image = images.postgres18;
 
     volumes = [
       "paperless-pgdata:/var/lib/postgresql"
@@ -141,7 +144,7 @@
   };
 
   virtualisation.oci-containers.containers.paperless-redis = {
-    image = "docker.io/library/redis:8@sha256:f4e03de519aa22dc6c0a42e4afb10ef8ff15d818e9d388b0782060e2a4dd583d";
+    image = images.paperlessRedis;
 
     volumes = [
       "paperless-redisdata:/data"
@@ -164,7 +167,7 @@
   };
 
   virtualisation.oci-containers.containers.paperless-gotenberg = {
-    image = "docker.io/gotenberg/gotenberg:8@sha256:799a261dea9e2b724cb789d1cead6ad45e9038f6e88c31182603d0375e91b96e";
+    image = images.paperlessGotenberg;
 
     cmd = [
       "gotenberg"
@@ -183,7 +186,7 @@
   };
 
   virtualisation.oci-containers.containers.paperless-tika = {
-    image = "docker.io/apache/tika:latest@sha256:eb02f1c06168de85505a238ca1ad6937e2d0c3805795dc1abb0d1235bbb6e6cd";
+    image = images.tika;
 
     log-driver = "journald";
 

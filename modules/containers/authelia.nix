@@ -1,5 +1,8 @@
 { config, ... }:
 
+let
+  images = import ../images.nix;
+in
 {
   # ── Volumes ───────────────────────────────────────────────────────────
 
@@ -56,7 +59,7 @@
   # ── Container ─────────────────────────────────────────────────────────
 
   virtualisation.oci-containers.containers.authelia = {
-    image = "authelia/authelia:4.39.16@sha256:edbce01c5125249e4f4faea01e0f76f0031d64b4a1d0c2514a0ca69cb126d05f";
+    image = images.authelia;
 
     user = "1000:1000";
 

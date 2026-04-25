@@ -99,6 +99,14 @@ in
         podman-network-isolated = mkNetworkService "isolated" { internal = true; };
       }
       // btrfsVolumeServices
-      // plainVolumeServices;
+      // plainVolumeServices
+      // {
+        # Keep the Docker-API translator resident; default 5s idle timeout
+        # caused podman.service to cycle on every Homepage/dockerproxy poll.
+        podman.serviceConfig.ExecStart = [
+          ""
+          "${pkgs.podman}/bin/podman $LOGGING system service --time=0"
+        ];
+      };
   };
 }

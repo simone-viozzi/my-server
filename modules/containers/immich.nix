@@ -164,7 +164,7 @@ in
       "--cap-add=DAC_OVERRIDE"
       "--security-opt=no-new-privileges:true"
       "--shm-size=128m"
-      "--health-cmd=pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER} || exit 1"
+      "--health-cmd=pg_isready -d \${POSTGRES_DB} -U \${POSTGRES_USER} || exit 1"
       "--health-interval=10s"
       "--health-start-period=30s"
     ];

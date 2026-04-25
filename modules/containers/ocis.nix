@@ -61,6 +61,11 @@ in
     # ── Collaboration (WOPI) secure-view app ──
     FRONTEND_APP_HANDLER_SECURE_VIEW_APP_ADDR=com.owncloud.api.collaboration.CollaboraOnline
     GRAPH_AVAILABLE_ROLES=b1e2218d-eef8-4d4c-b82d-0f1a1b48f3b5,a8d5fe5e-96e3-418d-825b-534dbdf22b99,fb6c3e19-e378-47e5-b277-9732f9de6e21,58c63c02-1d89-4572-916a-870abc5a1b7d,2d00ce52-1fc2-4dbc-8b95-a73b73395f5a,1c996275-f1c9-4e71-abdf-a42f6495e960,312c0871-5ef7-4b3a-85b6-0e4074c64049,aa97fe03-7980-45ac-9e50-b325749fd7e6
+
+    # ── Full-text search via Apache Tika ──
+    SEARCH_EXTRACTOR_TYPE=tika
+    SEARCH_EXTRACTOR_TIKA_TIKA_URL=http://ocis-tika:9998
+    SEARCH_EXTRACTOR_CS3SOURCE_INSECURE=true
   '';
 
   sops.templates."ocis-collaboration.env".content = ''
@@ -242,6 +247,19 @@ in
     ];
   };
 
+  virtualisation.oci-containers.containers.ocis-tika = {
+    image = images.tika;
+
+    log-driver = "journald";
+
+    extraOptions = [
+      "--network=isolated"
+      "--stop-timeout=30"
+      "--cap-drop=ALL"
+      "--security-opt=no-new-privileges:true"
+    ];
+  };
+
   virtualisation.oci-containers.containers.collaboration = {
     image = images.ocis;
 
@@ -275,17 +293,24 @@ in
       "podman-network-isolated.service"
       "podman-volume-ocis-config.service"
       "podman-volume-ocis-data.service"
+      "podman-ocis-tika.service"
     ];
     requires = [
       "podman-network-isolated.service"
       "podman-volume-ocis-config.service"
       "podman-volume-ocis-data.service"
+      "podman-ocis-tika.service"
     ];
     restartTriggers = [
       config.sops.templates."ocis.env".content
       config.sops.templates."ocis-routing.yaml".content
       config.sops.templates."ocis-csp.yaml".content
     ];
+  };
+
+  systemd.services.podman-ocis-tika = {
+    after = [ "podman-network-isolated.service" ];
+    requires = [ "podman-network-isolated.service" ];
   };
 
   systemd.services.podman-collabora = {

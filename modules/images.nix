@@ -35,6 +35,13 @@
   # ocis is reused by both the ocis server and the collaboration WOPI sidecar.
   ocis = "docker.io/owncloud/ocis:8.0.1@sha256:b35c557ff56bbddc1dd74d4142d81a8a2cac9ff7e5e774516281a691e42bb153";
 
+  # oCIS web extensions (single-arch linux/amd64 images — no manifest list).
+  # Init-container pattern: each copies its app dir into the shared ocis-apps volume.
+  ocisExtDrawio = "docker.io/owncloud/web-extensions:draw-io-0.3.3@sha256:57ef8c26e4e811f92e6e2ac784c42969f50ef0ac9e4384dbbf13b12f2a4c1ae4";
+  ocisExtJsonViewer = "docker.io/owncloud/web-extensions:json-viewer-0.3.3@sha256:1a609676de54153b4d7618413904b12078119a55ca3379ec75cedd1f84544cea";
+  ocisExtUnzip = "docker.io/owncloud/web-extensions:unzip-0.4.3@sha256:9fc726645749514c98c6b9b5a7e6315295897ff5c62a538a3ff383a49272160b";
+  ocisExtProgressBars = "docker.io/owncloud/web-extensions:progress-bars-0.3.3@sha256:8faf230c3c601fb4d212720a0edd86073e292893b032021f951512e78e215390";
+
   paperless = "ghcr.io/paperless-ngx/paperless-ngx:latest@sha256:aacd57f01877d6838deb259f4258975982c1850395cb1bd58e1fb05360b40ca4";
   paperlessRedis = "docker.io/library/redis:8@sha256:f4e03de519aa22dc6c0a42e4afb10ef8ff15d818e9d388b0782060e2a4dd583d";
   paperlessGotenberg = "docker.io/gotenberg/gotenberg:8@sha256:799a261dea9e2b724cb789d1cead6ad45e9038f6e88c31182603d0375e91b96e";

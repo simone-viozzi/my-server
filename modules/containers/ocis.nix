@@ -1,10 +1,43 @@
-{ config, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 # Integration nuances (Android app token_endpoint_auth_method, etc.):
 # see docs/nuances.md.
 
 let
   images = import ../images.nix;
+
+  # Web extensions: each is a one-shot init container that copies its app
+  # directory into the shared ocis-apps volume. oCIS reads it at runtime
+  # via WEB_ASSET_APPS_PATH.
+  webExtensions = {
+    "draw-io" = images.ocisExtDrawio;
+    "json-viewer" = images.ocisExtJsonViewer;
+    "unzip" = images.ocisExtUnzip;
+    "progress-bars" = images.ocisExtProgressBars;
+  };
+
+  mkWebExtInitService = name: image: {
+    description = "Install oCIS web extension: ${name}";
+    after = [
+      "podman-volume-ocis-apps.service"
+      "network-online.target"
+    ];
+    requires = [ "podman-volume-ocis-apps.service" ];
+    wants = [ "network-online.target" ];
+    before = [ "podman-ocis.service" ];
+    wantedBy = [ "podman-ocis.service" ];
+    restartTriggers = [ image ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = "${pkgs.podman}/bin/podman run --rm --user=root -v ocis-apps:/apps ${image} sh -c 'rm -rf /apps/${name} && cp -R /var/lib/nginx/html/${name}/ /apps/'";
+    };
+  };
 in
 {
   # ── Volumes ───────────────────────────────────────────────────────────
@@ -14,6 +47,9 @@ in
   };
   podman.volumes.ocis-data = {
     storage = "btrfs-hdd";
+  };
+  podman.volumes.ocis-apps = {
+    storage = "plain";
   };
 
   # ── Sops secrets ──────────────────────────────────────────────────────
@@ -66,6 +102,9 @@ in
     SEARCH_EXTRACTOR_TYPE=tika
     SEARCH_EXTRACTOR_TIKA_TIKA_URL=http://ocis-tika:9998
     SEARCH_EXTRACTOR_CS3SOURCE_INSECURE=true
+
+    # ── Web extensions (assets populated by ocis-ext-* init services) ──
+    WEB_ASSET_APPS_PATH=/var/lib/ocis-apps
   '';
 
   sops.templates."ocis-collaboration.env".content = ''
@@ -117,10 +156,12 @@ in
         - 'blob:'
         - 'https://auth.${config.sops.placeholder.base_domain}/'
         - 'https://collabora.${config.sops.placeholder.base_domain}/'
+        - 'https://embed.diagrams.net/'
       img-src:
         - "'self'"
         - 'data:'
         - 'blob:'
+        - 'https://collabora.${config.sops.placeholder.base_domain}/'
       manifest-src:
         - "'self'"
       media-src:
@@ -186,10 +227,6 @@ in
     "${config.sops.templates."ocis-routing.yaml".path}:/etc/traefik/dynamic/ocis.yaml:ro"
   ];
 
-  systemd.services.podman-traefik.restartTriggers = [
-    config.sops.templates."ocis-routing.yaml".content
-  ];
-
   # ── Containers ────────────────────────────────────────────────────────
 
   virtualisation.oci-containers.containers.ocis = {
@@ -204,6 +241,7 @@ in
     volumes = [
       "ocis-config:/etc/ocis"
       "ocis-data:/var/lib/ocis"
+      "ocis-apps:/var/lib/ocis-apps:ro"
       "${./ocis/app-registry.yaml}:/etc/ocis/app-registry.yaml:ro"
       "${config.sops.templates."ocis-csp.yaml".path}:/etc/ocis/csp.yaml:ro"
       "${./ocis/banned-password-list.txt}:/etc/ocis/banned-password-list.txt:ro"
@@ -288,50 +326,76 @@ in
 
   # ── Systemd ordering ─────────────────────────────────────────────────
 
-  systemd.services.podman-ocis = {
-    after = [
-      "podman-network-isolated.service"
-      "podman-volume-ocis-config.service"
-      "podman-volume-ocis-data.service"
-      "podman-ocis-tika.service"
-    ];
-    requires = [
-      "podman-network-isolated.service"
-      "podman-volume-ocis-config.service"
-      "podman-volume-ocis-data.service"
-      "podman-ocis-tika.service"
-    ];
-    restartTriggers = [
-      config.sops.templates."ocis.env".content
+  systemd.services = {
+    podman-traefik.restartTriggers = [
       config.sops.templates."ocis-routing.yaml".content
-      config.sops.templates."ocis-csp.yaml".content
     ];
-  };
 
-  systemd.services.podman-ocis-tika = {
-    after = [ "podman-network-isolated.service" ];
-    requires = [ "podman-network-isolated.service" ];
-  };
+    podman-ocis = {
+      after = [
+        "podman-network-isolated.service"
+        "podman-volume-ocis-config.service"
+        "podman-volume-ocis-data.service"
+        "podman-volume-ocis-apps.service"
+        "podman-ocis-tika.service"
+      ]
+      ++ map (n: "ocis-ext-${n}.service") (lib.attrNames webExtensions);
+      requires = [
+        "podman-network-isolated.service"
+        "podman-volume-ocis-config.service"
+        "podman-volume-ocis-data.service"
+        "podman-volume-ocis-apps.service"
+        "podman-ocis-tika.service"
+      ]
+      ++ map (n: "ocis-ext-${n}.service") (lib.attrNames webExtensions);
+      restartTriggers = [
+        config.sops.templates."ocis.env".content
+        config.sops.templates."ocis-routing.yaml".content
+        config.sops.templates."ocis-csp.yaml".content
+      ];
+    };
 
-  systemd.services.podman-collabora = {
-    restartTriggers = [
-      config.sops.templates."collabora.env".content
-    ];
-  };
+    podman-ocis-tika = {
+      after = [ "podman-network-isolated.service" ];
+      requires = [ "podman-network-isolated.service" ];
+    };
 
-  systemd.services.podman-collaboration = {
-    after = [
-      "podman-ocis.service"
-      "podman-collabora.service"
-      "podman-volume-ocis-config.service"
-    ];
-    requires = [
-      "podman-volume-ocis-config.service"
-    ];
-    restartTriggers = [
-      config.sops.templates."ocis-collaboration.env".content
-    ];
-  };
+    podman-collabora = {
+      restartTriggers = [
+        config.sops.templates."collabora.env".content
+      ];
+    };
+
+    podman-collaboration = {
+      after = [
+        "podman-ocis.service"
+        "podman-collabora.service"
+        "podman-volume-ocis-config.service"
+      ];
+      requires = [
+        "podman-volume-ocis-config.service"
+      ];
+      # Follow ocis lifecycle: when ocis restarts, NATS service-registry
+      # subscription is lost and collaboration must re-register, otherwise
+      # /app/list returns empty and Collabora disappears from the UI.
+      partOf = [ "podman-ocis.service" ];
+      # Collaboration calls log.Fatal() if NATS isn't reachable on first try.
+      # When ocis restarts, NATS needs ~10-20s to be ready — let collaboration
+      # retry long enough (default burst of 5/10s exhausts in <2s here).
+      serviceConfig.RestartSec = "10s";
+      unitConfig = {
+        StartLimitBurst = 10;
+        StartLimitIntervalSec = 300;
+      };
+      restartTriggers = [
+        config.sops.templates."ocis-collaboration.env".content
+      ];
+    };
+  }
+  # Web extension init services: copy app assets into ocis-apps volume.
+  // lib.mapAttrs' (
+    name: image: lib.nameValuePair "ocis-ext-${name}" (mkWebExtInitService name image)
+  ) webExtensions;
 
   # ── Backup ────────────────────────────────────────────────────────────
 

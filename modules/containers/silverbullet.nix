@@ -2,12 +2,26 @@
 
 let
   images = import ../images.nix;
+  constants = import ../../lib/constants.nix;
 in
 {
   # ── Volumes ───────────────────────────────────────────────────────────
 
   podman.volumes.silverbullet-space = {
     storage = "btrfs-hdd";
+  };
+
+  # Mount the same btrfs subvolume at ~/silverbullet-space so the space
+  # is editable from the host; container PUID=1000 matches simone's uid.
+  fileSystems."/home/simone/silverbullet-space" = {
+    device = "/dev/disk/by-uuid/${constants.storageDevices."btrfs-hdd".uuid}";
+    fsType = "btrfs";
+    options = [
+      "subvol=docker-volumes/@silverbullet-space"
+      "noatime"
+      "compress=zstd"
+      "nofail"
+    ];
   };
 
   # ── Sops secrets ──────────────────────────────────────────────────────

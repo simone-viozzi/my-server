@@ -198,5 +198,6 @@
     pkgs.htop
     pkgs.jq
     pkgs.openssl
+    pkgs.nixfmt
   ];
 }

@@ -18,7 +18,8 @@ nh os switch .
 # Rebuild and switch using nixos-rebuild
 sudo nixos-rebuild switch --flake .
 
-# Build without switching (dry run with diff)
+# Build without switching, then show an nvd package-level diff vs running system
+# (preferred for reviewing a change before `nh os switch`)
 nh os build .
 
 # Format nix files
@@ -65,6 +66,10 @@ The `_reference/` directory (gitignored) contains a working homelab NixOS config
 
 - **mcp-nixos**: Query NixOS options, packages, and Home Manager options. Use for looking up correct option names and types.
 - **tavily**: Web search and research. Use for finding NixOS configuration examples and documentation.
+
+## Skills
+
+- **update-containers** (`.claude/skills/update-containers/`) — bumps one stack (`modules/containers/<stack>.nix`) to its latest upstream version: fetches release notes, classifies whether infra changes are needed, edits `images.nix`, builds, and waits for the user to run `nh os switch` before committing. Each stack needs a sibling `<stack>.update.md` metadata file (schema in memory `reference_metadata_schema`).
 
 ## Nix Style
 

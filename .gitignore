@@ -11,3 +11,4 @@ result
 .mcp.json
 .pre-commit-config.yaml
 _reference
+settings.local.json

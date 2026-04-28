@@ -45,6 +45,9 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
+              extraSpecialArgs = {
+                claudeCodePkg = claude-code.packages.x86_64-linux.default;
+              };
               users.simone = import ./home/simone.nix;
             };
           }

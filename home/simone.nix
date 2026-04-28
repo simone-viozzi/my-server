@@ -2,6 +2,7 @@
   lib,
   config,
   pkgs,
+  claudeCodePkg,
   ...
 }:
 {
@@ -14,6 +15,42 @@
       PATH = "$HOME/.local/bin:$PATH";
       UV_PYTHON_DOWNLOADS = "never";
     };
+
+    activation.claudeAcnSync = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      src="$HOME/.claude"
+      dst="$HOME/.claude2"
+      if [ ! -d "$src" ]; then
+        exit 0
+      fi
+      mkdir -p "$dst"
+      shopt -s dotglob nullglob
+      for entry in "$src"/*; do
+        name=$(basename "$entry")
+        [ "$name" = ".credentials.json" ] && continue
+        link="$dst/$name"
+        if [ -L "$link" ] && [ "$(readlink "$link")" = "$entry" ]; then
+          continue
+        fi
+        if [ -e "$link" ] && [ ! -L "$link" ]; then
+          echo "claudeAcnSync: WARNING: $link exists as a real file/dir, not symlinking $entry over it" >&2
+          continue
+        fi
+        rm -f "$link"
+        ln -s "$entry" "$link"
+      done
+      # Prune stale symlinks pointing into $src for entries that no longer exist.
+      for link in "$dst"/*; do
+        [ -L "$link" ] || continue
+        target=$(readlink "$link")
+        case "$target" in
+          "$src"/*)
+            if [ ! -e "$target" ]; then
+              rm -f "$link"
+            fi
+            ;;
+        esac
+      done
+    '';
   };
 
   xdg.enable = true;
@@ -30,6 +67,7 @@
       dotDir = "${config.xdg.configHome}/zsh";
       shellAliases = {
         update = "nh os switch --update";
+        claude2 = "CLAUDE_CONFIG_DIR=$HOME/.claude2 claude";
         a = "als";
         la = "eza -la --icons -F";
         lg = "eza -l -F --icons --git --sort=modified";
@@ -193,6 +231,7 @@
   };
 
   home.packages = [
+    claudeCodePkg
     pkgs.gh
     pkgs.sops
     pkgs.htop

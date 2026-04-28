@@ -71,6 +71,11 @@ in
   virtualisation.oci-containers.containers.immich-server = {
     image = images.immichServer;
 
+    update = {
+      primary = true;
+      repo = "immich-app/immich";
+    };
+
     volumes = [
       "immich-upload:/usr/src/app/upload"
       "/etc/localtime:/etc/localtime:ro"

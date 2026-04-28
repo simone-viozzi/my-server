@@ -101,6 +101,11 @@ in
   virtualisation.oci-containers.containers.resume = {
     image = images.resume;
 
+    update = {
+      primary = true;
+      repo = "AmruthPillai/Reactive-Resume";
+    };
+
     volumes = [
       "resume-data:/app/data"
     ];

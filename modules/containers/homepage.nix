@@ -218,6 +218,11 @@ in
     virtualisation.oci-containers.containers.homepage-public = {
       image = images.homepage;
 
+      update = {
+        primary = true;
+        repo = "gethomepage/homepage";
+      };
+
       volumes = [
         "homepage-config-public:/app/config"
         "${settingsPublic}:/app/config/settings.yaml:ro"

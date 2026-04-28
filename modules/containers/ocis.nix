@@ -232,6 +232,11 @@ in
   virtualisation.oci-containers.containers.ocis = {
     image = images.ocis;
 
+    update = {
+      primary = true;
+      repo = "owncloud/ocis";
+    };
+
     entrypoint = "/bin/sh";
     cmd = [
       "-c"

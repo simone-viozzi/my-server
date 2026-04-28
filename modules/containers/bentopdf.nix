@@ -39,6 +39,11 @@ in
   virtualisation.oci-containers.containers.bentopdf = {
     image = images.bentopdf;
 
+    update = {
+      primary = true;
+      repo = "alam00000/bentopdf";
+    };
+
     environment = {
       TZ = "Europe/Rome";
     };

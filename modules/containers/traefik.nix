@@ -52,6 +52,11 @@ in
   virtualisation.oci-containers.containers.traefik = {
     image = images.traefik;
 
+    update = {
+      primary = true;
+      repo = "traefik/traefik";
+    };
+
     environmentFiles = [
       config.sops.templates."traefik.env".path
     ];

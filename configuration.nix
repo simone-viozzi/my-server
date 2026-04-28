@@ -9,6 +9,7 @@
     ./modules/users.nix
     ./modules/nh.nix
     ./modules/podman.nix
+    ./modules/container-updates.nix
     ./modules/containers/traefik.nix
     ./modules/containers/authelia.nix
     ./modules/containers/apprise.nix

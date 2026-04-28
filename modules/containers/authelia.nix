@@ -61,6 +61,11 @@ in
   virtualisation.oci-containers.containers.authelia = {
     image = images.authelia;
 
+    update = {
+      primary = true;
+      repo = "authelia/authelia";
+    };
+
     user = "1000:1000";
 
     volumes = [

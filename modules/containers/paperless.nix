@@ -85,6 +85,11 @@ in
   virtualisation.oci-containers.containers.paperless = {
     image = images.paperless;
 
+    update = {
+      primary = true;
+      repo = "paperless-ngx/paperless-ngx";
+    };
+
     user = "1000:1000";
 
     volumes = [

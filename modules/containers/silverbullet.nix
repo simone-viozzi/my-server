@@ -61,6 +61,11 @@ in
   virtualisation.oci-containers.containers.silverbullet = {
     image = images.silverbullet;
 
+    update = {
+      primary = true;
+      repo = "silverbulletmd/silverbullet";
+    };
+
     volumes = [
       "silverbullet-space:/space"
     ];

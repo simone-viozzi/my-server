@@ -73,6 +73,11 @@ in
   virtualisation.oci-containers.containers.karakeep = {
     image = images.karakeep;
 
+    update = {
+      primary = true;
+      repo = "karakeep-app/karakeep";
+    };
+
     volumes = [
       "karakeep-data:/data"
     ];

@@ -11,6 +11,11 @@ in
   virtualisation.oci-containers.containers.dockerproxy = {
     image = images.dockerproxy;
 
+    update = {
+      primary = true;
+      repo = "Tecnativa/docker-socket-proxy";
+    };
+
     volumes = [
       "/var/run/docker.sock:/var/run/docker.sock:ro"
     ];

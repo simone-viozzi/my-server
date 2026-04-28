@@ -44,6 +44,11 @@ in
   virtualisation.oci-containers.containers.apprise = {
     image = images.apprise;
 
+    update = {
+      primary = true;
+      repo = "caronc/apprise-api";
+    };
+
     user = "1000:1000";
 
     volumes = [

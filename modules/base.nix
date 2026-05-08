@@ -46,7 +46,9 @@
     nixfmt
     skopeo
     duf
+    dust
     inxi
+    tcpdump
   ];
 
   # Console

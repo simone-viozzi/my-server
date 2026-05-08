@@ -24,6 +24,7 @@
     ./modules/containers/ocis.nix
     ./modules/backup.nix
     ./modules/notifications.nix
+    ./modules/version-check.nix
   ];
 
   networking = {

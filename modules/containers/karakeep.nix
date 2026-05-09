@@ -118,7 +118,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=podman"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -167,15 +167,6 @@ in
     restartTriggers = [
       config.sops.templates."karakeep-web.env".content
       config.sops.templates."karakeep-routing.yaml".content
-    ];
-  };
-
-  systemd.services.podman-karakeep-chrome = {
-    after = [
-      "podman-network-isolated.service"
-    ];
-    requires = [
-      "podman-network-isolated.service"
     ];
   };
 

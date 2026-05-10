@@ -6,7 +6,7 @@ in
 {
   # ── Container ─────────────────────────────────────────────────────────
   # Read-only Docker/Podman socket proxy for Homepage container discovery.
-  # Only accessible from the isolated internal network.
+  # Only accessible from the homepage stack network.
 
   virtualisation.oci-containers.containers.dockerproxy = {
     image = images.dockerproxy;
@@ -31,7 +31,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=homepage-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -47,10 +47,10 @@ in
 
   systemd.services.podman-dockerproxy = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-homepage-net.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-homepage-net.service"
     ];
     serviceConfig.Type = "notify";
     serviceConfig.NotifyAccess = "all";

@@ -242,8 +242,8 @@ in
       log-driver = "journald";
 
       extraOptions = [
-        "--network=podman"
-        "--network=isolated"
+        "--network=homepage-net"
+        "--network=proxy"
         "--stop-timeout=30"
         "--cap-drop=ALL"
         "--security-opt=no-new-privileges:true"
@@ -277,8 +277,8 @@ in
       log-driver = "journald";
 
       extraOptions = [
-        "--network=podman"
-        "--network=isolated"
+        "--network=homepage-net"
+        "--network=proxy"
         "--stop-timeout=30"
         "--cap-drop=ALL"
         "--security-opt=no-new-privileges:true"
@@ -290,11 +290,13 @@ in
 
     systemd.services.podman-homepage-public = {
       after = [
-        "podman-network-isolated.service"
+        "podman-network-homepage-net.service"
+        "podman-network-proxy.service"
         "podman-volume-homepage-config-public.service"
       ];
       requires = [
-        "podman-network-isolated.service"
+        "podman-network-homepage-net.service"
+        "podman-network-proxy.service"
         "podman-volume-homepage-config-public.service"
       ];
       restartTriggers = [
@@ -305,12 +307,14 @@ in
 
     systemd.services.podman-homepage-private = {
       after = [
-        "podman-network-isolated.service"
+        "podman-network-homepage-net.service"
+        "podman-network-proxy.service"
         "podman-volume-homepage-config-private.service"
         "podman-dockerproxy.service"
       ];
       requires = [
-        "podman-network-isolated.service"
+        "podman-network-homepage-net.service"
+        "podman-network-proxy.service"
         "podman-volume-homepage-config-private.service"
         "podman-dockerproxy.service"
       ];

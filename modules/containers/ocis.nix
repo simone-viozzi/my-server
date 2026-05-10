@@ -265,8 +265,8 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=podman"
-      "--network=isolated"
+      "--network=ocis-net"
+      "--network=proxy"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -289,7 +289,8 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=podman"
+      "--network=ocis-net"
+      "--network=proxy"
       "--stop-timeout=30"
       "--cap-add=MKNOD"
       "--security-opt=no-new-privileges:true"
@@ -302,7 +303,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=ocis-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -328,7 +329,8 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=podman"
+      "--network=ocis-net"
+      "--network=proxy"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -344,7 +346,8 @@ in
 
     podman-ocis = {
       after = [
-        "podman-network-isolated.service"
+        "podman-network-ocis-net.service"
+        "podman-network-proxy.service"
         "podman-volume-ocis-config.service"
         "podman-volume-ocis-data.service"
         "podman-volume-ocis-apps.service"
@@ -352,7 +355,8 @@ in
       ]
       ++ map (n: "ocis-ext-${n}.service") (lib.attrNames webExtensions);
       requires = [
-        "podman-network-isolated.service"
+        "podman-network-ocis-net.service"
+        "podman-network-proxy.service"
         "podman-volume-ocis-config.service"
         "podman-volume-ocis-data.service"
         "podman-volume-ocis-apps.service"
@@ -367,11 +371,19 @@ in
     };
 
     podman-ocis-tika = {
-      after = [ "podman-network-isolated.service" ];
-      requires = [ "podman-network-isolated.service" ];
+      after = [ "podman-network-ocis-net.service" ];
+      requires = [ "podman-network-ocis-net.service" ];
     };
 
     podman-collabora = {
+      after = [
+        "podman-network-ocis-net.service"
+        "podman-network-proxy.service"
+      ];
+      requires = [
+        "podman-network-ocis-net.service"
+        "podman-network-proxy.service"
+      ];
       restartTriggers = [
         config.sops.templates."collabora.env".content
       ];
@@ -379,11 +391,15 @@ in
 
     podman-collaboration = {
       after = [
+        "podman-network-ocis-net.service"
+        "podman-network-proxy.service"
         "podman-ocis.service"
         "podman-collabora.service"
         "podman-volume-ocis-config.service"
       ];
       requires = [
+        "podman-network-ocis-net.service"
+        "podman-network-proxy.service"
         "podman-volume-ocis-config.service"
       ];
       # Follow ocis lifecycle: when ocis restarts, NATS service-registry

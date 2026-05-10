@@ -92,8 +92,8 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=podman"
-      "--network=isolated"
+      "--network=immich-net"
+      "--network=proxy"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -114,8 +114,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=podman"
-      "--network=isolated"
+      "--network=immich-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -128,7 +127,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=immich-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--cap-add=SETUID"
@@ -159,7 +158,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=immich-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--cap-add=SETUID"
@@ -179,13 +178,15 @@ in
 
   systemd.services.podman-immich-server = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-immich-net.service"
+      "podman-network-proxy.service"
       "podman-volume-immich-upload.service"
       "podman-immich-postgres.service"
       "podman-immich-redis.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-immich-net.service"
+      "podman-network-proxy.service"
       "podman-volume-immich-upload.service"
       "podman-immich-postgres.service"
       "podman-immich-redis.service"
@@ -197,11 +198,11 @@ in
 
   systemd.services.podman-immich-machine-learning = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-immich-net.service"
       "podman-volume-immich-model-cache.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-immich-net.service"
       "podman-volume-immich-model-cache.service"
     ];
     restartTriggers = [
@@ -211,20 +212,20 @@ in
 
   systemd.services.podman-immich-redis = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-immich-net.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-immich-net.service"
     ];
   };
 
   systemd.services.podman-immich-postgres = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-immich-net.service"
       "podman-volume-immich-pgdata.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-immich-net.service"
       "podman-volume-immich-pgdata.service"
     ];
     restartTriggers = [

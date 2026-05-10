@@ -105,6 +105,12 @@ in
 
     # ── Web extensions (assets populated by ocis-ext-* init services) ──
     WEB_ASSET_APPS_PATH=/var/lib/ocis-apps
+
+    # ── App passwords (rclone, mobile clients) ──
+    OCIS_ADD_RUN_SERVICES=auth-app
+    PROXY_ENABLE_APP_AUTH=true
+    WEB_OPTION_OPEN_APP_TOKEN_MANAGER=true
+    AUTH_APP_ALLOW_IMPERSONATION=false
   '';
 
   sops.templates."ocis-collaboration.env".content = ''

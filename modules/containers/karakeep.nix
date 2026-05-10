@@ -95,8 +95,8 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=podman"
-      "--network=isolated"
+      "--network=karakeep-net"
+      "--network=proxy"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -118,7 +118,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=podman"
+      "--network=karakeep-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -139,7 +139,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=karakeep-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -153,13 +153,15 @@ in
 
   systemd.services.podman-karakeep = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-karakeep-net.service"
+      "podman-network-proxy.service"
       "podman-volume-karakeep-data.service"
       "podman-karakeep-chrome.service"
       "podman-karakeep-meilisearch.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-karakeep-net.service"
+      "podman-network-proxy.service"
       "podman-volume-karakeep-data.service"
       "podman-karakeep-chrome.service"
       "podman-karakeep-meilisearch.service"
@@ -170,13 +172,22 @@ in
     ];
   };
 
+  systemd.services.podman-karakeep-chrome = {
+    after = [
+      "podman-network-karakeep-net.service"
+    ];
+    requires = [
+      "podman-network-karakeep-net.service"
+    ];
+  };
+
   systemd.services.podman-karakeep-meilisearch = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-karakeep-net.service"
       "podman-volume-karakeep-meilisearch.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-karakeep-net.service"
       "podman-volume-karakeep-meilisearch.service"
     ];
     restartTriggers = [

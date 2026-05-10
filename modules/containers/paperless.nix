@@ -104,8 +104,8 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=podman"
-      "--network=isolated"
+      "--network=paperless-net"
+      "--network=proxy"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -132,7 +132,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=paperless-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--cap-add=SETUID"
@@ -158,7 +158,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=paperless-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--cap-add=SETUID"
@@ -183,7 +183,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=paperless-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -196,7 +196,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=paperless-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -207,7 +207,8 @@ in
 
   systemd.services.podman-paperless = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-paperless-net.service"
+      "podman-network-proxy.service"
       "podman-volume-paperless-data.service"
       "podman-volume-paperless-media.service"
       "podman-paperless-postgres.service"
@@ -216,7 +217,8 @@ in
       "podman-paperless-tika.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-paperless-net.service"
+      "podman-network-proxy.service"
       "podman-volume-paperless-data.service"
       "podman-volume-paperless-media.service"
       "podman-paperless-postgres.service"
@@ -232,11 +234,11 @@ in
 
   systemd.services.podman-paperless-postgres = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-paperless-net.service"
       "podman-volume-paperless-pgdata.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-paperless-net.service"
       "podman-volume-paperless-pgdata.service"
     ];
     restartTriggers = [
@@ -246,30 +248,30 @@ in
 
   systemd.services.podman-paperless-redis = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-paperless-net.service"
       "podman-volume-paperless-redisdata.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-paperless-net.service"
       "podman-volume-paperless-redisdata.service"
     ];
   };
 
   systemd.services.podman-paperless-gotenberg = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-paperless-net.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-paperless-net.service"
     ];
   };
 
   systemd.services.podman-paperless-tika = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-paperless-net.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-paperless-net.service"
     ];
   };
 

@@ -121,8 +121,8 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=podman"
-      "--network=isolated"
+      "--network=reactive-resume-net"
+      "--network=proxy"
       "--stop-timeout=30"
       # Node runs as PID 1 with no SIGTERM handler, so the kernel drops it
       # and podman SIGKILLs after timeout. Node exits cleanly on SIGINT.
@@ -150,7 +150,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=reactive-resume-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--cap-add=SETUID"
@@ -182,7 +182,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=reactive-resume-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--cap-add=SYS_ADMIN"
@@ -216,7 +216,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=reactive-resume-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--cap-add=SETUID"
@@ -244,7 +244,7 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=isolated"
+      "--network=reactive-resume-net"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -255,14 +255,16 @@ in
 
   systemd.services.podman-resume = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-reactive-resume-net.service"
+      "podman-network-proxy.service"
       "podman-volume-resume-data.service"
       "podman-resume-postgres.service"
       "podman-resume-browserless.service"
       "podman-resume-seaweedfs-init.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-reactive-resume-net.service"
+      "podman-network-proxy.service"
       "podman-volume-resume-data.service"
       "podman-resume-postgres.service"
       "podman-resume-browserless.service"
@@ -276,11 +278,11 @@ in
 
   systemd.services.podman-resume-postgres = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-reactive-resume-net.service"
       "podman-volume-resume-pgdata.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-reactive-resume-net.service"
       "podman-volume-resume-pgdata.service"
     ];
     restartTriggers = [
@@ -290,10 +292,10 @@ in
 
   systemd.services.podman-resume-browserless = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-reactive-resume-net.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-reactive-resume-net.service"
     ];
     restartTriggers = [
       config.sops.templates."resume-browserless.env".content
@@ -302,11 +304,11 @@ in
 
   systemd.services.podman-resume-seaweedfs = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-reactive-resume-net.service"
       "podman-volume-resume-seaweedfs.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-reactive-resume-net.service"
       "podman-volume-resume-seaweedfs.service"
     ];
     restartTriggers = [
@@ -316,11 +318,11 @@ in
 
   systemd.services.podman-resume-seaweedfs-init = {
     after = [
-      "podman-network-isolated.service"
+      "podman-network-reactive-resume-net.service"
       "podman-resume-seaweedfs.service"
     ];
     requires = [
-      "podman-network-isolated.service"
+      "podman-network-reactive-resume-net.service"
       "podman-resume-seaweedfs.service"
     ];
     # Run once and don't restart — it's a one-shot init container

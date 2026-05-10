@@ -94,8 +94,31 @@ in
           serviceConfig.SuccessExitStatus = "143";
         }
       ) config.virtualisation.oci-containers.containers)
+      # ── Networks ─────────────────────────────────────────────────────
+      # TODO: distribute these per-stack into each module instead of a
+      # central list (see memory: project_todo_per_stack_network_decl).
+      // (
+        let
+          bridgeNets = [
+            "proxy"
+            "apprise-net"
+            "authelia-net"
+            "bentopdf-net"
+            "silverbullet-net"
+            "karakeep-net"
+            "reactive-resume-net"
+            "paperless-net"
+            "immich-net"
+            "homepage-net"
+            "ocis-net"
+          ];
+        in
+        lib.listToAttrs (
+          map (n: lib.nameValuePair "podman-network-${n}" (mkNetworkService n { })) bridgeNets
+        )
+      )
       // {
-        # ── Networks ─────────────────────────────────────────────────────
+        # Removed in phase 3 cleanup once nothing references it.
         podman-network-isolated = mkNetworkService "isolated" { internal = true; };
       }
       // btrfsVolumeServices

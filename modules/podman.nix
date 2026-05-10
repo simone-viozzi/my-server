@@ -117,10 +117,6 @@ in
           map (n: lib.nameValuePair "podman-network-${n}" (mkNetworkService n { })) bridgeNets
         )
       )
-      // {
-        # Removed in phase 3 cleanup once nothing references it.
-        podman-network-isolated = mkNetworkService "isolated" { internal = true; };
-      }
       // btrfsVolumeServices
       // plainVolumeServices
       // {

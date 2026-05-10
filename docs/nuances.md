@@ -37,3 +37,24 @@ rejects the token exchange with `invalid_client` (method mismatch). Use
   userinfo_signed_response_alg: 'none'
   token_endpoint_auth_method: 'client_secret_post'  # deviates from guide
 ```
+
+## oCIS app passwords — CLI requires explicit registry env
+
+oCIS 8.0.x has no web UI for app tokens (rclone, mobile clients). Tokens are
+managed via CLI or REST API only — see upstream `services/auth-app/README.md`.
+
+The running oCIS process uses the embedded NATS service registry. A fresh
+`ocis` CLI subprocess started via `podman exec` defaults to `mdns` and fails
+with `com.owncloud.api.gateway: service not found`. Override on the exec:
+
+```bash
+sudo podman exec \
+  -e MICRO_REGISTRY=nats-js-kv \
+  -e MICRO_REGISTRY_ADDRESS=127.0.0.1:9233 \
+  ocis ocis auth-app create --user-name=<user> --expiration=8760h
+```
+
+The token in the JSON output is the password — it's bcrypt-hashed at rest, so
+copy it now. Use it as the password in any WebDAV client (rclone:
+`rclone obscure '<token>'` then `pass = <obscured>`).
+

@@ -107,9 +107,11 @@ in
     WEB_ASSET_APPS_PATH=/var/lib/ocis-apps
 
     # ── App passwords (rclone, mobile clients) ──
+    # No web UI exists in oCIS 8.0.x — tokens are managed via CLI or REST API
+    # (`ocis auth-app create` / `POST /auth-app/tokens`). See services/auth-app
+    # README upstream.
     OCIS_ADD_RUN_SERVICES=auth-app
     PROXY_ENABLE_APP_AUTH=true
-    WEB_OPTION_OPEN_APP_TOKEN_MANAGER=true
     AUTH_APP_ALLOW_IMPERSONATION=false
   '';
 

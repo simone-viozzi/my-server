@@ -55,8 +55,11 @@ in
       "apprise-config:/config"
     ];
 
-    # Localhost-only for host systemd services (boot-notify, notify-failure)
-    # External access goes through Traefik + Authelia
+    # Localhost-only for host systemd services (boot-notify, notify-failure).
+    # External access goes through Traefik + Authelia.
+    # TODO: if multi-net + localhost publish breaks (podman#25865 mechanism
+    # changes), drop this and route host calls via Traefik —
+    # see memory: project_todo_apprise_drop_localhost_publish.
     ports = [
       "127.0.0.1:8000:8000"
     ];
@@ -68,7 +71,8 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=podman"
+      "--network=apprise-net"
+      "--network=proxy"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -81,9 +85,13 @@ in
   systemd.services.podman-apprise = {
     after = [
       "podman-volume-apprise-config.service"
+      "podman-network-apprise-net.service"
+      "podman-network-proxy.service"
     ];
     requires = [
       "podman-volume-apprise-config.service"
+      "podman-network-apprise-net.service"
+      "podman-network-proxy.service"
     ];
   };
 

@@ -79,7 +79,8 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=podman"
+      "--network=silverbullet-net"
+      "--network=proxy"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--cap-add=SETUID"
@@ -93,9 +94,13 @@ in
   systemd.services.podman-silverbullet = {
     after = [
       "podman-volume-silverbullet-space.service"
+      "podman-network-silverbullet-net.service"
+      "podman-network-proxy.service"
     ];
     requires = [
       "podman-volume-silverbullet-space.service"
+      "podman-network-silverbullet-net.service"
+      "podman-network-proxy.service"
     ];
     restartTriggers = [
       config.sops.templates."silverbullet-routing.yaml".content

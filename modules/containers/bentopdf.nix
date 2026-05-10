@@ -51,7 +51,8 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=podman"
+      "--network=bentopdf-net"
+      "--network=proxy"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -61,6 +62,14 @@ in
   # ── Systemd ordering ─────────────────────────────────────────────────
 
   systemd.services.podman-bentopdf = {
+    after = [
+      "podman-network-bentopdf-net.service"
+      "podman-network-proxy.service"
+    ];
+    requires = [
+      "podman-network-bentopdf-net.service"
+      "podman-network-proxy.service"
+    ];
     restartTriggers = [
       config.sops.templates."bentopdf-routing.yaml".content
     ];

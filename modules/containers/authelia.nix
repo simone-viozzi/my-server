@@ -82,7 +82,8 @@ in
     log-driver = "journald";
 
     extraOptions = [
-      "--network=podman"
+      "--network=authelia-net"
+      "--network=proxy"
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
@@ -95,9 +96,13 @@ in
   systemd.services.podman-authelia = {
     after = [
       "podman-volume-authelia-data.service"
+      "podman-network-authelia-net.service"
+      "podman-network-proxy.service"
     ];
     requires = [
       "podman-volume-authelia-data.service"
+      "podman-network-authelia-net.service"
+      "podman-network-proxy.service"
     ];
     restartTriggers = [
       config.sops.secrets.authelia_configuration.sopsFile

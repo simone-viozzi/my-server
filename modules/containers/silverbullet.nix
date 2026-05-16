@@ -74,6 +74,7 @@ in
       PUID = "1000";
       GUID = "1000";
       TZ = "Europe/Rome";
+      SB_SPACE_IGNORE = "_reference/*";
     };
 
     log-driver = "journald";

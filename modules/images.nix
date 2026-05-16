@@ -52,6 +52,6 @@
   resumeStorage = "docker.io/chrislusf/seaweedfs:4.19@sha256:751b523268e6f2f8615d019625129e9216ab6a6066d9536124b2aabe42fd4990";
   resumeMc = "quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z@sha256:eb4ea9884b77704230e2423e9004d2fa738dc272876b9cc41a297d29443b8780";
 
-  silverbullet = "docker.io/zefhemel/silverbullet:2.6.1@sha256:f74038b63d2b72c9f49d44b8c256b4cabbddd38604e576273d2a3609f43b11a2";
+  silverbullet = "docker.io/zefhemel/silverbullet:2.8.0@sha256:c4cd2861a780c183abbd4cdcd24fc80a5ac0c9255ad0658ed2c61f948426a8ac";
   traefik = "traefik:v3.6.11@sha256:acfc80650104f0194a15f73dc1648f517561bc1645391a15705332a064cfc33c";
 }

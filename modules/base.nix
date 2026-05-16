@@ -49,6 +49,8 @@
     dust
     inxi
     tcpdump
+    sshpass
+    rclone
   ];
 
   # Console

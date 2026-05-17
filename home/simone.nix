@@ -2,7 +2,6 @@
   lib,
   config,
   pkgs,
-  claudeCodePkg,
   ...
 }:
 {
@@ -231,7 +230,7 @@
   };
 
   home.packages = [
-    claudeCodePkg
+    pkgs.claude-code
     pkgs.gh
     pkgs.sops
     pkgs.htop

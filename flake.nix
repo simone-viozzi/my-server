@@ -36,6 +36,11 @@
       nixosConfigurations.simoserver = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
+          {
+            nixpkgs.overlays = [ claude-code.overlays.default ];
+            nixpkgs.config.allowUnfree = true;
+          }
+
           ./configuration.nix
           ./hardware-configuration.nix
 
@@ -45,9 +50,6 @@
             home-manager = {
               useGlobalPkgs = true;
               useUserPackages = true;
-              extraSpecialArgs = {
-                claudeCodePkg = claude-code.packages.x86_64-linux.default;
-              };
               users.simone = import ./home/simone.nix;
             };
           }

@@ -23,7 +23,6 @@ in
   sops.secrets.resume_auth_secret = { };
   sops.secrets.resume_s3_access_key = { };
   sops.secrets.resume_s3_secret_key = { };
-  sops.secrets.resume_browserless_token = { };
   sops.secrets.resume_oauth_client_id = { };
   sops.secrets.resume_oauth_client_secret = { };
 
@@ -38,8 +37,6 @@ in
   sops.templates."resume-app.env".content = ''
     NODE_ENV=production
     APP_URL=https://resume.${config.sops.placeholder.base_domain}
-    PRINTER_APP_URL=http://resume:3000
-    PRINTER_ENDPOINT=ws://resume-browserless:3000?token=${config.sops.placeholder.resume_browserless_token}
     DATABASE_URL=postgresql://postgres:${config.sops.placeholder.resume_postgres_password}@resume-postgres:5432/postgres
     AUTH_SECRET=${config.sops.placeholder.resume_auth_secret}
     S3_ACCESS_KEY_ID=${config.sops.placeholder.resume_s3_access_key}
@@ -58,10 +55,6 @@ in
   sops.templates."resume-s3.env".content = ''
     AWS_ACCESS_KEY_ID=${config.sops.placeholder.resume_s3_access_key}
     AWS_SECRET_ACCESS_KEY=${config.sops.placeholder.resume_s3_secret_key}
-  '';
-
-  sops.templates."resume-browserless.env".content = ''
-    TOKEN=${config.sops.placeholder.resume_browserless_token}
   '';
 
   # ── Traefik routing ───────────────────────────────────────────────────
@@ -129,6 +122,11 @@ in
       "--stop-signal=SIGINT"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
+      # curl was removed from the image in v5.1.0 — use node's fetch. /api/health
+      # returns 503 if the database or storage dependency is unhealthy.
+      ''--health-cmd=node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"''
+      "--health-interval=30s"
+      "--health-start-period=40s"
     ];
   };
 
@@ -163,30 +161,6 @@ in
       "--health-cmd=pg_isready -d postgres -U postgres || exit 1"
       "--health-interval=10s"
       "--health-start-period=30s"
-    ];
-  };
-
-  virtualisation.oci-containers.containers.resume-browserless = {
-    image = images.resumeBrowser;
-
-    environmentFiles = [
-      config.sops.templates."resume-browserless.env".path
-    ];
-
-    environment = {
-      CONCURRENT = "5";
-      HEALTH = "true";
-      QUEUED = "10";
-    };
-
-    log-driver = "journald";
-
-    extraOptions = [
-      "--network=reactive-resume-net"
-      "--stop-timeout=30"
-      "--cap-drop=ALL"
-      "--cap-add=SYS_ADMIN"
-      "--security-opt=no-new-privileges:true"
     ];
   };
 
@@ -259,7 +233,6 @@ in
       "podman-network-proxy.service"
       "podman-volume-resume-data.service"
       "podman-resume-postgres.service"
-      "podman-resume-browserless.service"
       "podman-resume-seaweedfs-init.service"
     ];
     requires = [
@@ -267,7 +240,6 @@ in
       "podman-network-proxy.service"
       "podman-volume-resume-data.service"
       "podman-resume-postgres.service"
-      "podman-resume-browserless.service"
       "podman-resume-seaweedfs-init.service"
     ];
     restartTriggers = [
@@ -287,18 +259,6 @@ in
     ];
     restartTriggers = [
       config.sops.templates."resume-db.env".content
-    ];
-  };
-
-  systemd.services.podman-resume-browserless = {
-    after = [
-      "podman-network-reactive-resume-net.service"
-    ];
-    requires = [
-      "podman-network-reactive-resume-net.service"
-    ];
-    restartTriggers = [
-      config.sops.templates."resume-browserless.env".content
     ];
   };
 

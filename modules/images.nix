@@ -16,12 +16,12 @@
   tika = "docker.io/apache/tika:3.3.0.0@sha256:eb02f1c06168de85505a238ca1ad6937e2d0c3805795dc1abb0d1235bbb6e6cd";
 
   # ── Per-service ─────────────────────────────────────────────────────
-  apprise = "caronc/apprise:v1.3.3@sha256:4bfeac268ba87b8e08e308c9aa0182fe99e9501ec464027afc333d1634e65977";
+  apprise = "caronc/apprise:v1.4.1@sha256:f20fcabea936abde3e910f23bb3ffab36dc350f0e1864aa7e565cad2ea5b547d";
   authelia = "authelia/authelia:4.39.19@sha256:809f92f5e8f1afd2b620527ffe9c1ae288ba8235934f5ef94d3c41887df509cf";
-  bentopdf = "ghcr.io/alam00000/bentopdf-simple:v2.8.3@sha256:02cfa04e24619eff21bf511c4ae1aad172f6a8a50bbb1bca37f77c1887b7a31e";
+  bentopdf = "ghcr.io/alam00000/bentopdf-simple:v2.8.4@sha256:d72eafe670d596b75cfefbd53a0fa94a06aee75ff9089669c6bc2f972bfea709";
   collabora = "docker.io/collabora/code:25.04.9.4.1@sha256:8301eadc855c8e9ca90a5540ce30cf179dd248748d61c96ea82e0d28a379b0e4";
   dockerproxy = "ghcr.io/tecnativa/docker-socket-proxy:v0.4.2@sha256:1f3a6f303320723d199d2316a3e82b2e2685d86c275d5e3deeaf182573b47476";
-  homepage = "ghcr.io/gethomepage/homepage:v1.12.3@sha256:cc84f2f5eb3c7734353701ccbaa24ed02dacb0d119114e50e4251e2005f3990a";
+  homepage = "ghcr.io/gethomepage/homepage:v1.13.1@sha256:28502a87e8a2f92dbe49b71a7cd3ad86821ba281fb310747b9bd067821629a4f";
 
   immichServer = "ghcr.io/immich-app/immich-server:v2.7.5@sha256:cd4aaf5d917fe19b942bba0df4e50eed8e6766190b381e85687cc7880255674e";
   immichMl = "ghcr.io/immich-app/immich-machine-learning:v2.7.5@sha256:c7a8bd9cc982024a55da94c235122449ff8fa91347b6e99f902f31e0349fc623";
@@ -43,7 +43,7 @@
   ocisExtUnzip = "docker.io/owncloud/web-extensions:unzip-0.4.3@sha256:9fc726645749514c98c6b9b5a7e6315295897ff5c62a538a3ff383a49272160b";
   ocisExtProgressBars = "docker.io/owncloud/web-extensions:progress-bars-0.3.3@sha256:8faf230c3c601fb4d212720a0edd86073e292893b032021f951512e78e215390";
 
-  paperless = "ghcr.io/paperless-ngx/paperless-ngx:2.20.14@sha256:aacd57f01877d6838deb259f4258975982c1850395cb1bd58e1fb05360b40ca4";
+  paperless = "ghcr.io/paperless-ngx/paperless-ngx:2.20.15@sha256:835974fc3368fc6714aa38542db7a1f0f542d03244e39b981e519aefc100f355";
   paperlessRedis = "docker.io/library/redis:8.6.2@sha256:d80663b725aa4303161e59c1f1266fd7eb1af96a4f841a43096273919b2ab795";
   paperlessGotenberg = "docker.io/gotenberg/gotenberg:8.31.0@sha256:799a261dea9e2b724cb789d1cead6ad45e9038f6e88c31182603d0375e91b96e";
 

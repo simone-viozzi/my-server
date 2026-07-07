@@ -74,6 +74,13 @@ in
 
     virtualisation.oci-containers.backend = "podman";
 
+    # Don't seed container /etc/hosts from the host's file. networking.nix maps
+    # the *.simoserver.top names to 127.0.0.1 as a host-side loopback shortcut to
+    # Traefik; leaking those into containers makes them resolve sibling services
+    # to their own loopback (e.g. collaboration → collabora → 127.0.0.1:443,
+    # connection refused). Containers must resolve those names via real DNS.
+    virtualisation.containers.containersConf.settings.containers.base_hosts_file = "none";
+
     # Image layers and metadata live on the scratch SSD (offloaded from NVMe).
     # The /mnt/scratch-ssd/containers subvol is mounted via modules/disk.nix.
     virtualisation.containers.storage.settings.storage = {

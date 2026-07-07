@@ -53,5 +53,5 @@
   resumeMc = "quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z@sha256:eb4ea9884b77704230e2423e9004d2fa738dc272876b9cc41a297d29443b8780";
 
   silverbullet = "docker.io/zefhemel/silverbullet:2.9.0@sha256:9df706c803f7f0a7bc02ae9759273699041f9bd25d5ae8bf062160d5afe6dbd1";
-  traefik = "traefik:v3.6.11@sha256:acfc80650104f0194a15f73dc1648f517561bc1645391a15705332a064cfc33c";
+  traefik = "traefik:v3.7.6@sha256:e2c19575dd9ed00f0a6ebc662c0a0c8c8c5df15779100ad7aca14cb5b09d875c";
 }

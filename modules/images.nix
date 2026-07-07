@@ -28,10 +28,10 @@
   immichValkey = "docker.io/valkey/valkey:9.0.3@sha256:06eccea34d6e9ff4f7daacd598629fb07bf8ddc5cdbc5717bcc13266abcb70e2";
   immichPostgres = "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23";
 
-  karakeep = "ghcr.io/karakeep-app/karakeep:0.31.0@sha256:efd9682b69401288c6caa26d76b1c723e4252fe7a962bb78eb00a6cd5227aaca";
+  karakeep = "ghcr.io/karakeep-app/karakeep:0.32.0@sha256:f351c5c37cf7bebfe5a32ad99bbd071f8df773f2c55093b30b57771ac83a8667";
   # alpine-chrome's most specific tag is the chrome major (`:124`); upstream does not publish patch tags.
   karakeepBrowser = "gcr.io/zenika-hub/alpine-chrome:124@sha256:58155bc929e3453820bd54c806c73d3abfc07df6454182d87a44df75ea5a1d3a";
-  karakeepMeili = "docker.io/getmeili/meilisearch:v1.13.3@sha256:c4d6ab59c18d7b3636e82af862c31861ccf8afb3e9c14dddf9d3e868840667cd";
+  karakeepMeili = "docker.io/getmeili/meilisearch:v1.41.0@sha256:d84b081420b2e5899f5acc3745e1d6510950430fef3ee6b9df5e53b0bf3e19c9";
 
   # ocis is reused by both the ocis server and the collaboration WOPI sidecar.
   ocis = "docker.io/owncloud/ocis:8.0.1@sha256:b35c557ff56bbddc1dd74d4142d81a8a2cac9ff7e5e774516281a691e42bb153";

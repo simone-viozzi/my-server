@@ -1,6 +1,26 @@
 _:
 
 {
+  # Loopback overrides — mirrors TRAEFIK_PROXY_ALIASES in traefik.nix so
+  # host-side traffic to Traefik-proxied services skips the WAN hairpin.
+  # Traefik binds 0.0.0.0:443 on the host, so 127.0.0.1 reaches it directly.
+  networking.hosts."127.0.0.1" = [
+    "simoserver.top"
+    "apprise.simoserver.top"
+    "auth.simoserver.top"
+    "collabora.simoserver.top"
+    "collaboration.simoserver.top"
+    "homepage-private.simoserver.top"
+    "immich.simoserver.top"
+    "karakeep.simoserver.top"
+    "ocis.simoserver.top"
+    "paperless.simoserver.top"
+    "pdf.simoserver.top"
+    "resume.simoserver.top"
+    "silverbullet.simoserver.top"
+    "traefik.simoserver.top"
+  ];
+
   # Firewall — only non-Docker ports need opening here.
   # Docker publishes container ports by modifying iptables directly.
   networking.firewall = {

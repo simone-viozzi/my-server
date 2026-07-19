@@ -21,7 +21,7 @@
   bentopdf = "ghcr.io/alam00000/bentopdf-simple:v2.8.6@sha256:430b73233fd5d7c1de63dc94665687f4ebaac37ceb9b867b425785368c78ecda";
   collabora = "docker.io/collabora/code:25.04.9.4.1@sha256:8301eadc855c8e9ca90a5540ce30cf179dd248748d61c96ea82e0d28a379b0e4";
   dockerproxy = "ghcr.io/tecnativa/docker-socket-proxy:v0.4.2@sha256:1f3a6f303320723d199d2316a3e82b2e2685d86c275d5e3deeaf182573b47476";
-  homepage = "ghcr.io/gethomepage/homepage:v1.13.1@sha256:28502a87e8a2f92dbe49b71a7cd3ad86821ba281fb310747b9bd067821629a4f";
+  homepage = "ghcr.io/gethomepage/homepage:v1.13.2@sha256:c881120b024d6a8e2f3c9664efc568984e4352e47df459d6b32e225374c71955";
 
   immichServer = "ghcr.io/immich-app/immich-server:v2.7.5@sha256:cd4aaf5d917fe19b942bba0df4e50eed8e6766190b381e85687cc7880255674e";
   immichMl = "ghcr.io/immich-app/immich-machine-learning:v2.7.5@sha256:c7a8bd9cc982024a55da94c235122449ff8fa91347b6e99f902f31e0349fc623";

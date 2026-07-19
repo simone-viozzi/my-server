@@ -47,7 +47,7 @@
   paperlessRedis = "docker.io/library/redis:8.6.2@sha256:d80663b725aa4303161e59c1f1266fd7eb1af96a4f841a43096273919b2ab795";
   paperlessGotenberg = "docker.io/gotenberg/gotenberg:8.31.0@sha256:799a261dea9e2b724cb789d1cead6ad45e9038f6e88c31182603d0375e91b96e";
 
-  resume = "docker.io/amruthpillai/reactive-resume:v5.2.2@sha256:877b57b04865b2aafe036bc32d8fa9d8ff2c551177ce44ad90c69f4680b0bdbf";
+  resume = "docker.io/amruthpillai/reactive-resume:v5.2.3@sha256:da1b936d960fa54299be902045c4ecfffe4ec0435949c7e259cbabe15465f4b7";
   # browserless removed in reactive-resume v5.1.0 — PDF generation is now client-side.
   resumeStorage = "docker.io/chrislusf/seaweedfs:4.19@sha256:751b523268e6f2f8615d019625129e9216ab6a6066d9536124b2aabe42fd4990";
   resumeMc = "quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z@sha256:eb4ea9884b77704230e2423e9004d2fa738dc272876b9cc41a297d29443b8780";

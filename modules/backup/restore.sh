@@ -21,13 +21,14 @@ human() { numfmt --to=iec --suffix=B "$1" 2>/dev/null || printf '%sB' "$1"; }
 
 usage() {
   cat >&2 <<'EOF'
-Usage: backup-restore <command> <service> [options]
+Usage: backup-restore <command> [service] [options]
 
 Commands:
-  list    list snapshots                              (metadata only, free)
-  ls      browse a snapshot's contents                (metadata only, free)
-  fetch   restore into staging, never touching live data
-  verify  restore to a temp dir, verify content, discard
+  services  what can be restored, and how fresh it is  (metadata only, free)
+  list      list snapshots for one service             (metadata only, free)
+  ls        browse a snapshot's contents               (metadata only, free)
+  fetch     restore into staging, never touching live data
+  verify    restore to a temp dir, verify content, discard
 
 Options:
   --snapshot ID   snapshot to use (default: latest)
@@ -45,15 +46,18 @@ EOF
 [ $# -ge 1 ] || usage
 CMD=$1
 shift
-case "$CMD" in
-  list | ls | fetch | verify) ;;
-  -h | --help) usage ;;
-  *) die "unknown command: $CMD (expected list, ls, fetch or verify)" ;;
-esac
 
-[ $# -ge 1 ] || die "missing <service>"
-SERVICE=$1
-shift
+SERVICE=""
+case "$CMD" in
+  services) ;; # operates over every service; takes no <service>
+  list | ls | fetch | verify)
+    [ $# -ge 1 ] || die "missing <service> (try: backup-restore services)"
+    SERVICE=$1
+    shift
+    ;;
+  -h | --help) usage ;;
+  *) die "unknown command: $CMD (expected services, list, ls, fetch or verify)" ;;
+esac
 
 SNAPSHOT="latest"
 VOLUME=""
@@ -109,11 +113,22 @@ set +a
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-/var/cache/restic}"
 
 [ -r "${RESTORE_CONFIG:?}" ] || die "cannot read $RESTORE_CONFIG"
-if ! jq -e --arg s "$SERVICE" '.services | has($s)' "$RESTORE_CONFIG" >/dev/null; then
-  die "unknown service '$SERVICE' (known: $(jq -r '.services | keys | join(", ")' "$RESTORE_CONFIG"))"
+
+# Point SERVICE/PASSWORD_FILE at one service. `services` calls this per repo as
+# it iterates; every other command calls it once for its argument.
+PASSWORD_FILE=""
+select_service() {
+  SERVICE=$1
+  if ! jq -e --arg s "$SERVICE" '.services | has($s)' "$RESTORE_CONFIG" >/dev/null; then
+    die "unknown service '$SERVICE' (known: $(jq -r '.services | keys | join(", ")' "$RESTORE_CONFIG"))"
+  fi
+  PASSWORD_FILE=$(jq -r --arg s "$SERVICE" '.services[$s].passwordFile' "$RESTORE_CONFIG")
+  [ -r "$PASSWORD_FILE" ] || die "cannot read restic password file $PASSWORD_FILE"
+}
+
+if [ -n "$SERVICE" ]; then
+  select_service "$SERVICE"
 fi
-PASSWORD_FILE=$(jq -r --arg s "$SERVICE" '.services[$s].passwordFile' "$RESTORE_CONFIG")
-[ -r "$PASSWORD_FILE" ] || die "cannot read restic password file $PASSWORD_FILE"
 
 restic_cmd() {
   restic -r "${RESTIC_REPO_BASE}/${SERVICE}" --password-file "$PASSWORD_FILE" "$@"
@@ -153,6 +168,25 @@ check_space() {
 
 # ── Commands ──────────────────────────────────────────────────────────────
 case "$CMD" in
+  services)
+    # One `snapshots --json` per repo — metadata only, no data egress. A repo
+    # that fails is reported inline rather than aborting the table: an
+    # unreachable or uninitialised repo is itself the thing worth seeing.
+    printf '%-14s %-10s %-12s %s\n' SERVICE SNAPSHOTS LATEST VOLUMES
+    while read -r svc; do
+      select_service "$svc"
+      if snaps=$(restic_cmd snapshots --json 2>/dev/null); then
+        count=$(printf '%s' "$snaps" | jq -r 'length')
+        latest=$(printf '%s' "$snaps" | jq -r 'if length > 0 then .[-1].time[:10] else "none" end')
+      else
+        count="ERR"
+        latest="unreachable"
+      fi
+      vols=$(jq -r --arg s "$svc" '.services[$s].volumes | map(.name) | join(", ")' "$RESTORE_CONFIG")
+      printf '%-14s %-10s %-12s %s\n' "$svc" "$count" "$latest" "$vols"
+    done < <(jq -r '.services | keys[]' "$RESTORE_CONFIG")
+    ;;
+
   list)
     restic_cmd snapshots
     ;;

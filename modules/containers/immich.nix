@@ -239,6 +239,9 @@ in
     enable = true;
     schedule = "02:00";
     timeout = "6h";
+    # Repo is ~59G — larger than the volumes it backs up, because retention
+    # accumulates changed data across daily/weekly/monthly snapshots.
+    checkSubset = "5%";
     volumes = [
       "immich-upload"
       "immich-pgdata"

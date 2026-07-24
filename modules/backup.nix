@@ -96,11 +96,16 @@ let
     serviceName:
     pkgs.writeShellScript "restic-check-${serviceName}" ''
       set -euo pipefail
-      echo "=== Restic integrity check: ${serviceName} ==="
+      # Bare `check` only validates repository structure and metadata — it never
+      # downloads a data blob, so it cannot tell us the backups are actually
+      # retrievable. --read-data-subset fetches and hashes real data each run.
+      echo "=== Restic integrity check: ${serviceName} (data subset ${
+        cfg.services.${serviceName}.checkSubset
+      }) ==="
       ${pkgs.restic}/bin/restic \
         -r "''${RESTIC_REPO_BASE}/${serviceName}" \
         --password-file ${config.sops.secrets."restic_password_${serviceName}".path} \
-        check
+        check --read-data-subset=${cfg.services.${serviceName}.checkSubset}
       echo "=== Check OK: ${serviceName} ==="
     '';
 
@@ -178,6 +183,20 @@ in
         default = "6h";
         description = "Default systemd timeout for backup units";
       };
+      checkSubset = lib.mkOption {
+        type = lib.types.str;
+        default = "2G";
+        description = ''
+          How much real data each weekly `restic check` downloads and hashes,
+          as a restic --read-data-subset value (a size, 'x%', or 'n/t').
+
+          A size is used rather than 'n/t' because repo sizes here span four
+          orders of magnitude: an 'n/53' split leaves small repos (authelia is
+          8 packs) with mostly empty groups that verify nothing. With a size,
+          repos smaller than this are read in full every week, and large ones
+          are randomly sampled at a bounded, predictable egress cost.
+        '';
+      };
     };
 
     services = lib.mkOption {
@@ -194,6 +213,11 @@ in
               type = lib.types.str;
               default = cfg.defaults.timeout;
               description = "Systemd timeout for this backup";
+            };
+            checkSubset = lib.mkOption {
+              type = lib.types.str;
+              default = cfg.defaults.checkSubset;
+              description = "restic --read-data-subset value for this service's weekly check";
             };
             volumes = lib.mkOption {
               type = lib.types.listOf lib.types.str;
@@ -352,7 +376,10 @@ in
             serviceConfig = {
               Type = "oneshot";
               ExecStart = "${mkCheckScript serviceName}";
-              TimeoutStartSec = "1h";
+              # The check now downloads a slice of real data, not just metadata.
+              # ocis is ~184G, so one weekly slice is ~3.5G over the wire —
+              # 1h was sized for a metadata-only check and would time out.
+              TimeoutStartSec = "3h";
               EnvironmentFile = config.sops.templates."restic-b2.env".path;
               Environment = "XDG_CACHE_HOME=/var/cache/restic";
             };

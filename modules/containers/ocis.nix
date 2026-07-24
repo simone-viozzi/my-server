@@ -432,6 +432,10 @@ in
     enable = true;
     schedule = "02:00";
     timeout = "2h";
+    # Repo is ~125G, far past the 2G default that gives small repos full weekly
+    # coverage. A percentage holds the sampling rate steady as the repo grows,
+    # where a fixed size would silently verify less and less of it.
+    checkSubset = "5%";
     volumes = [
       "ocis-config"
       "ocis-data"

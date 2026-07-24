@@ -92,6 +92,39 @@ let
     text = builtins.readFile ./backup/backup.sh;
   };
 
+  # Manifest consumed by restore.sh. Carries `livePath` and `containers` even
+  # though the current commands never write to live data — the deferred
+  # in-place `swap` needs them, and baking them in now keeps that additive.
+  mkRestoreConfig = pkgs.writeText "backup-restore.json" (
+    builtins.toJSON {
+      inherit lockFile;
+      services = lib.mapAttrs (serviceName: _: {
+        passwordFile = config.sops.secrets."restic_password_${serviceName}".path;
+        containers = containersForService serviceName;
+        volumes = lib.mapAttrsToList (volName: vol: {
+          name = volName;
+          device = deviceName vol.storage;
+          livePath = "${btrbkMountPoint (deviceName vol.storage)}/docker-volumes/@${volName}";
+        }) (volumesForService serviceName);
+      }) cfg.services;
+    }
+  );
+
+  restoreRunner = pkgs.writeShellApplication {
+    name = "backup-restore";
+    runtimeInputs = with pkgs; [
+      restic
+      jq
+      coreutils
+      findutils
+    ];
+    text = ''
+      export RESTORE_CONFIG="${mkRestoreConfig}"
+      export RESTIC_ENV_FILE="${config.sops.templates."restic-b2.env".path}"
+    ''
+    + builtins.readFile ./backup/restore.sh;
+  };
+
   mkCheckScript =
     serviceName:
     pkgs.writeShellScript "restic-check-${serviceName}" ''
@@ -268,7 +301,10 @@ in
     systemd.tmpfiles.rules =
       map (device: "d ${snapshotDir device} 0755 root root -") allBackupDevices
       ++ map (device: "d ${currentDir device} 0755 root root -") allBackupDevices
-      ++ [ "d /var/cache/restic 0700 root root -" ];
+      ++ [
+        "d /var/cache/restic 0700 root root -"
+        "d /var/lib/backup-restore 0700 root root -"
+      ];
 
     # ── Sops secrets for B2 + per-service restic passwords ──────────────
     sops.secrets = {
@@ -377,7 +413,7 @@ in
               Type = "oneshot";
               ExecStart = "${mkCheckScript serviceName}";
               # The check now downloads a slice of real data, not just metadata.
-              # ocis is ~184G, so one weekly slice is ~3.5G over the wire —
+              # ocis is ~125G at 5%, so one weekly slice is ~6.3G over the wire —
               # 1h was sized for a metadata-only check and would time out.
               TimeoutStartSec = "3h";
               EnvironmentFile = config.sops.templates."restic-b2.env".path;
@@ -420,6 +456,9 @@ in
       );
 
     # ── Diagnostic script ─────────────────────────────────────────────
-    environment.systemPackages = [ mkDiagnosticScript ];
+    environment.systemPackages = [
+      mkDiagnosticScript
+      restoreRunner
+    ];
   };
 }

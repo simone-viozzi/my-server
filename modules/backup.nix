@@ -303,7 +303,12 @@ in
       ++ map (device: "d ${currentDir device} 0755 root root -") allBackupDevices
       ++ [
         "d /var/cache/restic 0700 root root -"
+        # `fetch` output is deliberate and persists until removed by hand.
         "d /var/lib/backup-restore 0700 root root -"
+        # `verify` scratch. Its EXIT trap covers normal exits, errors and
+        # Ctrl-C, but not SIGKILL/OOM/power loss — and a killed `verify ocis`
+        # would otherwise strand ~183G. Age it so tmpfiles reaps the remains.
+        "d /var/lib/backup-restore/.tmp 0700 root root 1d"
       ];
 
     # ── Sops secrets for B2 + per-service restic passwords ──────────────

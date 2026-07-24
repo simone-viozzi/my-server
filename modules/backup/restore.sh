@@ -232,7 +232,10 @@ case "$CMD" in
       info "restored to: $TARGET"
       info "live volumes were not modified."
     else
-      TMPDIR_VERIFY=$(mktemp -d "$STAGING_ROOT/.verify-$SERVICE-XXXXXX")
+      # Under .tmp/ so systemd-tmpfiles can reap it if we are killed before the
+      # trap runs; see the tmpfiles rules in backup.nix.
+      mkdir -p "$STAGING_ROOT/.tmp"
+      TMPDIR_VERIFY=$(mktemp -d "$STAGING_ROOT/.tmp/verify-$SERVICE-XXXXXX")
       trap 'rm -rf "$TMPDIR_VERIFY"' EXIT
       check_space "$SIZE" "$TMPDIR_VERIFY"
 

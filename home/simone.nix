@@ -57,7 +57,13 @@
   xdg.configFile."zsh/.p10k.zsh".source = ./p10k.zsh;
 
   programs = {
-    eza.enable = true;
+    eza = {
+      enable = true;
+      icons = "auto";
+      # -F/--classify takes an optional WHEN since eza 0.23; a bare -F eats the
+      # next positional arg, so always pass the value explicitly.
+      extraOptions = [ "--classify=auto" ];
+    };
     fzf.enable = true;
     zoxide.enable = true;
 
@@ -68,11 +74,11 @@
         update = "nh os switch --update";
         claude2 = "CLAUDE_CONFIG_DIR=$HOME/.claude2 claude";
         a = "als";
-        la = "eza -la --icons -F";
-        lg = "eza -l -F --icons --git --sort=modified";
-        ls = "eza --icons -F";
-        tree-git = "eza --icons --tree --git-ignore";
-        tree = "eza -F --icons --tree";
+        la = "eza -la";
+        lg = "eza -l --git --sort=modified";
+        ls = "eza";
+        tree-git = "eza --tree --git-ignore";
+        tree = "eza --tree";
         df = "duf";
         diff = "delta";
         pod-logs = "for svc in $(systemctl list-units --type=service --all 'podman-*.service' --no-legend | awk '{print $1}'); do echo \"=== $svc ===\"; systemctl status \"$svc\" --no-pager -n3 2>&1; echo; done";

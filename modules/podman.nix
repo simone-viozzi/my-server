@@ -51,6 +51,16 @@ in
     description = "Podman volume definitions. Each container module declares its own volumes here.";
   };
 
+  options.podman.networks = lib.mkOption {
+    type = lib.types.listOf lib.types.str;
+    default = [ ];
+    description = ''
+      Bridge networks contributed by individual stack modules. Declaring a
+      network here (rather than in the central list below) means it disappears
+      along with the stack when the stack is disabled.
+    '';
+  };
+
   # ── Config ───────────────────────────────────────────────────────────
   config = {
     # ── Podman daemon ──────────────────────────────────────────────────
@@ -106,12 +116,11 @@ in
       # central list (see memory: project_todo_per_stack_network_decl).
       // (
         let
-          bridgeNets = [
+          bridgeNets = cfg.networks ++ [
             "proxy"
             "apprise-net"
             "authelia-net"
             "bentopdf-net"
-            "silverbullet-net"
             "karakeep-net"
             "reactive-resume-net"
             "paperless-net"

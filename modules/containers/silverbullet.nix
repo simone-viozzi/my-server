@@ -11,6 +11,8 @@ in
     storage = "btrfs-hdd";
   };
 
+  podman.networks = [ "silverbullet-net" ];
+
   # Mount the same btrfs subvolume at ~/silverbullet-space so the space
   # is editable from the host; container PUID=1000 matches simone's uid.
   fileSystems."/home/simone/silverbullet-space" = {

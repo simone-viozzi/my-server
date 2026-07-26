@@ -87,6 +87,10 @@ in
 
     environment = {
       TZ = "Europe/Rome";
+      # Opt in to the CSP shipped in the image (server/helmet.json). Traefik's
+      # secure-headers sets no CSP, so this is additive; the duplicate HSTS /
+      # X-Frame-Options / Referrer-Policy are overwritten by the proxy.
+      IMMICH_HELMET_FILE = "true";
     };
 
     log-driver = "journald";

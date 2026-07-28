@@ -4,6 +4,10 @@ let
   images = import ../images.nix;
 in
 {
+  # ── Networks ──────────────────────────────────────────────────────────
+
+  podman.networks = [ "paperless-net" ];
+
   # ── Volumes ───────────────────────────────────────────────────────────
 
   podman.volumes.paperless-pgdata = {

@@ -123,7 +123,6 @@ in
             "bentopdf-net"
             "karakeep-net"
             "reactive-resume-net"
-            "paperless-net"
             "immich-net"
             "homepage-net"
             "ocis-net"

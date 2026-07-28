@@ -16,7 +16,7 @@ let
     immich = true;
     silverbullet = false;
     reactive-resume = true;
-    paperless = true;
+    paperless = false;
     karakeep = true;
     bentopdf = true;
     ocis = true;

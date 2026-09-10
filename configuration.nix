@@ -14,7 +14,7 @@ let
     dockerproxy = true;
     homepage = true;
     immich = true;
-    silverbullet = false;
+    silverbullet = true;
     reactive-resume = true;
     paperless = false;
     karakeep = true;

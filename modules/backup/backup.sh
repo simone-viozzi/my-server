@@ -26,6 +26,18 @@ set -euo pipefail
 STEP="init"
 START_TIME=$(date +%s)
 JSON_LOG=""
+# Classification of the service's units, made before the stop. The question is
+# not "was it running" but "why wasn't it" — a oneshot that exited cleanly and a
+# container that crashed both read as inactive, and they want opposite handling.
+#   RESTART   — bring these back up afterwards
+#   FAILED    — were down unexpectedly; restarted, but reported
+#   LEFT      — down cleanly (finished oneshot, or stopped by hand); left alone
+# All empty until the classification runs, which is also correct for the
+# recovery path: if we failed before stopping anything, there is nothing to
+# start.
+RESTART=()
+FAILED=()
+LEFT=()
 
 log() { echo "[$(date +%H:%M:%S)] [$STEP] $*"; }
 err() { echo "[$(date +%H:%M:%S)] [$STEP] ERROR: $*" >&2; }
@@ -46,13 +58,9 @@ cleanup() {
     # Best-effort container restart so the service is never left stopped.
     local prev_step="$STEP"
     STEP="recovery-restart"
-    if [ -n "${BACKUP_CONFIG:-}" ] && [ -r "$BACKUP_CONFIG" ]; then
-      local -a rec_containers rec_units
-      mapfile -t rec_containers < <(jq -r '.containers[]' "$BACKUP_CONFIG")
-      rec_units=("${rec_containers[@]/#/podman-}")
-      rec_units=("${rec_units[@]/%/.service}")
-      log "Restarting ${#rec_containers[@]} container(s): ${rec_containers[*]}"
-      systemctl start "${rec_units[@]}" || true
+    if [ "${#RESTART[@]}" -gt 0 ]; then
+      log "Restarting ${#RESTART[@]} container(s): ${RESTART[*]}"
+      systemctl start "${RESTART[@]}" || true
     fi
     "$NOTIFY_BIN" \
       "BACKUP FAILED: $SERVICE" \
@@ -88,6 +96,38 @@ STEP="stopping-containers"
 mapfile -t CONTAINERS < <(jq -r '.containers[]' "$CFG")
 UNITS=("${CONTAINERS[@]/#/podman-}")
 UNITS=("${UNITS[@]/%/.service}")
+# Classify before stopping. ActiveState is read explicitly rather than via
+# `is-active --quiet`, which is true only for "active" and so would misfile a
+# container caught mid-start as down and leave it stopped.
+for unit in "${UNITS[@]}"; do
+  short="${unit#podman-}"
+  short="${short%.service}"
+  state=$(systemctl show "$unit" --property=ActiveState --value)
+  result=$(systemctl show "$unit" --property=Result --value)
+  case "$state" in
+    active | activating | reloading)
+      RESTART+=("$unit")
+      ;;
+    failed)
+      log "$short is failed (result=$result); restarting it and reporting"
+      RESTART+=("$unit")
+      FAILED+=("$short")
+      ;;
+    *)
+      if [ "$result" != "success" ]; then
+        # Down with a non-success result: it was meant to be up.
+        log "$short is $state (result=$result); restarting it and reporting"
+        RESTART+=("$unit")
+        FAILED+=("$short")
+      else
+        # Exited cleanly — a finished oneshot, or stopped by hand. Either way
+        # the intent is "down", so honour it; just don't let it go unnoticed.
+        log "$short exited cleanly; leaving it stopped"
+        LEFT+=("$short")
+      fi
+      ;;
+  esac
+done
 log "Stopping ${#CONTAINERS[@]} container(s): ${CONTAINERS[*]}"
 systemctl stop "${UNITS[@]}"
 
@@ -100,8 +140,12 @@ done < <(jq -r '.volumes[].name' "$CFG")
 
 # --- Restart containers (single call — systemd resolves dependency order) ---
 STEP="starting-containers"
-log "Starting ${#CONTAINERS[@]} container(s): ${CONTAINERS[*]}"
-systemctl start "${UNITS[@]}"
+if [ "${#RESTART[@]}" -gt 0 ]; then
+  log "Starting ${#RESTART[@]} container(s): ${RESTART[*]}"
+  systemctl start "${RESTART[@]}"
+else
+  log "Nothing to start: every container was already down"
+fi
 
 # --- Refresh stable .current/@<vol> CoW snapshots ---
 # Gives restic an identical source path across runs so parent lookup and
@@ -165,6 +209,19 @@ END_TIME=$(date +%s)
 DURATION=$(( END_TIME - START_TIME ))
 DURATION_FMT="$(( DURATION / 60 ))m$(( DURATION % 60 ))s"
 
+# Container anomalies. A backup must never quietly resurrect something that was
+# stopped on purpose — but it must never quietly hide it either, or a container
+# that is down stays down unnoticed until someone goes looking.
+CONTAINER_NOTE=""
+if [ "${#FAILED[@]}" -gt 0 ]; then
+  CONTAINER_NOTE+="
+*was down:* \`${FAILED[*]}\` — restarted"
+fi
+if [ "${#LEFT[@]}" -gt 0 ]; then
+  CONTAINER_NOTE+="
+*left stopped:* \`${LEFT[*]}\` (clean exit)"
+fi
+
 # Disarm failure trap before notifying success (cleanup still runs for $JSON_LOG rm + fd close).
 trap - EXIT
 rm -f "$JSON_LOG"
@@ -175,5 +232,5 @@ exec 9>&- || true
   "*duration:* \`$DURATION_FMT\`
 *files:* \`$FILES_NEW\` new / \`$FILES_CHANGED\` changed / \`$FILES_UNMODIFIED\` unchanged
 *added:* \`$DATA_ADDED_H\` of \`$TOTAL_H\`
-*snapshot:* \`$SNAPSHOT_ID\`"
+*snapshot:* \`$SNAPSHOT_ID\`$CONTAINER_NOTE"
 echo "=== Backup complete: $SERVICE ($DURATION_FMT) ==="

@@ -1,4 +1,14 @@
 {
+  # Public domain, needed at *evaluation* time — `networking.hosts` compiles
+  # into /etc/hosts as a build-time store path, so it cannot read the sops
+  # `base_domain` secret (a sops placeholder is only substituted at activation,
+  # when templates are rendered). Container modules that build their config at
+  # activation time keep using `config.sops.placeholder.base_domain` instead.
+  #
+  # To stop publishing the domain later, move this value into a gitignored
+  # file and import it here — every consumer follows automatically.
+  domain = "simoserver.top";
+
   # Map podman.volumes storage types to device UUIDs and names
   storageDevices = {
     "btrfs-hdd" = {

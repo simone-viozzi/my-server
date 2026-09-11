@@ -32,6 +32,7 @@ in
     ./modules/disk.nix
     ./modules/swap.nix
     ./modules/networking.nix
+    ./modules/ddns.nix
     ./modules/users.nix
     ./modules/nh.nix
     ./modules/podman.nix

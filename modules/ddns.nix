@@ -1,34 +1,34 @@
 { config, ... }:
 
+let
+  inherit (import ../lib/constants.nix) domain;
+in
 {
   # ── Dynamic DNS (Namecheap) ───────────────────────────────────────────
   # The apex record `@` is an "A + Dynamic DNS Record" at Namecheap and the
   # wildcard `*` is a CNAME onto it, so updating the apex moves every
   # subdomain with it — only one host needs to be pushed.
 
-  sops.secrets.base_domain = { };
   sops.secrets.namecheap_ddns_password = { };
-
-  # The whole ddclient.conf is rendered by sops: it carries both the domain
-  # (login=) and the DDNS password, neither of which should reach the store.
-  sops.templates."ddclient.conf".content = ''
-    cache=/var/lib/ddclient/ddclient.cache
-    foreground=YES
-    usev4=webv4, webv4=ipify-ipv4
-    protocol=namecheap
-    server=dynamicdns.park-your-domain.com
-    login=${config.sops.placeholder.base_domain}
-    password=${config.sops.placeholder.namecheap_ddns_password}
-    quiet=yes
-    @
-  '';
 
   services.ddclient = {
     enable = true;
-    # Overrides the module-generated config entirely; see the template above.
-    configFile = config.sops.templates."ddclient.conf".path;
+    protocol = "namecheap";
+    server = "dynamicdns.park-your-domain.com";
+
+    # For this protocol ddclient sends `login` as the domain and each entry in
+    # `domains` as the host, so `@` is the apex record.
+    username = domain;
+    domains = [ "@" ];
+    passwordFile = config.sops.secrets.namecheap_ddns_password.path;
+
+    # Namecheap's endpoint only accepts A records; the default would have
+    # ddclient chase an IPv6 address it can never push.
+    usev6 = "";
+
     # Namecheap enforces a 5 minute minimum between updates.
     interval = "10min";
+    quiet = true;
   };
 
   systemd.services.ddclient = {
@@ -36,7 +36,6 @@
     # and fires a notification for nothing.
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
-    restartTriggers = [ config.sops.templates."ddclient.conf".content ];
     onFailure = [ "notify-failure@%n.service" ];
   };
 }

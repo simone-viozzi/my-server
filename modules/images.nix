@@ -17,7 +17,7 @@
 
   # ── Per-service ─────────────────────────────────────────────────────
   apprise = "docker.io/caronc/apprise:v1.5.4@sha256:fcc6c3bac58d571c72cd52f5b28b3728f1c1b7a90a8fa6bd7cc4a0a185f0c31f";
-  authelia = "authelia/authelia:4.39.20@sha256:b5f415d5f14b154c2aa2b186d9f329d879e223da36e115cd871db4c261d5af54";
+  authelia = "docker.io/authelia/authelia:4.39.20@sha256:b5f415d5f14b154c2aa2b186d9f329d879e223da36e115cd871db4c261d5af54";
   bentopdf = "ghcr.io/alam00000/bentopdf-simple:v2.8.6@sha256:430b73233fd5d7c1de63dc94665687f4ebaac37ceb9b867b425785368c78ecda";
   collabora = "docker.io/collabora/code:25.04.9.4.1@sha256:8301eadc855c8e9ca90a5540ce30cf179dd248748d61c96ea82e0d28a379b0e4";
   dockerproxy = "ghcr.io/tecnativa/docker-socket-proxy:v0.4.2@sha256:1f3a6f303320723d199d2316a3e82b2e2685d86c275d5e3deeaf182573b47476";
@@ -53,5 +53,5 @@
   resumeMc = "quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z@sha256:eb4ea9884b77704230e2423e9004d2fa738dc272876b9cc41a297d29443b8780";
 
   silverbullet = "docker.io/zefhemel/silverbullet:2.9.0@sha256:9df706c803f7f0a7bc02ae9759273699041f9bd25d5ae8bf062160d5afe6dbd1";
-  traefik = "traefik:v3.7.8@sha256:54c598430bee8479c93179940c37f793cbe1e9e0405036b67ed11ba2f1fa252d";
+  traefik = "docker.io/library/traefik:v3.7.8@sha256:54c598430bee8479c93179940c37f793cbe1e9e0405036b67ed11ba2f1fa252d";
 }

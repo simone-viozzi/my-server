@@ -11,3 +11,8 @@ tls:
       alpnProtocols:
         - h2
         - http/1.1
+        # Required for the TLS-ALPN-01 ACME challenge. Overriding alpnProtocols
+        # replaces Traefik's default list, which includes acme-tls/1 — without
+        # it Let's Encrypt's validator is refused with "no application protocol"
+        # and no certificate can ever be renewed.
+        - acme-tls/1

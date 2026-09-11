@@ -99,9 +99,12 @@ in
       "--log=true"
       "--log.level=INFO"
       "--certificatesresolvers.leresolver.acme.storage=/certs/acme.json"
-      "--certificatesresolvers.leresolver.acme.httpchallenge.entrypoint=web"
-      "--certificatesresolvers.leresolver.acme.tlschallenge=false"
-      "--certificatesresolvers.leresolver.acme.httpchallenge=true"
+      # TLS-ALPN-01, not HTTP-01: the challenge is answered on the websecure
+      # entrypoint (:443), which is the only port forwarded from the WAN.
+      # Port 80 is never reachable from outside, so every HTTP-01 renewal
+      # timed out at Let's Encrypt. The web entrypoint below stays for the
+      # HTTP-to-HTTPS redirect only.
+      "--certificatesresolvers.leresolver.acme.tlschallenge=true"
       "--accesslog=true"
       "--entryPoints.web=true"
       "--entryPoints.web.address=:80"

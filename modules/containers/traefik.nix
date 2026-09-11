@@ -219,9 +219,17 @@ in
         )
       );
     };
+    # Every mounted template needs a trigger. These are bind-mounted as single
+    # files, so sops replacing one on the host leaves the container holding the
+    # old inode — the file provider's watch never sees it and the change is
+    # silently ignored until something restarts the container.
     restartTriggers = [
       config.sops.templates."traefik.env".content
       config.sops.templates."traefik-aliases.env".content
+      config.sops.templates."traefik-headers.yaml".content
+      config.sops.templates."traefik-tls.yaml".content
+      config.sops.templates."traefik-authelia-mw.yaml".content
+      config.sops.templates."traefik-routing.yaml".content
     ];
   };
 

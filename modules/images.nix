@@ -17,7 +17,7 @@
 
   # ── Per-service ─────────────────────────────────────────────────────
   apprise = "docker.io/caronc/apprise:v1.5.4@sha256:fcc6c3bac58d571c72cd52f5b28b3728f1c1b7a90a8fa6bd7cc4a0a185f0c31f";
-  authelia = "docker.io/authelia/authelia:4.39.20@sha256:b5f415d5f14b154c2aa2b186d9f329d879e223da36e115cd871db4c261d5af54";
+  authelia = "docker.io/authelia/authelia:4.39.25@sha256:510bad64f40a6077f8c194a5b170e8c165cef3a591abbab52cdd4dd8bf4ad4e8";
   bentopdf = "ghcr.io/alam00000/bentopdf-simple:v2.8.8@sha256:598efc25622c92e59e6e4557fbdbd5ce34e1f77b74a557eed7eb9ab4bc70a436";
   collabora = "docker.io/collabora/code:25.04.9.4.1@sha256:8301eadc855c8e9ca90a5540ce30cf179dd248748d61c96ea82e0d28a379b0e4";
   dockerproxy = "ghcr.io/tecnativa/docker-socket-proxy:v0.4.2@sha256:1f3a6f303320723d199d2316a3e82b2e2685d86c275d5e3deeaf182573b47476";

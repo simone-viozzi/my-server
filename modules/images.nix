@@ -16,7 +16,7 @@
   tika = "docker.io/apache/tika:3.3.0.0@sha256:eb02f1c06168de85505a238ca1ad6937e2d0c3805795dc1abb0d1235bbb6e6cd";
 
   # ── Per-service ─────────────────────────────────────────────────────
-  apprise = "caronc/apprise:v1.5.1@sha256:c06bdf3074331fabc2dc254bd856bf3d337ba13cea61a21ddab68a820d04d52c";
+  apprise = "docker.io/caronc/apprise:v1.5.4@sha256:fcc6c3bac58d571c72cd52f5b28b3728f1c1b7a90a8fa6bd7cc4a0a185f0c31f";
   authelia = "authelia/authelia:4.39.20@sha256:b5f415d5f14b154c2aa2b186d9f329d879e223da36e115cd871db4c261d5af54";
   bentopdf = "ghcr.io/alam00000/bentopdf-simple:v2.8.6@sha256:430b73233fd5d7c1de63dc94665687f4ebaac37ceb9b867b425785368c78ecda";
   collabora = "docker.io/collabora/code:25.04.9.4.1@sha256:8301eadc855c8e9ca90a5540ce30cf179dd248748d61c96ea82e0d28a379b0e4";

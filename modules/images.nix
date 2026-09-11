@@ -34,7 +34,7 @@
   karakeepMeili = "docker.io/getmeili/meilisearch:v1.41.0@sha256:d84b081420b2e5899f5acc3745e1d6510950430fef3ee6b9df5e53b0bf3e19c9";
 
   # ocis is reused by both the ocis server and the collaboration WOPI sidecar.
-  ocis = "docker.io/owncloud/ocis:8.0.6@sha256:0292cda75549cd9199d763a40794d8d7eb411bed56ccba1169eb02f0ba27c4b5";
+  ocis = "docker.io/owncloud/ocis:8.0.8@sha256:c007429cf630c4ab9f12b51b6aa2916c0d0120cede5ea2609733bc7ccea566a3";
 
   # oCIS web extensions (single-arch linux/amd64 images — no manifest list).
   # Init-container pattern: each copies its app dir into the shared ocis-apps volume.

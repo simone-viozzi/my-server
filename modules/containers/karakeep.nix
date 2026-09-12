@@ -106,13 +106,19 @@ in
   virtualisation.oci-containers.containers.karakeep-chrome = {
     image = images.karakeepBrowser;
 
+    # The karakeep-chrome entrypoint starts Chrome on an internal port and
+    # forwards container port 9222 itself, so passing --remote-debugging-address
+    # or --remote-debugging-port here conflicts with that forwarding and must be
+    # omitted. It also supplies --no-sandbox, so dropping ours does not turn the
+    # sandbox back on. The remaining flags match upstream's compose for this
+    # image, including the window size: screenshots capture the visible part of
+    # the page, so that size is the screenshot size.
     cmd = [
-      "--no-sandbox"
       "--disable-gpu"
       "--disable-dev-shm-usage"
-      "--remote-debugging-address=0.0.0.0"
-      "--remote-debugging-port=9222"
       "--hide-scrollbars"
+      "--disable-blink-features=AutomationControlled"
+      "--window-size=1440,900"
     ];
 
     log-driver = "journald";
@@ -122,6 +128,9 @@ in
       "--stop-timeout=30"
       "--cap-drop=ALL"
       "--security-opt=no-new-privileges:true"
+      # The entrypoint supervises a child Chrome process; without an init the
+      # reaped children accumulate as zombies.
+      "--init"
     ];
   };
 

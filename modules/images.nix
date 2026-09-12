@@ -28,9 +28,12 @@
   immichValkey = "docker.io/valkey/valkey:9.0.3@sha256:06eccea34d6e9ff4f7daacd598629fb07bf8ddc5cdbc5717bcc13266abcb70e2";
   immichPostgres = "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23";
 
-  karakeep = "ghcr.io/karakeep-app/karakeep:0.32.0@sha256:f351c5c37cf7bebfe5a32ad99bbd071f8df773f2c55093b30b57771ac83a8667";
-  # alpine-chrome's most specific tag is the chrome major (`:124`); upstream does not publish patch tags.
-  karakeepBrowser = "gcr.io/zenika-hub/alpine-chrome:124@sha256:58155bc929e3453820bd54c806c73d3abfc07df6454182d87a44df75ea5a1d3a";
+  karakeep = "ghcr.io/karakeep-app/karakeep:0.33.2@sha256:3d57623bf031f32a0597a3ebe0cd869bff6ba181c02ebc90fac492458bcfd4a4";
+  # Karakeep's own Chrome image. Replaced gcr.io/zenika-hub/alpine-chrome:124,
+  # which upstream abandoned and the registry now answers with 403 — it could
+  # not have been pulled again. Tags carry the full Chrome version plus a build
+  # suffix, so pin that rather than `release`.
+  karakeepBrowser = "ghcr.io/karakeep-app/karakeep-chrome:151.0.7922.47-r1@sha256:7dd0edb7a82dd71a574a968e0361bf6e0ae850c4b291e14539e0f0000d810e36";
   karakeepMeili = "docker.io/getmeili/meilisearch:v1.41.0@sha256:d84b081420b2e5899f5acc3745e1d6510950430fef3ee6b9df5e53b0bf3e19c9";
 
   # ocis is reused by both the ocis server and the collaboration WOPI sidecar.

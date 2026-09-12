@@ -23,9 +23,9 @@
   dockerproxy = "ghcr.io/tecnativa/docker-socket-proxy:v0.5.0@sha256:753044cb0851ce53ab44c2504872ff02ae37be9c294fa8abea3754074e61eab4";
   homepage = "ghcr.io/gethomepage/homepage:v2.3.0@sha256:913a68a2fb4527334b7dd881d1cd21e9535bf97d9d2e13144b13ef46ad72caa8";
 
-  immichServer = "ghcr.io/immich-app/immich-server:v3.0.3@sha256:118946756b2274f741be9d301428401be8716024c407b019cd424fa1e6f518e6";
-  immichMl = "ghcr.io/immich-app/immich-machine-learning:v3.0.3@sha256:fbb2485a6ec1877697d003a7d81d445bd8aea3248a866aa1c3d75b9e134787d0";
-  immichValkey = "docker.io/valkey/valkey:9.0.3@sha256:06eccea34d6e9ff4f7daacd598629fb07bf8ddc5cdbc5717bcc13266abcb70e2";
+  immichServer = "ghcr.io/immich-app/immich-server:v3.2.0@sha256:949bbf9ff32543539f471bc275437e6d1a1a4fee43c55bb9e4c06b946909bf1c";
+  immichMl = "ghcr.io/immich-app/immich-machine-learning:v3.2.0@sha256:30b81e0c6f68d80d6a8e6d0a8dddd7780e78d0c89e44d7701d9a4212ae8d90ca";
+  immichValkey = "docker.io/valkey/valkey:9.1.1@sha256:cc03bc07761acc552c960bfbcc66196dcf02e949dadb92d941d970ed6c782fea";
   immichPostgres = "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23";
 
   karakeep = "ghcr.io/karakeep-app/karakeep:0.33.2@sha256:3d57623bf031f32a0597a3ebe0cd869bff6ba181c02ebc90fac492458bcfd4a4";

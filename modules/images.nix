@@ -20,7 +20,7 @@
   authelia = "docker.io/authelia/authelia:4.39.25@sha256:510bad64f40a6077f8c194a5b170e8c165cef3a591abbab52cdd4dd8bf4ad4e8";
   bentopdf = "ghcr.io/alam00000/bentopdf-simple:v2.8.8@sha256:598efc25622c92e59e6e4557fbdbd5ce34e1f77b74a557eed7eb9ab4bc70a436";
   collabora = "docker.io/collabora/code:25.04.9.4.1@sha256:8301eadc855c8e9ca90a5540ce30cf179dd248748d61c96ea82e0d28a379b0e4";
-  dockerproxy = "ghcr.io/tecnativa/docker-socket-proxy:v0.4.2@sha256:1f3a6f303320723d199d2316a3e82b2e2685d86c275d5e3deeaf182573b47476";
+  dockerproxy = "ghcr.io/tecnativa/docker-socket-proxy:v0.5.0@sha256:753044cb0851ce53ab44c2504872ff02ae37be9c294fa8abea3754074e61eab4";
   homepage = "ghcr.io/gethomepage/homepage:v1.13.2@sha256:c881120b024d6a8e2f3c9664efc568984e4352e47df459d6b32e225374c71955";
 
   immichServer = "ghcr.io/immich-app/immich-server:v3.0.3@sha256:118946756b2274f741be9d301428401be8716024c407b019cd424fa1e6f518e6";

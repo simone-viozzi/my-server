@@ -39,6 +39,8 @@ in
 
   sops.templates."paperless-app.env".content = ''
     PAPERLESS_SECRET_KEY=${config.sops.placeholder.paperless_secret_key}
+    # Required as of v3: the engine is no longer inferred from PAPERLESS_DBHOST.
+    PAPERLESS_DBENGINE=postgresql
     PAPERLESS_DBHOST=paperless-postgres
     PAPERLESS_DBPASS=${config.sops.placeholder.paperless_postgres_password}
     PAPERLESS_DBUSER=paperless

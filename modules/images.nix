@@ -13,7 +13,7 @@
 {
   # ── Shared (multiple consumers — keep in sync) ──────────────────────
   postgres18 = "docker.io/library/postgres:18.3@sha256:86717e5efb6cbea47812978d06ae953d83acea41f31b796af11087df4b31de52";
-  tika = "docker.io/apache/tika:3.3.0.0@sha256:eb02f1c06168de85505a238ca1ad6937e2d0c3805795dc1abb0d1235bbb6e6cd";
+  tika = "docker.io/apache/tika:3.3.1.0@sha256:c9e60f15c1ff3f826e3102e18352ef21cf398a3f2505871913c3dc643dcc50ea";
 
   # ── Per-service ─────────────────────────────────────────────────────
   apprise = "docker.io/caronc/apprise:v1.5.4@sha256:fcc6c3bac58d571c72cd52f5b28b3728f1c1b7a90a8fa6bd7cc4a0a185f0c31f";
@@ -46,9 +46,9 @@
   ocisExtUnzip = "docker.io/owncloud/web-extensions:unzip-0.4.3@sha256:9fc726645749514c98c6b9b5a7e6315295897ff5c62a538a3ff383a49272160b";
   ocisExtProgressBars = "docker.io/owncloud/web-extensions:progress-bars-0.3.3@sha256:8faf230c3c601fb4d212720a0edd86073e292893b032021f951512e78e215390";
 
-  paperless = "ghcr.io/paperless-ngx/paperless-ngx:2.20.15@sha256:835974fc3368fc6714aa38542db7a1f0f542d03244e39b981e519aefc100f355";
+  paperless = "ghcr.io/paperless-ngx/paperless-ngx:3.1.3@sha256:ad7059ba2e2bd1cdfd66509651ee6127862a80acf0a8a4462709ad5427f181c4";
   paperlessRedis = "docker.io/library/redis:8.6.2@sha256:d80663b725aa4303161e59c1f1266fd7eb1af96a4f841a43096273919b2ab795";
-  paperlessGotenberg = "docker.io/gotenberg/gotenberg:8.31.0@sha256:799a261dea9e2b724cb789d1cead6ad45e9038f6e88c31182603d0375e91b96e";
+  paperlessGotenberg = "docker.io/gotenberg/gotenberg:8.34@sha256:0ec4b0a125c55ff1dfaed071cab30e0f37cc4326f7d53d903ee5b24e4f27fd85";
 
   resume = "docker.io/amruthpillai/reactive-resume:v5.3.0@sha256:828dd46b21bf922ffaac870c7cf5895d97bc4b1f48e2eb08880284d241de4d35";
   # browserless removed in reactive-resume v5.1.0 — PDF generation is now client-side.

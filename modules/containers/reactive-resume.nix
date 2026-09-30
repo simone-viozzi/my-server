@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 
 let
   images = import ../images.nix;
@@ -202,18 +202,29 @@ in
     ];
   };
 
+  # Creates the S3 bucket on first run, then no-ops. Mirrors upstream's
+  # `seaweedfs_create_bucket`: the guard talks to the S3 HTTP endpoint on :8333,
+  # not the master's gRPC on :9333 — seaweedfs runs with `-ip=0.0.0.0`, so the
+  # master advertises an address no sibling container can dial.
   virtualisation.oci-containers.containers.resume-seaweedfs-init = {
-    image = images.resumeMc;
+    image = images.resumeAwsCli;
 
     entrypoint = "/bin/sh";
     cmd = [
       "-c"
-      "sleep 5; mc alias set seaweedfs http://resume-seaweedfs:8333 $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY; mc mb --ignore-existing seaweedfs/reactive-resume; exit 0"
+      ''
+        aws --endpoint-url http://resume-seaweedfs:8333 s3api head-bucket --bucket reactive-resume 2>/dev/null ||
+        aws --endpoint-url http://resume-seaweedfs:8333 s3 mb s3://reactive-resume
+      ''
     ];
 
     environmentFiles = [
       config.sops.templates."resume-s3.env".path
     ];
+
+    environment = {
+      AWS_DEFAULT_REGION = "us-east-1";
+    };
 
     log-driver = "journald";
 
@@ -235,12 +246,18 @@ in
       "podman-resume-postgres.service"
       "podman-resume-seaweedfs-init.service"
     ];
+    # Deliberately NOT in `requires`: the bucket init is idempotent and normally a
+    # no-op, so a failure there must not keep the app down. It is still ordered
+    # ahead of us (`after`) and still pulled in (via the init's own `wantedBy`).
+    # Upstream gates the app on it (`service_completed_successfully`); we don't,
+    # because on 2026-09-28 that hard edge turned a withdrawn init image into a
+    # 2.5-day outage. A missing bucket surfaces via /api/health, which the
+    # container's healthcheck already polls.
     requires = [
       "podman-network-reactive-resume-net.service"
       "podman-network-proxy.service"
       "podman-volume-resume-data.service"
       "podman-resume-postgres.service"
-      "podman-resume-seaweedfs-init.service"
     ];
     restartTriggers = [
       config.sops.templates."resume-app.env".content
@@ -285,9 +302,15 @@ in
       "podman-network-reactive-resume-net.service"
       "podman-resume-seaweedfs.service"
     ];
-    # Run once and don't restart — it's a one-shot init container
-    serviceConfig.Restart = "on-failure";
-    serviceConfig.RestartSec = "10s";
+    # Pull ourselves in from the app and order ahead of it, rather than having the
+    # app `requires` us — same shape as ocis.nix's web-extension init units.
+    before = [ "podman-resume.service" ];
+    wantedBy = [ "podman-resume.service" ];
+    # Genuinely run once. This previously said `on-failure` with a 10s delay and
+    # no limit, which contradicted the comment and looped 53+ times against an
+    # image that no longer exists. mkForce because oci-containers itself defines
+    # Restart = "on-failure" for every container.
+    serviceConfig.Restart = lib.mkForce "no";
   };
 
   # ── Backup ────────────────────────────────────────────────────────────

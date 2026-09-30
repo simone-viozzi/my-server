@@ -50,10 +50,12 @@
   paperlessRedis = "docker.io/library/redis:8.6.2@sha256:d80663b725aa4303161e59c1f1266fd7eb1af96a4f841a43096273919b2ab795";
   paperlessGotenberg = "docker.io/gotenberg/gotenberg:8.34@sha256:0ec4b0a125c55ff1dfaed071cab30e0f37cc4326f7d53d903ee5b24e4f27fd85";
 
-  resume = "docker.io/amruthpillai/reactive-resume:v5.3.0@sha256:828dd46b21bf922ffaac870c7cf5895d97bc4b1f48e2eb08880284d241de4d35";
+  resume = "docker.io/amruthpillai/reactive-resume:v5.3.2@sha256:e2173f82009de0170004b3d7ed851cd8a1ef85dd3bd9dcc543388272e93ffb9d";
   # browserless removed in reactive-resume v5.1.0 — PDF generation is now client-side.
   resumeStorage = "docker.io/chrislusf/seaweedfs:4.19@sha256:751b523268e6f2f8615d019625129e9216ab6a6066d9536124b2aabe42fd4990";
-  resumeMc = "quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z@sha256:eb4ea9884b77704230e2423e9004d2fa738dc272876b9cc41a297d29443b8780";
+  # Replaced minio/mc, which MinIO withdrew from every public registry. Upstream's
+  # compose pins :latest; 2.37.6 is the newest 2.x at time of writing.
+  resumeAwsCli = "docker.io/amazon/aws-cli:2.37.6@sha256:765cd28591054a864a27ec6999a7f85c7a24e0bd92b9880803e4712ec906ddae";
 
   silverbullet = "docker.io/zefhemel/silverbullet:2.10.0@sha256:23dff1d7b3975999fde6592bbadae0620eedc593d1cb0d76b906d8b15d6ebf17";
   traefik = "docker.io/library/traefik:v3.7.13@sha256:96780238b1bbda5a9bb997f4307ce69e798ad1cf6eb7f2dcc0a440823467d199";
